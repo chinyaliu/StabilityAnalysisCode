@@ -38,7 +38,7 @@ switch lower(method(1))
         phi = -wp/k/(1i);
 end
 %% Plot phi
-fig1 = figure('position',[0 0 1440 1280]);
+figure('position',[0 0 1440 1280]);
 subplot(1,2,1);
 plot(real(phi(1:fix(N+1)/2)),z(1:fix(N+1)/2),'-k','linewidth',1);
 hold on; plot(real(phi(minpos)),z(minpos),'ro'); hold off;
@@ -56,9 +56,8 @@ title('imag','FontSize',30);
 set(gca,'fontsize',24);
 grid on;
 sgtitle('\phi','FontSize',30);
-saveas(fig1,'phi.png');
 %% Plot u
-fig2 = figure('position',[0 0 1440 1280]);
+figure('position',[0 0 1440 1280]);
 subplot(1,2,1);
 plot(real(up(1:fix(N+1)/2)),z(1:fix(N+1)/2),'.-k','linewidth',1);
 hold on; plot(real(up(minpos)),z(minpos),'ro'); hold off;
@@ -76,9 +75,8 @@ title('imag','FontSize',30);
 set(gca,'fontsize',24);
 grid on;
 sgtitle('u''','FontSize',30);
-saveas(fig2,'u_per.png');
 %% Plot w
-fig3 = figure('position',[0 0 1440 1280]);
+figure('position',[0 0 1440 1280]);
 subplot(1,2,1);
 plot(real(wp(1:fix(N+1)/2)),z(1:fix(N+1)/2),'k','linewidth',1);
 hold on; plot(real(wp(minpos)),z(minpos),'ro'); hold off;
@@ -96,4 +94,3 @@ title('imag','FontSize',30);
 set(gca,'fontsize',24);
 grid on;
 sgtitle('w''','FontSize',30);
-saveas(fig3,'w_per.png');
