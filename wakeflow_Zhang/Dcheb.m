@@ -1,9 +1,5 @@
 function [x,D] = Dcheb(N,num,points)
-if strcmpi(points,'m')
-    M = N-2;
-else
-    M = N;
-end
+if strcmpi(points,'d4') M = N-2; else M = N; end
 x = cospi((0:1:M)/M)'; 
 D = zeros(M+1,N+1,num+1);
 D(:,:,1) = cospi((0:1:M)'*(0:1:N)/M);

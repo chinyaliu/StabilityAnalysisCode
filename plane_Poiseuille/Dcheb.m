@@ -1,5 +1,5 @@
 function [x,D] = Dcheb(N,num,points)
-if strcmpi(points,'m')
+if strcmpi(points,'d4')
     M = N-2;
 else
     M = N;

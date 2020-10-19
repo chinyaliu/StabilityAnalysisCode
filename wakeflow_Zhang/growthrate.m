@@ -2,50 +2,74 @@ close all; clear all;% clc
 %% Solver & Algorithm list
 order = ["D2", "D4", "uw"];
 diff_method = ["Schimd", "Trefethen"];
-constructAB_method = ["Origin", "Schimd", "Herbert"];
+constructAB_method = ["D4", "Schimd", "Herbert"];
 solveGEPmethod = ["qr", "qz", "eig", "eigs", "polyeig", "singgep", "jdqz"];
 %% Inputs
-solver1 = [2,1,2]; % [order, diff_method, constructAB_method]
+solver1 = [1,1,1]; % [order, diff_method, constructAB_method]
 solver2 = [2,2,2];
 algorithm = 1;
 do_balancing = 'n';
-N = 500;
+N = 800;
 dk = 0.01;
 k = dk:dk:4;
 Re1 = 1000;
 Re2 = inf;
 Fr2 = 2.25;
-h = 6;
+h = @(k) 2*pi/k;
 %% Run solver
 method1 = [order(solver1(1)), diff_method(solver1(2)), constructAB_method(solver1(3))];
-method2 = [order(solver2(1)), diff_method(solver2(2)), constructAB_method(solver2(3))];
+% method2 = [order(solver2(1)), diff_method(solver2(2)), constructAB_method(solver2(3))];
 alg = solveGEPmethod(algorithm);
 for i = 1:length(k)
-%     [o, ~, cA(i), errGEP(i), db(i)] = wZhang_solver(N,k(i),h,Re1,Fr2,method,algorithm,do_balancing);
-%     oi(i,:) = imag(o);
-%     fprintf('k = %.2f, growth rate = %.4f\n', k(i), oi(i));
-%     [o, ~, cAf(i), errGEPf(i), dbf(i)] = wZhang_solver(N,k(i),h,Re2,Fr2,method,algorithm,do_balancing);
-%     oinf(i,:) = imag(o);
-%     fprintf('k = %.2f, growth rate = %.4f\n', k(i), oinf(i));
-    [o, ~, cA1(i), errGEP1(i), db1(i)] = wZhang_solver(N,k(i),h,Re2,Fr2,method1,alg,do_balancing);
+    [o, ~, cA1(i), errGEP1(i), db1(i)] = wZhang_solver(N,k(i),h(k(i)),Re2,Fr2,method1,alg,do_balancing);
     o1(i,:) = imag(o);
-    fprintf('k = %.2f, growth rate = %.4f\n', k(i), o1(i));
-    [o, ~, cA2(i), errGEP2(i), db2(i)] = wZhang_solver(N,k(i),h,Re2,Fr2,method2,alg,do_balancing);
-    o2(i,:) = imag(o);
+    o1r(i,:) = real(o);
+%     fprintf('k = %.2f, growth rate = %.4f\n', k(i), o1(i));
+    fprintf('k = %.2f, growth rate = %.4f\n', k(i), real(o)/k(i));
+%     [o, ~, cA2(i), errGEP2(i), db2(i)] = wZhang_solver(N,k(i),h,Re2,Fr2,method2,alg,do_balancing);
+%     o2(i,:) = imag(o);
 end
-% oi(isnan(oi)) = 0;
-% oinf(isnan(oinf)) = 0;
+o1(isnan(o1)) = nan;
+o1r(imag(o1)<0) = nan;
 %% Plot growth rate v.s. k
-% fig1 = figure('position',[50,0,1000,720]);
-% plot(k,oi,'linewidth',1,'DisplayName','Re = 1000');
+fig1 = figure('position',[50,0,1000,720]);
+plot(k,o1,'linewidth',1,'DisplayName','original');
 % hold on;
-% plot(k,oinf,'linewidth',1,'DisplayName','Re = inf');
+% plot(k,o2,'linewidth',1,'DisplayName','Re = inf');
+% hold off;
+ylim([0 0.04]);
+xlim([0 4]);
+set(gca,'fontsize',20);
+xlabel('$\tilde{k}$', 'Interpreter', 'LaTeX','fontsize',30);
+ylabel('$\tilde{\omega_i}$', 'Interpreter', 'LaTeX','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
+ax = gca;
+ax.YAxis.Exponent = -2;
+% legend('location','northeast');
+grid on;
+%% Plot omega_r v.s. k
+fig2 = figure('position',[50,0,1000,720]);
+plot(k,o1r,'linewidth',1,'DisplayName','Re = 1000');
+% hold on;
+% plot(k,o2,'linewidth',1,'DisplayName','Re = inf');
 % hold off;
 % ylim([0 0.04]);
 % xlim([0 4]);
-% xlabel('$\tilde{k}$', 'Interpreter', 'LaTeX','fontsize',14);
-% ylabel('$\tilde{\omega_i}$', 'Interpreter', 'LaTeX','fontsize',14);
-% ttext = sprintf('$Fr^2 = %.2f$', Fr2);
-% title(ttext,'fontsize',16,'interpreter','latex');
+set(gca,'fontsize',20);
+xlabel('$\tilde{k}$', 'Interpreter', 'LaTeX','fontsize',30);
+ylabel('$\tilde{\omega_r}$', 'Interpreter', 'LaTeX','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
 % legend('location','northeast');
-% grid on;
+grid on;
+%% Plot c_r v.s. k
+fig3 = figure('position',[50,0,1000,720]);
+plot(k,o1r./k.','linewidth',1,'DisplayName','Re = 1000');
+% hold on;
+% plot(k,o2,'linewidth',1,'DisplayName','Re = inf');
+% hold off;
+% ylim([0 0.04]);
+% xlim([0 4]);
+set(gca,'fontsize',20);
+xlabel('$\tilde{k}$', 'Interpreter', 'LaTeX','fontsize',30);
+ylabel('$\tilde{c_r}$', 'Interpreter', 'LaTeX','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
+% legend('location','northeast');
+ylim([0 1]);
+grid on;

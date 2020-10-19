@@ -1,43 +1,85 @@
 close all; clear all;% clc
+load('neutral_pts.mat');
 %% Solver & Algorithm list
 order = ["D2", "D4", "uw"];
 diff_method = ["Schimd", "Trefethen"];
-constructAB_method = ["Origin", "Schimd", "Herbert"];
+constructAB_method = ["D4", "Schimd", "Herbert"];
 solveGEPmethod = ["qr", "qz", "eig", "eigs", "polyeig", "singgep", "jdqz"];
 %% Inputs
-solver1 = [2,1,2]; % [order, diff_method, constructAB_method]
-solver2 = [2,2,2];
+solver = [2,1,1]; % [order, diff_method, constructAB_method]
 algorithm = 1;
 do_balancing = 'n';
-N = 800;
-dk = 0.01;
-k = dk:dk:1.2;
-Re1 = 1000;
-Re2 = 100000;
+N = 401;
 %% Run solver
-method1 = [order(solver1(1)), diff_method(solver1(2)), constructAB_method(solver1(3))];
-method2 = [order(solver2(1)), diff_method(solver2(2)), constructAB_method(solver2(3))];
+method = [order(solver(1)), diff_method(solver(2)), constructAB_method(solver(3))];
 alg = solveGEPmethod(algorithm);
-for i = 1:length(k)
-    [o, ~, cA1(i), errGEP1(i), db1(i)] = poiseuille_solver(N,k(i),Re2,method1,alg,do_balancing);
-    o1(i,:) = imag(o);
-    fprintf('k = %.2f, growth rate = %.4f\n', k(i), o1(i));
-    [o, ~, cA2(i), errGEP2(i), db2(i)] = poiseuille_solver(N,k(i),Re2,method2,alg,do_balancing);
-    o2(i,:) = imag(o);
+if (strcmpi(method(1),'d4') && strcmpi(method(2),'schimd') && strcmpi(method(3),'d4'))
+    M = N-2;
+else
+    M = N;
 end
-% oi(isnan(oi)) = 0;
-% oinf(isnan(oinf)) = 0;
-%% Plot growth rate v.s. k
-% fig1 = figure('position',[50,0,1000,720]);
-% plot(k,oi,'linewidth',1,'DisplayName','Re = 1000');
-% hold on;
-% plot(k,oinf,'linewidth',1,'DisplayName','Re = inf');
-% hold off;
-% ylim([0 0.04]);
-% xlim([0 4]);
-% xlabel('$\tilde{k}$', 'Interpreter', 'LaTeX','fontsize',14);
-% ylabel('$\tilde{\omega_i}$', 'Interpreter', 'LaTeX','fontsize',14);
-% ttext = sprintf('$Fr^2 = %.2f$', Fr2);
-% title(ttext,'fontsize',16,'interpreter','latex');
-% legend('location','northeast');
-% grid on;
+z = cospi((0:1:M)/M)'; 
+U = 1-z.^2;
+
+R_tar = [1e4 1e5 1e6 1e7 1e8 1e9];
+for i = 1:length(R_tar)
+    [~,pos] = min(abs(Re0-R_tar(i)));
+    if ( (pos+5)>length(Re0) || (pos-5)<1)
+        k_tar = sort(k0(pos-10:pos));
+    else
+        k_tar = sort(k0(pos-5:pos+5));
+    end
+    kn = k_tar(1)-0.01:0.01:k_tar(end)+0.01;
+    for j = 1:length(kn)
+        [o,~,~,~,~] = poiseuille_solver(N,kn(j),R_tar(i),method,alg,do_balancing);
+        R(i).oi(j) = imag(o);
+        R(i).or(j) = real(o);
+        if (imag(o)<0)
+            R(i).or(j) = nan;
+        end
+    end
+    R(i).kn = kn;
+end
+
+fig1 = figure('position',[50,50,1280,1440]);
+subplot(2,1,1);
+for i = 1:length(R_tar)
+    text = sprintf('%.0e',R_tar(i));
+    plot(R(i).kn,R(i).or,'marker','.','markersize',10,'Displayname',text,'linewidth',1);
+    hold on;
+end
+hold off;
+legend('location','northwest','fontsize',24);
+set(gca,'fontsize',24);
+% xlabel('k','fontsize',30);
+ylabel('\omega_r ','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
+grid on;
+subplot(2,1,2);
+for i = 1:length(R_tar)
+    text = sprintf('%.0e',R_tar(i));
+    plot(R(i).kn,R(i).oi,'marker','.','markersize',10,'Displayname',text,'linewidth',1);
+    hold on;
+end
+hold off;
+% legend('location','northwest','fontsize',24);
+set(gca,'fontsize',24);
+ylim([0 0.008]);
+xlabel('k','fontsize',30);
+ylabel('\omega_i ','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
+ax = gca;
+ax.YAxis.Exponent = -3;
+grid on;
+
+fig2 = figure('position',[50,50,1280,720]);
+for i = 1:length(R_tar)
+    text = sprintf('%.0e',R_tar(i));
+    c_r = R(i).or./R(i).kn;
+    plot(R(i).kn,c_r,'marker','.','markersize',10,'Displayname',text,'linewidth',1);
+    hold on;
+end
+hold off;
+legend('location','southeast','fontsize',24);
+set(gca,'fontsize',24);
+xlabel('k','fontsize',30);
+ylabel('c_r ','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
+grid on;

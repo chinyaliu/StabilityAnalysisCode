@@ -14,4 +14,4 @@ Re = 1e4;
 %% Run solver
 method = [order(solver(1)), diff_method(solver(2)), constructAB_method(solver(3))];
 alg = solveGEPmethod(algorithm);
-[o, ~, cA, errGEP, db] = poiseuille_solver(N,k,Re,method,alg,do_balancing);
+[o, an, cA, errGEP, db] = poiseuille_solver(N,k,Re,method,alg,do_balancing);

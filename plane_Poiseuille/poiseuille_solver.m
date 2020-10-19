@@ -1,6 +1,5 @@
 function [o, an, cA, errGEP, dobalance] = poiseuille_solver(N,k,Re,method,alg,balance)
 %% Differential order of solving method
-col_point = 'n';
 switch lower(method(1))
     case 'd2'
         ord = 2;
@@ -12,7 +11,6 @@ switch lower(method(1))
             if strcmpi(method{2},'trefethen')
                     error('Trefethen''s differential method can''t be used for M = N-2\n');
             end
-            col_point = 'm';
         end
         method(1) = method(3);
     otherwise
@@ -21,7 +19,7 @@ end
 %% Differential matrix & BC
 switch lower(method(2))
     case 'schimd'
-        [z,D] = Dcheb(N,ord,col_point);
+        [z,D] = Dcheb(N,ord,method(1));
     case 'trefethen'
         [Du,z]=cheb(N);
         D(:,:,1) = eye(N+1);
