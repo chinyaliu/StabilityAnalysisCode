@@ -36,7 +36,7 @@ g = @(zz) (5000*acosh((-2497/(625*(zz - 1)))^(1/2)/2))/4407;
 %% Iterate for domain height z_L
 zL = zL1;
 flag = 0;
-for i = 1:21
+for i = 1:31
     %% Differential matrix & Base flow velocity
     w1 = (2/zL).^(0:1:ord);
     w2 = (2/(h-zL)).^(0:1:ord);
@@ -67,7 +67,7 @@ for i = 1:21
     elseif(abs(zL+ztemp) < 1e-8) % converged
         fprintf('converged to zL = %.8f\n', zL);
         break;
-    elseif(imag(o) > 0 && i ~= 20) % keep iterating
+    elseif(imag(o) > 0 && i ~= 30) % keep iterating
         fprintf('iter %2d, zL = %.8f\n', i, zL);
         zL = -ztemp;
     elseif (flag == 1) % didn't converge or growth rate !> 0
@@ -82,6 +82,6 @@ end
 z = [z(2:length(zeta)); z(length(zeta)+2:end)];
 zc = -double(g(real(o)/k));
 M = size(D1,2);
-phi = [reshape(reshape(permute(D1(2:end,:,:),[1 3 2]),[],M)*an(1:M),[],3);...
-    reshape(reshape(permute(D2(2:end,:,:),[1 3 2]),[],M)*an(M+1:end-1),[],3)];
+phi = [reshape(reshape(permute(D1(2:end,:,1:3),[1 3 2]),[],M)*an(1:M),[],3);...
+    reshape(reshape(permute(D2(2:end,:,1:3),[1 3 2]),[],M)*an(M+1:end-1),[],3)];
 end
