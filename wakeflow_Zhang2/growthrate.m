@@ -10,7 +10,7 @@ algorithm = 1;
 do_balancing = 'n';
 N = 400;
 dk = 0.01;
-k = dk:dk:4.5;
+k = dk:dk:4;
 Re = inf;
 Fr2 = 2.25;
 inflec_pt = -0.74708299;
@@ -35,8 +35,6 @@ cutz = cutz(2:end);
 %% Plot growth rate v.s. k
 o1 = imag(o);
 o1r = real(o);
-o1(isnan(o1)) = nan;
-o1r(imag(o1)<0) = nan;
 fig1 = figure('position',[50,0,1000,720]);
 plot(k,o1,'linewidth',1);
 ylim([0 0.04]);
@@ -54,14 +52,14 @@ grid on;
 % xlabel('$\tilde{k}$', 'Interpreter', 'LaTeX','fontsize',30);
 % ylabel('$\tilde{\omega_r}$', 'Interpreter', 'LaTeX','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
 % grid on;
-% %% Plot c_r v.s. k
-% fig3 = figure('position',[50,0,1000,720]);
-% plot(k,o1r./k,'linewidth',1);
-% set(gca,'fontsize',20);
-% xlabel('$\tilde{k}$', 'Interpreter', 'LaTeX','fontsize',30);
-% ylabel('$\tilde{c_r}$', 'Interpreter', 'LaTeX','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
-% ylim([0 1]);
-% grid on;
+%% Plot c_r v.s. k
+fig3 = figure('position',[50,0,1000,720]);
+plot(k,o1r./k,'linewidth',1);
+set(gca,'fontsize',20);
+xlabel('$\tilde{k}$', 'Interpreter', 'LaTeX','fontsize',30);
+ylabel('$\tilde{c_r}$', 'Interpreter', 'LaTeX','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
+ylim([0 1]);
+grid on;
 %% Plot z_c v.s. k
 fig4 = figure('position',[50,0,1000,720]);
 plot(k,z_c,'linewidth',1);
