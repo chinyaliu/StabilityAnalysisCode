@@ -17,6 +17,21 @@ switch lower(method)
         B(N:2*N-2,N+2:end-1) = D{2}(:,:,3) - k^2*D{2}(:,:,1);
         B(2*N,1:N+1) = w1(2)*BC{1}(2,:);
         B(2*N-1,end) = 1;
+    case 'ray_match'
+    %% Rayleigh match only phi
+        % Matrix A
+        A1 = [k*U{1}(:,1).*D{1}(:,:,3) - (U{1}(:,1)*k^3 + U{1}(:,3)*k).*D{1}(:,:,1) zeros(N,N+2)];
+        A2 = [zeros(N-1,N+1) k*U{2}(:,1).*D{2}(:,:,3) - (U{2}(:,1)*k^3 + U{2}(:,3)*k).*D{2}(:,:,1) zeros(N-1,1)];
+        Abc1 = [k*BC{1}(1,:) zeros(1,N+1) k*BC{3}(1)];
+        Abc3 = [k*BC{3}(1).*BC{1}(2,:)*w1(2) - k*BC{3}(2).*BC{1}(1,:) zeros(1,N+1) k/Fr2];
+        Amatch = [BC{2}(1,:).*w1(1).' -BC{1}(1,:).*w2(1).' 0];
+        A = [A1; A2; Abc1; Abc3; [zeros(1,N+1) BC{2}(1,:) 0]; Amatch;];
+        % Matrix B
+        B = zeros(2*N+3, 2*N+3);
+        B(1:N,1:N+1) = D{1}(:,:,3) - k^2*D{1}(:,:,1);
+        B(N+1:2*N-1,N+2:end-1) = D{2}(:,:,3) - k^2*D{2}(:,:,1);
+        B(2*N+1,1:N+1) = w1(2)*BC{1}(2,:);
+        B(2*N,end) = 1;
     case 'd4'
       %% D4
         % Matrix A

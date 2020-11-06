@@ -1,15 +1,15 @@
 close all; clear all;% clc
 %% Solver & Algorithm list
-order = ["Ray", "D4"]; %, "uw"];
+order = ["Ray", "D4", "Ray_match"];
 diff_method = ["Schimd", "Trefethen"];
-constructAB_method = ["D4", "Schimd"];%, "Herbert"];
+constructAB_method = ["D4", "Schimd"];
 solveGEPmethod = ["qr", "qz", "eig", "eigs", "polyeig", "singgep", "jdqz"];
 %% Inputs
-solver = [1,1,1]; % [order, diff_method, constructAB_method]
+solver = [3,1,1]; % [order, diff_method, constructAB_method]
 algorithm = 1; % solveGEPmethod
 do_balancing = 'n';
 N = 400;
-k = 0.9;
+k = 0.5;
 Re = inf;
 Fr2 = 2.25;
 h = @(k) 2*pi/k;

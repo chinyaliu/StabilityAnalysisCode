@@ -1,7 +1,7 @@
 function [o, an, cA, errGEP, dob, z, phi, zc, zL] = wZhang_solver2(N,k,h,Re,Fr2,method,alg,balance,zL1,iter)
 %% Order of governing equation
 switch lower(method(1))
-    case 'ray'
+    case {'ray','ray_match'}
         ord = 2;
     case 'd4'
         ord = 4;
@@ -36,7 +36,7 @@ g = @(zz) (5000*acosh((-2497/(625*(zz - 1)))^(1/2)/2))/4407;
 %% Iterate for domain height z_L
 zL = zL1;
 flag = 0;
-for i = 1:31
+for i = 1:11
     %% Differential matrix & Base flow velocity
     w1 = (2/zL).^(0:1:ord);
     w2 = (2/(h-zL)).^(0:1:ord);
@@ -44,16 +44,18 @@ for i = 1:31
     D2 = reshape((reshape(D,[],ord+1).*w2),size(D,1),[],ord+1);
     [Ubase,z] = baseflow_zhang2(zeta,h,zL);
     BC{3} = Ubase(1,:);
+    BC{4} = Ubase(length(zeta),:);
+    BC{5} = permute(D1(end,:,:),[3 2 1]);
     %% Construct matrix A B
     switch lower(method(1))
         case 'schimd'
             Dall = {D1(3:end-2,:,:), D2(3:end-2,:,:)};
             Ubase = {Ubase(3:N-1,:); Ubase(N+4:end-2,:)};
             [A, B] = matAB_zhang2('d4', N, Dall, Ubase, BC, k, Re, Fr2, w1, w2);
-    %     case 'herbert'
-    %         D = {[D1(1,:,:); D1(4:end-3,:,:); D1(end,:,:)], [D2(1,:,:); D2(4:end-3,:,:); D2(end,:,:)]};
-    %         Ubase = {[Ubase(1,:,:); Ubase(4:N-2,:,:); Ubase(N+1,:,:)], [Ubase(N+2,:,:); Ubase(N+5:end-3,:,:); Ubase(end,:,:)]};
-    %         [A, B] = matAB_zhang2('d4', N, D, Ubase, BC, k, Re, Fr2, w1, w2);
+        case 'ray_match'
+            Dall = {D1(2:end,:,:), D2(2:end-1,:,:)};
+            Ubase = {Ubase(2:size(Ubase,1)/2,:), Ubase(size(Ubase,1)/2+2:end-1,:)};
+            [A, B] = matAB_zhang2(method(1), N, Dall, Ubase, BC, k, Re, Fr2, w1, w2);
         otherwise
             Dall = {D1(2:end-1,:,:), D2(2:end-1,:,:)};
             Ubase = {Ubase(2:size(Ubase,1)/2-1,:), Ubase(size(Ubase,1)/2+2:end-1,:)};
@@ -67,7 +69,7 @@ for i = 1:31
     elseif(abs(zL+ztemp) < 1e-8) % converged
         fprintf('converged to zL = %.8f\n', zL);
         break;
-    elseif(imag(o) > 0 && i ~= 30) % keep iterating
+    elseif(imag(o) > 0 && i ~= 10) % keep iterating
         fprintf('iter %2d, zL = %.8f\n', i, zL);
         zL = -ztemp;
     elseif (flag == 1) % didn't converge or growth rate !> 0
