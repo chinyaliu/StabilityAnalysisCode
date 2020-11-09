@@ -1,6 +1,6 @@
 close all; clear all;% clc
 %% Solver & Algorithm list
-order = ["Ray", "D4"]; %, "uw"];
+order = ["Ray", "D4", "Ray_match"];
 diff_method = ["Schimd", "Trefethen"];
 constructAB_method = ["D4", "Schimd"];%, "Herbert"];
 solveGEPmethod = ["qr", "qz", "eig", "eigs", "polyeig", "singgep", "jdqz"];
@@ -9,8 +9,7 @@ solver = [1,1,1]; % [order, diff_method, constructAB_method]
 algorithm = 1;
 do_balancing = 'n';
 N = 400;
-dk = 0.01;
-k = dk:dk:4;
+k = linspace(0.01,4,80);
 Re = inf;
 Fr2 = 2.25;
 inflec_pt = -0.74708299;
@@ -21,6 +20,7 @@ h2 = @(k) 6.5;
 method = [order(solver(1)), diff_method(solver(2)), constructAB_method(solver(3))];
 alg = solveGEPmethod(algorithm);
 %% Run solver
+tic;
 for i = 1:length(k)
     if (k(i) < pi/3)
         h = h1;
@@ -30,6 +30,7 @@ for i = 1:length(k)
     [o(i), ~, ~, ~, ~, z(:,i), phi{i}, z_c(i), cutz(i+1)] = wZhang_solver2(N,k(i),h(k(i)),Re,Fr2,method,alg,do_balancing,cutz(i),'y');
     fprintf('k = %.2f, growth rate = %.4f\n', k(i), imag(o(i)));
 end
+toc;
 cutz = cutz(2:end);
 % save('modeshape','phi','z','N','k','cutz','o','z_c');
 %% Plot growth rate v.s. k

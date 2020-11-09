@@ -44,8 +44,6 @@ for i = 1:11
     D2 = reshape((reshape(D,[],ord+1).*w2),size(D,1),[],ord+1);
     [Ubase,z] = baseflow_zhang2(zeta,h,zL);
     BC{3} = Ubase(1,:);
-    BC{4} = Ubase(length(zeta),:);
-    BC{5} = permute(D1(end,:,:),[3 2 1]);
     %% Construct matrix A B
     switch lower(method(1))
         case 'schimd'
@@ -53,8 +51,8 @@ for i = 1:11
             Ubase = {Ubase(3:N-1,:); Ubase(N+4:end-2,:)};
             [A, B] = matAB_zhang2('d4', N, Dall, Ubase, BC, k, Re, Fr2, w1, w2);
         case 'ray_match'
-            Dall = {D1(2:end,:,:), D2(2:end-1,:,:)};
-            Ubase = {Ubase(2:size(Ubase,1)/2,:), Ubase(size(Ubase,1)/2+2:end-1,:)};
+            Dall = {D1(2:end-1,:,:), D2(1:end-1,:,:)};
+            Ubase = {Ubase(2:size(Ubase,1)/2-1,:), Ubase(size(Ubase,1)/2+1:end-1,:)};
             [A, B] = matAB_zhang2(method(1), N, Dall, Ubase, BC, k, Re, Fr2, w1, w2);
         otherwise
             Dall = {D1(2:end-1,:,:), D2(2:end-1,:,:)};
