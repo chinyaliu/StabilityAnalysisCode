@@ -1,41 +1,35 @@
-function [w,xv,dobalance,bakerr,cA] = solveGEP(A,B,modenum,includenegative,algorithm,balance)
-if strcmp(balance,'y')
-    n = length(A);
-    % balance
-    if isdouble(fi(A)) && isdouble(fi(B))
-        [Ab,Bb,rscale,info] = lapack('DGGBAL(h,i,D,i,D,i,i,i,d,D,d,I)',...
-            'S',n,A,n,B,n,0,0,zeros(n,1),zeros(n,1),zeros(6*n,1),0);
-        if info ~= 0
-            error('error in dggbal.')
-        end
-    else
-        [Ab,Bb,rscale,info] = lapack('ZGGBAL(h,i,Z,i,Z,i,i,i,d,D,d,I)',...
-            'S',n,A,n,B,n,0,0,zeros(n,1),zeros(n,1),zeros(6*n,1),0);
-        if info ~= 0
-            error('error in zggbal.')
-        end
-    end
-
-    if cond(A) > cond(Ab)
-        cA = cond(Ab);
-        [w,V] = QZ(Ab,Bb,algorithm,modenum,includenegative);
-        % backward transformation to original eigenvector
-        xv = nan(size(V)); % preallocate
-        for i = 1:modenum
-            xv(:,:,i) = diag(rscale)*V(:,:,i);
-        end
-        dobalance = 1;
-    elseif cond(A) < cond(Ab)
-        cA = cond(A);
-        [w,V] = QZ(A,B,algorithm,modenum,includenegative);
-        xv(:,:,1:modenum) = V(:,:,1:modenum);
-        dobalance = 0;
-    end
-    bakerr = max(max(abs(A*xv(:,:,1)-w(1)*B*xv(:,:,1))));
-else
-    [w,xv] = QZ(A,B,algorithm,modenum,includenegative);
-    bakerr = max(max(abs(A*xv(:,:,1)-w(1)*B*xv(:,:,1))));
-    cA = cond(A);
-    dobalance = 0;
+function [w,xv,err,cA] = solveGEP(A,B,modenum,algorithm)
+switch algorithm
+    case 'qr'
+        [V,D] = eig(A\B);
+        ev = 1./diag(D);
+    case 'qz'
+        [AA,BB,~,~,V,~] = qz(A,B);
+        ev = diag(AA)./diag(BB);
+    case 'eig'
+        [V,D] = eig(A,B,'qz');
+        ev = diag(D);
 end
+% find unstable modes
+a = 1:length(ev);
+ev_ind = a(abs(ev)<1e+3 & abs(ev)>1e-5 & abs(imag(ev)) > 1e-10);
+if isempty(ev_ind)
+    w = NAN*(1+1i);
+    xv = NaN(length(A),1)*(1+1i);
+else
+    [~, ind] = sort(imag(ev(ev_ind)),'descend');
+    ev_ind = ev_ind(ind);
+    w = ev(ev_ind);
+    xv = V(:,ev_ind);
+    if (modenum == 1) || (w(1) < 0)
+        w = w(1);
+        xv = xv(:,1);
+    else
+        w = w(w>0);
+        xv = xv(:,w>0);
+    end
+end
+
+err = max(abs(A*xv-B*xv*diag(w)));
+cA = cond(A);
 end

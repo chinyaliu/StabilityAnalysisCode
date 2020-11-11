@@ -60,14 +60,19 @@ for i = 1:11
             [A, B] = matAB_zhang2(method(1), N, Dall, Ubase, BC, k, Re, Fr2, w1, w2);
     end
     %% Find eigenvalue(s)
-    [o,an,dob,errGEP,cA] = solveGEP(A,B,1,'y',alg,balance);
-    ztemp = -double(g(real(o)/k));
+    if strcmp(balance,'y')
+        [o,an,dob,errGEP,cA] = balancing(A,B,1,'y',alg);
+    else
+        [o,an,errGEP,cA] = solveGEP(A,B,1,alg);
+        dob = 0;
+    end
+    ztemp = -double(g(real(o(1))/k));
     if (strcmp(iter,'n')) % known critical height
         break;
     elseif(abs(zL+ztemp) < 1e-8) % converged
         fprintf('converged to zL = %.8f\n', zL);
         break;
-    elseif(imag(o) > 0 && i ~= 10) % keep iterating
+    elseif(imag(o(1)) > 0 && i ~= 10) % keep iterating
         fprintf('iter %2d, zL = %.8f\n', i, zL);
         zL = -ztemp;
     elseif (flag == 1) % didn't converge or growth rate !> 0

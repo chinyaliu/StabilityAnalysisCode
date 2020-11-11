@@ -3,13 +3,13 @@ close all; clear all;% clc
 order = ["Ray", "D4", "Ray_match"];
 diff_method = ["Schimd", "Trefethen"];
 constructAB_method = ["D4", "Schimd"];
-solveGEPmethod = ["qr", "qz", "eig", "eigs", "polyeig", "singgep", "jdqz"];
+solveGEPmethod = ["qr", "qz", "eig"];
 %% Inputs
-solver = [3,1,1]; % [order, diff_method, constructAB_method]
+solver = [1,1,1]; % [order, diff_method, constructAB_method]
 algorithm = 1; % solveGEPmethod
 do_balancing = 'n';
 N = 400;
-k = 1.7;
+k = 3.3;
 Re = inf;
 Fr2 = 2.25;
 if k < pi/3
@@ -23,7 +23,7 @@ method = [order(solver(1)), diff_method(solver(2)), constructAB_method(solver(3)
 alg = solveGEPmethod(algorithm);
 %% Run solver
 t1 = tic;
-[o, an, cA, errGEP, db, z, phi, zc, zLo] = wZhang_solver2(N,k,h(k),Re,Fr2,method,alg,do_balancing,zL,'n');
+[o, an, cA, errGEP, db, z, phi, zc, zLo] = wZhang_solver2(N,k,h(k),Re,Fr2,method,alg,do_balancing,zL,'y');
 toc(t1);
 %% Plot
 for i = 1:3
@@ -49,7 +49,11 @@ ylim([blim 0]);
 % ax.YTickLabel{yax == -zL} = ['\color{red}' ax.YTickLabel{yax == -zL}];
 grid on;
 subplot(1,4,2);
-plot(unwrap(angle(phi(:,i))),z,'-k.','linewidth',1,'markersize',10);
+ang_phi = unwrap(angle(phi(:,i)));
+% rn = real(phi(:,i)) < 0;
+% in = imag(phi(:,i)) < 0;
+% ang_phi(rn & in) = ang_phi(rn & in) + 2*pi;
+plot(ang_phi,z,'-k.','linewidth',1,'markersize',10);
 hold on;
 yline(-zLo, '-.r', 'linewidth', 1.5);
 yline(-zL, '--b', 'linewidth', 1.5);

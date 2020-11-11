@@ -1,5 +1,9 @@
 close all; clear all;% clc
-load('modeshape.mat');
+% load('modeshape.mat');
+load('grdata.mat');
+z_c = -cutz(1:end-1);
+z = z.';
+phi = cellfun(@(x) squeeze(x), mat2cell(permute(phi,[1 3 2]),ones(1,length(k))), 'UniformOutput', false);
 k = k(k<=4);
 o = o(k<=4);
 o1 = imag(o);
@@ -17,6 +21,7 @@ for i = 1:length(k)
     end
     ang(:,i) = angle(phi{i}(:,1));
 end
+
 % ang(ang<0) = ang(ang<0) + pi;
 %% Plot phi
 figure('position',[0 0 1920 1080]);
@@ -40,6 +45,8 @@ for i = 1:length(k)
 %     subplot(1,4,1);
     subplot(6,5,(6:5:30));
     plot(abs(phi{i}(:,1)),z(:,i),'-k','linewidth',1);
+    xlim([0 1]);
+    ylim([-6 0]);
     if (~isnan(z_c(i)))
         hold on; yline(z_c(i), '-.r', 'linewidth', 1.5); 
         yline(inflec_pt, '--b', 'linewidth', 1.5); 
@@ -50,8 +57,6 @@ for i = 1:length(k)
     end
     xlabel('$||\phi||$','FontSize',30, 'Interpreter', 'LaTeX');
     ylabel('z','FontSize',30, 'Interpreter', 'LaTeX','rotation',0);
-    xlim([0 1]);
-    ylim([-6 0]);
     grid on;
     set(gca,'fontsize',24);
     
