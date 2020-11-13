@@ -1,28 +1,34 @@
 close all; clear all;% clc
 %% Solver & Algorithm list
-order = ["D2", "D4", "uw"];
+order = ["Ray", "D4"];
 diff_method = ["Schimd", "Trefethen"];
-constructAB_method = ["D4", "Schimd", "Herbert"];
-solveGEPmethod = ["qr", "qz", "eig", "eigs", "polyeig", "singgep", "jdqz"];
+constructAB_method = ["D4", "Schimd"];
+solveGEPmethod = ["qr", "qz", "eig"];
 %% Inputs
 solver = [1,1,1]; % [order, diff_method, constructAB_method]
 algorithm = 1; % solveGEPmethod
 do_balancing = 'n';
+Ni = 600;
 Re = inf;
 Fr2 = 2.25;
 h = @(k) 2*pi/k;
-%% Run solver
+zL = 0.74708299;
 %% Set solver
 method = [order(solver(1)), diff_method(solver(2)), constructAB_method(solver(3))];
 alg = solveGEPmethod(algorithm);
 %% Run solver
-N = 40:20:1200;
-k = [0.01 0.2 0.4 0.6];
-% k = [0.87 1 2 3 4];
+N = 20:10:600;
+% k = [0.01 0.2 0.4 0.6];
+k = [0.87 1 2 3 4];
+case1 = wZhang_solver(N(1),1,1,Re,Fr2,method);
 for j = 1:length(k)
     fprintf('k = %.2f\n',k(j));
+    case1.k = k(j); case1.h = h(k(j)); case1.N = Ni;
+    case1.solver(zL, 'y', alg, do_balancing);
+    zLn = case1.zL;
     for i = 1:length(N)
-        [o, ~, ~, ~, ~] = wZhang_solver(N(i),k(j),h(k(j)),Re,Fr2,method,alg,do_balancing);
+        case1.N = N(i);
+        [o, an, cA, errGEP, db] = case1.solver(zLn,'n',alg,do_balancing);
         oi(i,:) = imag(o);
         or(i,:) = real(o);
         cr = real(o)/k(j);

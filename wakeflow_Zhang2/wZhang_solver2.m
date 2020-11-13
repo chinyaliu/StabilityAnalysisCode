@@ -84,9 +84,8 @@ for i = 1:11
         fprintf('iter %2d, try inflection pt\n', i);
     end
 end
-z = [z(2:length(zeta)); z(length(zeta)+2:end)];
 zc = -double(g(real(o)/k));
 M = size(D1,2);
-phi = [reshape(reshape(permute(D1(2:end,:,1:3),[1 3 2]),[],M)*an(1:M),[],3);...
-    reshape(reshape(permute(D2(2:end,:,1:3),[1 3 2]),[],M)*an(M+1:end-1),[],3)];
+phi = [reshape(reshape(permute(D1(:,:,1:3),[1 3 2]),[],M)*an(1:M),[],3);...
+    reshape(reshape(permute(D2(:,:,1:3),[1 3 2]),[],M)*an(M+1:end-1),[],3)];
 end

@@ -9,7 +9,7 @@ solver = [1,1,1]; % [order, diff_method, constructAB_method]
 algorithm = 1; % solveGEPmethod
 do_balancing = 'n';
 N = 400;
-k = 3.3;
+k = 3;
 Re = inf;
 Fr2 = 2.25;
 if k < pi/3
