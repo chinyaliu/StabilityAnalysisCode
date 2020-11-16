@@ -3,13 +3,14 @@ classdef wZhang_solver < handle
         k = 1; h = -6; Re = inf; Fr2 = 0; 
     end
     properties( SetObservable )
-        N = 400; method = ['','',''];
+        N = 400; method;
     end
     properties (SetAccess = private)
         z; zc; phi; zL = 1;
     end
     properties (Access = private)
         zeta; Din; BC; ord;
+        g = @(x) (5000*acosh((-2497/(625*(x - 1)))^(1/2)/2))/4407;
     end
     methods
         function obj = wZhang_solver(N,k,h,Re,Fr2,meth)

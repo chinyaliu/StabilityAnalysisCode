@@ -18,8 +18,9 @@ method = [order(solver(1)), diff_method(solver(2)), constructAB_method(solver(3)
 alg = solveGEPmethod(algorithm);
 %% Run solver
 N = 20:10:600;
-% k = [0.01 0.2 0.4 0.6];
-k = [0.87 1 2 3 4];
+k = [0.01 0.2 0.4 0.6];
+% k = [0.87 1 2 3 4];
+tic;
 case1 = wZhang_solver(N(1),1,1,Re,Fr2,method);
 for j = 1:length(k)
     fprintf('k = %.2f\n',k(j));
@@ -28,15 +29,14 @@ for j = 1:length(k)
     zLn = case1.zL;
     for i = 1:length(N)
         case1.N = N(i);
-        [o, an, cA, errGEP, db] = case1.solver(zLn,'n',alg,do_balancing);
+        o = case1.solver(zLn,'n',alg,do_balancing);
         oi(i,:) = imag(o);
-        or(i,:) = real(o);
-        cr = real(o)/k(j);
         fprintf('N = %3d, growth rate = %.8f\n', N(i), oi(i));
     end
     doi{j} = abs(diff(oi));
 end
-%% Plot figures
+toc;
+%% Plot figure
 fig1 = figure('position',[50,0,1000,720]);
 % doi = abs(diff(oi));
 nam = sprintf('k = %.2f',k(1));
@@ -50,7 +50,6 @@ hold off;
 set(gca,'fontsize',20);
 xlabel('$N$', 'Interpreter', 'LaTeX','fontsize',30);
 ylabel('$\ | \ \omega_i(N_m) - \omega_i(N_{m+1})\ |$', 'Interpreter', 'LaTeX','fontsize',30);
-% titext = sprintf('z_L = %.8f', zL);
-% text(350,1e-4,titext,'fontsize',30);
 legend('location','northeast');
 grid on;
+exportgraphics(fig1, 'fig_convergence\branch1.png');

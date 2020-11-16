@@ -29,7 +29,8 @@ else
         xv = xv(:,w>0);
     end
 end
-
-err = max(abs(A*xv-B*xv*diag(w)));
-cA = cond(A);
+if nargout > 2
+    err = max(abs(A*xv-B*xv*diag(w)));
+    cA = cond(A);
+end
 end
