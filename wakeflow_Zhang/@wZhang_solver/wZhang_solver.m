@@ -2,7 +2,7 @@ classdef wZhang_solver < handle
     properties
         k = 1; h = -6; Re = inf; Fr2 = 0; 
     end
-    properties( SetObservable )
+    properties(SetObservable)
         N = 400; method;
     end
     properties (SetAccess = private)
@@ -16,7 +16,7 @@ classdef wZhang_solver < handle
         function obj = wZhang_solver(N,k,h,Re,Fr2,meth)
             if (nargin == 6)
                 obj.N = N; obj.k = k; obj.h = h; obj.Re = Re;
-                obj.Fr2 = Fr2; obj.method = meth; 
+                obj.Fr2 = Fr2; obj.method = lower(meth); 
             end
             obj.diffmat();
             addlistener(obj,'N','PostSet',@obj.chgDM);
@@ -29,7 +29,7 @@ classdef wZhang_solver < handle
             obj.diffmat();
         end
         diffmat(obj);
-        U = baseflow_zhang2(obj);
-        [A, B] = matAB_zhang2(obj, D, U, w1, w2);
+        U = baseflow(obj);
+        [A, B] = matAB(obj, D, U);
     end
 end

@@ -18,8 +18,8 @@ method = [order(solver(1)), diff_method(solver(2)), constructAB_method(solver(3)
 alg = solveGEPmethod(algorithm);
 %% Run solver
 N = 20:10:600;
-k = [0.01 0.2 0.4 0.6];
-% k = [0.87 1 2 3 4];
+% k = [0.01 0.2 0.4 0.6];
+k = [0.87 1 2 3 4];
 tic;
 case1 = wZhang_solver(N(1),1,1,Re,Fr2,method);
 for j = 1:length(k)
@@ -52,4 +52,4 @@ xlabel('$N$', 'Interpreter', 'LaTeX','fontsize',30);
 ylabel('$\ | \ \omega_i(N_m) - \omega_i(N_{m+1})\ |$', 'Interpreter', 'LaTeX','fontsize',30);
 legend('location','northeast');
 grid on;
-exportgraphics(fig1, 'fig_convergence\branch1.png');
+exportgraphics(fig1, 'fig_convergence\branch2.png');

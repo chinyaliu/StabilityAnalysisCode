@@ -1,6 +1,6 @@
 function diffmat(obj)
 %% Order of governing equation
-switch lower(obj.method(1))
+switch obj.method(1)
     case 'ray'
         obj.ord = 2;
     case 'd4'
@@ -10,12 +10,11 @@ switch lower(obj.method(1))
                     error('Trefethen''s differential method can''t be used for M = N-2\n');
             end
         end
-        obj.method(1) = obj.method(3);
     otherwise
         error('Invalid method(1) name');
 end
 %% Differential matrix & BC
-switch lower(obj.method(2))
+switch obj.method(2)
     case 'schimd'
         [obj.zeta,obj.Din] = Dcheb(obj.N,obj.ord,obj.method(1));
     case 'trefethen'

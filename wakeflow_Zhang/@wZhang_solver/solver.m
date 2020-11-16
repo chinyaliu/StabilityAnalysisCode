@@ -8,19 +8,10 @@ for i = 1:11
     w2 = (2/(obj.h-obj.zL)).^(0:1:obj.ord);
     D1 = reshape((reshape(obj.Din,[],obj.ord+1).*w1),size(obj.Din,1),[],obj.ord+1);
     D2 = reshape((reshape(obj.Din,[],obj.ord+1).*w2),size(obj.Din,1),[],obj.ord+1);
-    Ubase = obj.baseflow_zhang2();
+    Ubase = obj.baseflow();
     obj.BC{3} = Ubase(1,:);
       %% Construct matrix A B
-    switch lower(obj.method(1))
-        case 'schimd'
-            Dall = {D1(3:end-2,:,:), D2(3:end-2,:,:)};
-            Ubase = {Ubase(3:obj.N-1,:); Ubase(obj.N+4:end-2,:)};
-            [A, B] = obj.matAB_zhang2(Dall, Ubase, w1, w2);
-        otherwise
-            Dall = {D1(2:end-1,:,:), D2(2:end-1,:,:)};
-            Ubase = {Ubase(2:size(Ubase,1)/2-1,:), Ubase(size(Ubase,1)/2+2:end-1,:)};
-            [A, B] = obj.matAB_zhang2(Dall, Ubase, w1, w2);
-    end
+    [A, B] = obj.matAB([D1;D2], Ubase);
       %% Find eigenvalue(s)
     if strcmp(bal,'y')
         [o,an,dob,errGEP,cA] = balancing(A,B,1,'y',alg);

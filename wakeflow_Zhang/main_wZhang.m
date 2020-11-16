@@ -9,14 +9,10 @@ solver = [1,1,1]; % [order, diff_method, constructAB_method]
 algorithm = 1; % solveGEPmethod
 do_balancing = 'n';
 N = 400;
-k = 1.5;
+k = 0.3;
 Re = inf;
 Fr2 = 2.25;
-if k < pi/3
-    h = 2*pi/k;
-else
-    h = 6.5;
-end
+h = 2*pi/k;
 zL = 0.74708299;
 %% Set solver
 method = [order(solver(1)), diff_method(solver(2)), constructAB_method(solver(3))];
@@ -41,7 +37,7 @@ for i = 1:3
         subplot(1,4,j);
         plot(plotvar{j},case1.z,'-k.','linewidth',1,'markersize',10);
         hold on;
-        yline(case1.zc, '-.r', 'linewidth', 1.5);
+%         yline(case1.zc, '-.r', 'linewidth', 1.5);
         yline(-zL, '--b', 'linewidth', 1.5);
         hold off;
         set(gca,'fontsize',20);

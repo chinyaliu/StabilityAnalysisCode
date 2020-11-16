@@ -15,7 +15,7 @@ Fr2 = 2.25;
 inflec_pt = -0.74708299;
 cutz = NaN(1,length(k)+1);
 cutz(1) = -inflec_pt;
-h = 6.5*ones(1,length(k));
+h = 6*ones(1,length(k));
 h(k<pi/3) = 2*pi./k(k<pi/3);
 %% Set solver
 method = [order(solver(1)), diff_method(solver(2)), constructAB_method(solver(3))];
@@ -28,7 +28,7 @@ for i = 1:length(k)
     p1.k = k(i); p1.h = h(i);
 %     [o(i), an] = p1.solver(cutz(i), 'y', alg, do_balancing);
 %     z(:,i) = p1.z; phi{i} = p1.phi; 
-    o(i) = p1.solver(cutz(i), 'y', alg, do_balancing);
+    o(i) = p1.solver(cutz(i), 'n', alg, do_balancing);
     z_c(i) = p1.zc; cutz(i+1)=p1.zL;
     fprintf('k = %.2f, growth rate = %.4f\n', k(i), imag(o(i)));
 end
@@ -38,7 +38,7 @@ cutz = cutz(2:end);
 fig1 = figure('position',[50,0,1000,720]);
 plot(k,imag(o),'linewidth',2);
 ylim([0 0.04]);
-% xlim([0 4]);
+xlim([0 4]);
 set(gca,'fontsize',20);
 xlabel('$\tilde{k}$', 'Interpreter', 'LaTeX','fontsize',30);
 ylabel('$\tilde{\omega_i}$', 'Interpreter', 'LaTeX','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
@@ -58,7 +58,7 @@ yticks(yt);
 ind = find(yt==inflec_pt);
 ax = gca;
 ax.YTickLabel{ind} = ['\color{red}' ax.YTickLabel{ind}];
-xlim([0 4.5]);
+xlim([0 4]);
 ylim([-3.6 0]);
 %% Save data & figures
 % save('diffk','phi','z','N','k','cutz','o','z_c');
