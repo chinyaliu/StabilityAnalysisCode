@@ -2,7 +2,7 @@ function [o, an, cA, errGEP, dob] = solver(obj, zL1, iter, alg, bal)
 %% Iterate for domain height z_L
 obj.zL = zL1;
 flag = 0;
-for i = 1:11
+for i = 1:21
       %% Differential matrix & Base flow velocity
     w1 = (2/obj.zL).^(0:1:obj.ord);
     w2 = (2/(obj.h-obj.zL)).^(0:1:obj.ord);
@@ -26,13 +26,13 @@ for i = 1:11
     ztemp = -obj.g(real(o(1))/obj.k);
     if (strcmp(iter,'n')) % known critical height
         break;
-    elseif(abs(obj.zL+ztemp) < 1e-8) % converged
+    elseif(abs(obj.zL+ztemp) < 1e-9) % converged
         fprintf('converged to zL = %.8f\n', obj.zL);
         break;
     elseif(imag(o(1)) > 0 && i ~= 10) % keep iterating
         fprintf('iter %2d, zL = %.8f\n', i, obj.zL);
         obj.zL = -ztemp;
-    elseif (flag == 1) % didn't converge or growth rate !> 0
+    elseif (flag == 1 || zL1 == 0.74708299) % didn't converge or growth rate !> 0
         obj.zL = zL1;
         break;
     else % try inflection point z = -0.74708299

@@ -28,7 +28,7 @@ for i = 1:length(k)
     p1.k = k(i); p1.h = h(i);
 %     [o(i), an] = p1.solver(cutz(i), 'y', alg, do_balancing);
 %     z(:,i) = p1.z; phi{i} = p1.phi; 
-    o(i) = p1.solver(cutz(i), 'n', alg, do_balancing);
+    o(i) = p1.solver(cutz(i), 'y', alg, do_balancing);
     z_c(i) = p1.zc; cutz(i+1)=p1.zL;
     fprintf('k = %.2f, growth rate = %.4f\n', k(i), imag(o(i)));
 end
@@ -37,7 +37,7 @@ cutz = cutz(2:end);
 %% Plot growth rate v.s. k
 fig1 = figure('position',[50,0,1000,720]);
 plot(k,imag(o),'linewidth',2);
-ylim([0 0.04]);
+% ylim([0 0.04]);
 xlim([0 4]);
 set(gca,'fontsize',20);
 xlabel('$\tilde{k}$', 'Interpreter', 'LaTeX','fontsize',30);
@@ -59,7 +59,7 @@ ind = find(yt==inflec_pt);
 ax = gca;
 ax.YTickLabel{ind} = ['\color{red}' ax.YTickLabel{ind}];
 xlim([0 4]);
-ylim([-3.6 0]);
+% ylim([-3.6 0]);
 %% Save data & figures
 % save('diffk','phi','z','N','k','cutz','o','z_c');
 exportgraphics(fig1, 'fig_growthrate\omega_i.png');
