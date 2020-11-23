@@ -9,7 +9,6 @@ for i = 1:21
     D1 = reshape((reshape(obj.Din,[],obj.ord+1).*w1),size(obj.Din,1),[],obj.ord+1);
     D2 = reshape((reshape(obj.Din,[],obj.ord+1).*w2),size(obj.Din,1),[],obj.ord+1);
     Ubase = obj.baseflow();
-    obj.BC{3} = Ubase(1,:);
       %% Construct matrix A B
     [A, B] = obj.matAB([D1;D2], Ubase);
       %% Find eigenvalue(s)

@@ -8,20 +8,24 @@ solveGEPmethod = ["qr", "qz", "eig"];
 solver = [1,1,1]; % [order, diff_method, constructAB_method]
 algorithm = 1; % solveGEPmethod
 do_balancing = 'n';
-N = 400;
-k = 3;
+N = 100;
+k = 1.6;
 Re = inf;
 Fr2 = 2.25;
+delt = 0.05;
 h = 2*pi/k;
+if k > pi/3
+    h = 6;
+end
 zL = 0.74708299;
 %% Set solver
 method = [order(solver(1)), diff_method(solver(2)), constructAB_method(solver(3))];
 alg = solveGEPmethod(algorithm);
 %% Run solver
 t1 = tic;
-case1 = wZhang_solver(N,k,h,Re,Fr2,method);
+case1 = wZhang_complex(N,k,h,Re,Fr2,method,delt);
 % [o, an, cA, errGEP, dob] = case1.solver(zL, 'y', alg, do_balancing);
-[o, an] = case1.solver(zL, 'y', alg, do_balancing);
+[o, an] = case1.solver(alg, do_balancing);
 toc(t1);
 %% Plot
 figtitle = ["$\phi$", "$\phi_ z$", "$\phi_ {zz}$"];
@@ -38,7 +42,7 @@ for i = 1:3
         subplot(1,4,j);
         plot(plotvar{j},case1.z,'-k.','linewidth',1,'markersize',10);
         hold on;
-        yline(case1.zc, '-.r', 'linewidth', 1.5);
+%         yline(case1.zc, '-.r', 'linewidth', 1.5);
 %         yline(-zL, '--b', 'linewidth', 1.5);
         xline(0,'--b','linewidth',1.5);
         hold off;
