@@ -5,14 +5,14 @@ diff_method = ["Schimd", "Trefethen"];
 constructAB_method = ["D4", "Schimd"];%, "Herbert"];
 solveGEPmethod = ["qr", "qz", "eig", "eigs", "polyeig", "singgep", "jdqz"];
 %% Inputs
-solver = [1,1,1]; % [order, diff_method, constructAB_method]
+solver = [1,2,1]; % [order, diff_method, constructAB_method]
 algorithm = 1;
 do_balancing = 'n';
-N = 200;
-k = linspace(0.01,4,100);
+N = 100;
+k = linspace(0.01,4,400);
 Re = inf;
 Fr2 = 2.25;
-delt = 0.02;
+delt = 0.03;
 inflec_pt = -0.74708299;
 h = 6*ones(1,length(k));
 h(k<pi/3) = 2*pi./k(k<pi/3);
@@ -28,7 +28,9 @@ for i = 1:length(k)
     p1.k = k(i); p1.h = h(i);
 %     [o(i), an] = p1.solver(cutz(i), 'y', alg, do_balancing);
 %     z(:,i) = p1.z; phi{i} = p1.phi; 
-    o(i) = p1.solver(alg, do_balancing);
+    op = p1.solver(alg, do_balancing);
+    call{i} = op/k(i);
+    o(i) = op(1);
 %     z_c(i) = p1.zc;
     fprintf('k = %.2f, growth rate = %.4f\n', k(i), imag(o(i)));
 end
@@ -44,6 +46,33 @@ ylabel('$\tilde{\omega_i}$', 'Interpreter', 'LaTeX','fontsize',30,'rotation',0, 
 ax = gca;
 ax.YAxis.Exponent = -2;
 grid on;
+%% Plot c_i vs c_r
+fig2 = figure('position',[50,0,1000,720]);
+for i = 1:length(k)
+    plot(real(call{i}),imag(call{i}),'.','Markersize',8);
+    hold on
+    set(gca,'fontsize',20);
+    xlabel('$\tilde{c_r}$', 'Interpreter', 'LaTeX','fontsize',30);
+    ylabel('$\tilde{c_i}$', 'Interpreter', 'LaTeX','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
+    ylim([-0.12 0.12]);
+    xlim([-2 4]);
+    grid on;
+    titext = sprintf('k = %.2f',k(i));
+    title(titext,'FontSize',30);
+    F(i) = getframe(gcf);
+end
+hold off;
+nam = sprintf('comp1_h%03d.mp4',100*delt);
+vname = ['mov_eigenvalue\' nam];
+writerObj = VideoWriter(vname,'MPEG-4');
+writerObj.FrameRate = 10;
+writerObj.Quality = 100;
+open(writerObj);
+for i = 1:length(F)
+    frame = F(i);
+    writeVideo(writerObj, frame);
+end
+close(writerObj);
 % %% Plot z_c v.s. k
 % fig2 = figure('position',[50,0,1000,720]);
 % plot(k,z_c,'linewidth',2);

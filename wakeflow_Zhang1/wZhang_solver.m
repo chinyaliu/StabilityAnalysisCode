@@ -51,5 +51,5 @@ else
     end
 end
 %% Find eigenvalue(s)
-[o,an,dobalance,errGEP,cA] = solveGEP(A,B,1,'y',alg,balance);
+[o,an,dobalance,errGEP,cA] = solveGEP(A,B,'max','y',alg,balance);
 end

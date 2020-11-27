@@ -63,7 +63,7 @@ for i = 1:11
     if strcmp(balance,'y')
         [o,an,dob,errGEP,cA] = balancing(A,B,1,'y',alg);
     else
-        [o,an,errGEP,cA] = solveGEP(A,B,1,alg);
+        [o,an,errGEP,cA] = solveGEP(A,B,'max',alg);
         dob = 0;
     end
     ztemp = -double(g(real(o(1))/k));

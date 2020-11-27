@@ -16,10 +16,10 @@ for i = 1:21
         [o,an,dob,errGEP,cA] = balancing(A,B,1,'y',alg);
     else
         if nargout > 2
-            [o,an,errGEP,cA] = solveGEP(A,B,1,alg);
+            [o,an,errGEP,cA] = solveGEP(A,B,'max',alg);
             dob = 0;
         else
-            [o,an] = solveGEP(A,B,1,alg);
+            [o,an] = solveGEP(A,B,'max',alg);
         end
     end
     ztemp = -obj.g(real(o(1))/obj.k);
