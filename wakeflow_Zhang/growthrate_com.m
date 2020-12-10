@@ -5,18 +5,19 @@ diff_method = ["Schimd", "Trefethen"];
 constructAB_method = ["D4", "Schimd"];%, "Herbert"];
 solveGEPmethod = ["qr", "qz", "eig", "eigs", "polyeig", "singgep", "jdqz"];
 %% Inputs
-solver = [1,2,1]; % [order, diff_method, constructAB_method]
+solver = [1,1,1]; % [order, diff_method, constructAB_method]
 algorithm = 1;
 do_balancing = 'n';
-N = 100;
+N = 200;
 k = linspace(0.01,4,400);
 Re = inf;
 Fr2 = 2.25;
-delt = 0.03;
+delt = 0.04;
 inflec_pt = -0.74708299;
 h = 6*ones(1,length(k));
 h(k<pi/3) = 2*pi./k(k<pi/3);
-% h = 2*pi./k;
+% h = 6*h;
+% h = 0.005*ones(1,length(k));
 %% Set solver
 method = [order(solver(1)), diff_method(solver(2)), constructAB_method(solver(3))];
 alg = solveGEPmethod(algorithm);
@@ -62,17 +63,17 @@ for i = 1:length(k)
     F(i) = getframe(gcf);
 end
 hold off;
-nam = sprintf('comp1_h%03d.mp4',100*delt);
-vname = ['mov_eigenvalue\' nam];
-writerObj = VideoWriter(vname,'MPEG-4');
-writerObj.FrameRate = 10;
-writerObj.Quality = 100;
-open(writerObj);
-for i = 1:length(F)
-    frame = F(i);
-    writeVideo(writerObj, frame);
-end
-close(writerObj);
+% nam = sprintf('comp1_h%03d.mp4',100*delt);
+% vname = ['mov_eigenvalue\' nam];
+% writerObj = VideoWriter(vname,'MPEG-4');
+% writerObj.FrameRate = 10;
+% writerObj.Quality = 100;
+% open(writerObj);
+% for i = 1:length(F)
+%     frame = F(i);
+%     writeVideo(writerObj, frame);
+% end
+% close(writerObj);
 % %% Plot z_c v.s. k
 % fig2 = figure('position',[50,0,1000,720]);
 % plot(k,z_c,'linewidth',2);

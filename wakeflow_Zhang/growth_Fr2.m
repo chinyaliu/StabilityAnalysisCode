@@ -11,7 +11,7 @@ do_balancing = 'n';
 N = 400;
 k = linspace(0.01,4,100);
 Re = inf;
-Fr = [0 0.5:2:6.5 inf];
+Fr = [0.5:2:6.5 inf];
 Fr2 = Fr.^2;
 inflec_pt = -0.74708299;
 cutz = NaN(1,length(k)+1);
@@ -59,4 +59,4 @@ grid on;
 leg = legend('location','northeast');
 title(leg,'Fr');
 %% Save data
-save('growth_fr','N','k','Fr','frcase');
+% save('growth_fr','N','k','Fr','frcase');

@@ -62,5 +62,5 @@ xlim([0 4]);
 % ylim([-3.6 0]);
 %% Save data & figures
 % save('diffk','phi','z','N','k','cutz','o','z_c');
-exportgraphics(fig1, 'fig_growthrate\omega_i.png');
-exportgraphics(fig2, 'fig_growthrate\criticalheight.png');
+% exportgraphics(fig1, 'fig_growthrate\omega_i.png');
+% exportgraphics(fig2, 'fig_growthrate\criticalheight.png');

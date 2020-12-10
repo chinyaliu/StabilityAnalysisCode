@@ -11,12 +11,14 @@ switch algorithm
         ev = diag(D);
 end
 % find unstable modes
+a = 1:length(ev);
 if (strcmpi(modenum,'all'))
-    [~, ind] = sort(imag(ev),'descend');
-    w = ev(ind);
-    xv = V(:,ind);
+    ev_ind = a(abs(ev)<1e+3);
+    [~, ind] = sort(imag(ev(ev_ind)),'descend');
+    ev_ind = ev_ind(ind);
+    w = ev(ev_ind);
+    xv = V(:,ev_ind);
 else
-    a = 1:length(ev);
     ev_ind = a(abs(ev)<1e+3 & abs(ev)>1e-5 & abs(imag(ev)) > 1e-10);
     if isempty(ev_ind)
         w = NaN*(1+1i);

@@ -6,10 +6,7 @@ classdef wZhang_solver < handle
         N = 400; method;
     end
     properties (SetAccess = private)
-        z; zc; phi; zL = 1;
-    end
-    properties (Access = private)
-        zeta; Din; BC; ord;
+        z; zc; phi; zL; zeta; Din; ord;
         g = @(x) (5000*acosh((-2497/(625*(x - 1)))^(1/2)/2))/4407;
     end
     methods

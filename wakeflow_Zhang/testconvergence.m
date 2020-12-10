@@ -19,20 +19,23 @@ alg = solveGEPmethod(algorithm);
 %% Run solver
 N = 20:10:600;
 % k = [0.01 0.2 0.4 0.6];
-% k = [0.87 1 2 3 4];
-k = 0.6033;
+k = [0.87 1 2 3 4];
+% k = 0.6033;
 tic;
-case1 = wZhang_solver(N(1),1,1,Re,Fr2,method);
+% case1 = wZhang_solver(N(1),1,1,Re,Fr2,method);
+case1 = wZhang_block(N,k(1),h(k(1)),Re,Fr2,method);
 for j = 1:length(k)
     fprintf('k = %.2f\n',k(j));
-    case1.k = k(j); case1.h = h(k(j));
-%     case1.k = k(j); case1.h = h(k(j)); case1.N = Ni;
+%     case1.k = k(j); case1.h = h(k(j));
+    case1.k = k(j); case1.h = h(k(j)); case1.N = Ni;
 %     case1.solver(zL, 'y', alg, do_balancing);
-%     zLn = case1.zL;
+    case1.solver(zL, 'y', alg, do_balancing,0.1);
+    zLn = case1.zL;
     for i = 1:length(N)
         case1.N = N(i);
 %         o = case1.solver(zLn,'n',alg,do_balancing);
-        o = case1.solver(zL,'y',alg,do_balancing);
+%         o = case1.solver(zL,'y',alg,do_balancing);
+        o = case1.solver(zLn, 'n', alg, do_balancing,0.1);
         oi(i,:) = imag(o);
         fprintf('N = %3d, growth rate = %.8f\n', N(i), oi(i));
     end
