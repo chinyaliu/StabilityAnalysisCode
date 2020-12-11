@@ -1,12 +1,12 @@
 classdef wZhang_block < handle
     properties
-        k = 1; h = -6; Re = inf; Fr2 = 0; eps;
+        k = 1; h = -6; Re = inf; Fr2 = 0;
     end
     properties(SetObservable)
         N = 400; method;
     end
     properties (SetAccess = private)
-        z; zc; phi; zL; dm; ord;
+        z; zc; phi; zL; dm; ord; cL;
         g = @(x) (5000*acosh((-2497/(625*(x - 1)))^(1/2)/2))/4407;
     end
     methods
@@ -34,8 +34,18 @@ classdef wZhang_block < handle
         function chgN(obj, varargin)
             obj.diffmat();
         end
+        function newcl(obj,ci,eps)
+            c1 = 0.9988; c2 = 0.8814;
+            uzz = 2*c1*c2^2*(sech(c2*obj.zL)).^2.*((sech(c2*obj.zL)).^2-2*(tanh(c2*obj.zL)).^2);
+            obj.cL = eps*sqrt(2*abs(ci/uzz));
+        end
         diffmat(obj);
         [A, B] = matAB(obj, D, U);
         [N, arr] = setN4sub(obj);
+        function [N, arr] = setN2sub(obj)
+            arr = [0 obj.zL obj.h];
+            N = 0.5*obj.N*ones(1,2);
+%             obj.N = sum(N);
+        end
     end
 end

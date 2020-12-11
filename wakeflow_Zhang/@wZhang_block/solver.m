@@ -1,8 +1,9 @@
 function [o, an, cA, errGEP, dob] = solver(obj, zL1, iter, alg, bal, eps)
 %% Iterate for domain height z_L
-obj.eps = eps; obj.zL = zL1;
+obj.cL = eps; obj.zL = zL1;
 flag = 0;
 [N, arr] = obj.setN4sub();
+% [N, arr] = obj.setN2sub();
 for j = 1:length(N)
     subD(j) = subdomain(N(j),arr(j),arr(j+1),obj.dm,obj.k);
 end
@@ -37,9 +38,17 @@ for i = 1:21
         flag = 1;
         fprintf('iter %2d, try inflection pt\n', i);
     end
+%     if i == 1
+%         obj.N = obj.N/2;
+%     end
+    newcl(obj,imag(o(1)/obj.k),eps);
     [N, arr] = obj.setN4sub();
     for j = 1:length(N)
-        subD(j).chgL(N(j),arr(j),arr(j+1));
+        if j > length(subD)
+            subD(j) = subdomain(N(j),arr(j),arr(j+1),obj.dm,obj.k);
+        else
+            subD(j).chgL(N(j),arr(j),arr(j+1));
+        end
     end
     subD = subD(1:length(N));
 end
@@ -47,7 +56,7 @@ obj.zc = -obj.g(real(o)/obj.k);
 if nargout > 1 % calculate modeshape only when eigenvector is needed
     obj.z = []; obj.phi = [];
     N = [0 N+1];
-    for i = 1:4
+    for i = 1:length(N)-1
         obj.z = [obj.z;subD(i).z];
         obj.phi = [obj.phi;subD(i).modeshape(an(sum(N(1:i))+1:sum(N(1:i+1))))];
     end

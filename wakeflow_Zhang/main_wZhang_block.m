@@ -7,13 +7,14 @@ solveGEPmethod = ["qr", "qz", "eig"];
 solver = [1,1]; % [order, diff_method]
 algorithm = 1; % solveGEPmethod
 do_balancing = 'n';
-N = 400;
-k = 3;
+N = 800;
+k = 0.01;
 Re = inf;
 Fr2 = 2.25;
 h = 2*pi/k;
+% h = 6;
 zL = 0.74708299;
-eps = 0.05;
+eps = 0.15;
 %% Set solver
 method = [order(solver(1)), diff_method(solver(2))];
 alg = solveGEPmethod(algorithm);
@@ -38,8 +39,8 @@ for i = 1:3
         plot(plotvar{j},case1.z,'-k.','linewidth',1,'markersize',10);
         hold on;
         yline(case1.zc, '-.r', 'linewidth', 1.5);
-        yline(case1.zc-eps, '--r', 'linewidth', 1);
-        yline(case1.zc+eps, '--r', 'linewidth', 1);
+        yline(case1.zc-case1.cL, '--r', 'linewidth', 1);
+        yline(case1.zc+case1.cL, '--r', 'linewidth', 1);
         xline(0,'--b','linewidth',1.5);
         hold off;
         set(gca,'fontsize',20);

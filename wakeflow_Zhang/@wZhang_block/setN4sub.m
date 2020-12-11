@@ -1,26 +1,18 @@
 function [N, arr] = setN4sub(obj)
-if obj.eps > 0.5*obj.zL
-    arr = [0 obj.zL obj.zL+obj.eps obj.h];
-    obj.eps = obj.zL;
+if isnan(obj.cL)
+    obj.cL = obj.zL;
+end
+if obj.cL > 0.5*obj.zL
+    arr = [0 obj.zL 2*obj.zL obj.h];
 else
-    arr = [0 obj.zL-obj.eps obj.zL obj.zL+obj.eps obj.h];
+    arr = [0 obj.zL-obj.cL obj.zL obj.zL+obj.cL obj.h];
 end
 N = zeros(1,length(arr)-1);
-a = diff(arr)/obj.h < 0.1;
-N(a) = ceil(obj.N/10);
+a = diff(arr)/obj.h < 0.2;
+N(a) = ceil(obj.N/5);
 N = N + ceil((obj.N-sum(N))*diff(arr)/obj.h).*(~a);
+% if a(1) == 1
+%     N(1) = N(1)/2;
+% end
 N(end) = obj.N-sum(N(1:end-1));
-% if eps/obj.h < 0.05
-%     N(2) = ceil(obj.N/20);
-% else
-%     N(2) = ceil(obj.eps/obj.h);
-% end
-% N(1) = ceil((obj.N - 2*N(2))*(obj.zL - obj.eps)/(obj.h-2*obj.eps));
-% N(3) = N(2);
-% N(4) = obj.N - N(1) - 2*N(2);
-% if N(1) < ceil(obj.N/20)
-%     N(1) = 0;
-%     N(4) = obj.N - 2*N(2);
-%     obj.eps = obj.zL;
-% end
 end
