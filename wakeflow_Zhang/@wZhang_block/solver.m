@@ -9,7 +9,12 @@ for j = 1:length(N)
 end
 for i = 1:21
       %% Construct matrix A B
-    [A, B] = obj.matAB(subD);
+    % Governing equation
+    [A, B] = subD(1).match(subD(2:end));
+    % BC (free surface)
+    [A(1:2,1:subD(1).N+1), A(1:2,end), B(1:2,1:subD(1).N+1), B(1:2,end)] = subD(1).BC0(obj.Fr2);
+    % BC (truncated)
+    A(end, obj.N-subD(end).N+length(subD):end-1) = subD(end).BCh();
       %% Find eigenvalue(s)
     if strcmp(bal,'y')
         [o,an,dob,errGEP,cA] = balancing(A,B,1,'y',alg);
@@ -38,9 +43,6 @@ for i = 1:21
         flag = 1;
         fprintf('iter %2d, try inflection pt\n', i);
     end
-%     if i == 1
-%         obj.N = obj.N/2;
-%     end
     newcl(obj,imag(o(1)/obj.k),eps);
     [N, arr] = obj.setN4sub();
     for j = 1:length(N)

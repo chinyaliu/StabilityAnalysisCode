@@ -40,12 +40,10 @@ classdef wZhang_block < handle
             obj.cL = eps*sqrt(2*abs(ci/uzz));
         end
         diffmat(obj);
-        [A, B] = matAB(obj, D, U);
         [N, arr] = setN4sub(obj);
         function [N, arr] = setN2sub(obj)
             arr = [0 obj.zL obj.h];
             N = 0.5*obj.N*ones(1,2);
-%             obj.N = sum(N);
         end
     end
 end

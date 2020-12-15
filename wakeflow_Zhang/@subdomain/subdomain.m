@@ -37,6 +37,21 @@ classdef subdomain < handle
         function A = BCh(obj)
             A = obj.D(end,:,1);
         end
+        function [A, B] = match(obj,sub)
+            x = obj.N+2; y = obj.N+2;
+            a = obj.N + sum(vertcat(sub.N));
+            A = zeros(a+length(sub)+3,a+length(sub)+2);
+            B = zeros(a+length(sub)+2,a+length(sub)+2);
+            A(1:obj.N+3, 1:obj.N+1) = obj.A;
+            B(3:obj.N+1, 1:obj.N+1) = obj.B;
+            for i = 1:length(sub) 
+                A(y:y+sub(i).N+2, x:x+sub(i).N) = sub(i).A;
+                B(y+2:y+sub(i).N, x:x+sub(i).N) = sub(i).B;
+                x = x+sub(i).N+1;
+                y = y+sub(i).N+1;
+            end
+            A = A(1:end-1,:);
+        end
     end
     methods (Access = private)
         function makeAB(obj)
