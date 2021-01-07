@@ -15,8 +15,9 @@ Fr2 = 2.25;
 inflec_pt = -0.74708299;
 cutz = NaN(1,length(k)+1);
 cutz(1) = -inflec_pt;
-h = 6*ones(1,length(k));
-h(k<pi/3) = 2*pi./k(k<pi/3);
+% h = 6*ones(1,length(k));
+% h(k<pi/3) = 2*pi./k(k<pi/3);
+h = 2*pi./k;
 %% Set solver
 method = [order(solver(1)), diff_method(solver(2)), constructAB_method(solver(3))];
 alg = solveGEPmethod(algorithm);
@@ -28,8 +29,13 @@ for i = 1:length(k)
     p1.k = k(i); p1.h = h(i);
 %     [o(i), an] = p1.solver(cutz(i), 'y', alg, do_balancing);
 %     z(:,i) = p1.z; phi{i} = p1.phi; 
-    o(i) = p1.solver(cutz(i), 'y', alg, do_balancing);
-    z_c(i) = p1.zc; cutz(i+1)=p1.zL;
+    o(i) = p1.solver(alg, do_balancing, cutz(i));
+    z_c(i) = p1.zc; 
+    if isnan(z_c(i))
+        cutz(i+1)=cutz(1);
+    else
+        cutz(i+1)=-p1.zc;
+    end
     fprintf('k = %.2f, growth rate = %.4f\n', k(i), imag(o(i)));
 end
 toc;

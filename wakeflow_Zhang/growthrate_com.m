@@ -8,16 +8,16 @@ solveGEPmethod = ["qr", "qz", "eig", "eigs", "polyeig", "singgep", "jdqz"];
 solver = [1,1,1]; % [order, diff_method, constructAB_method]
 algorithm = 1;
 do_balancing = 'n';
-N = 200;
-k = linspace(0.01,4,400);
+N = 400;
+k = linspace(0.01,4,100);
 Re = inf;
 Fr2 = 2.25;
-delt = 0.04;
+delt = 0;
 inflec_pt = -0.74708299;
-h = 6*ones(1,length(k));
-h(k<pi/3) = 2*pi./k(k<pi/3);
-% h = 6*h;
-% h = 0.005*ones(1,length(k));
+% h = 6*ones(1,length(k));
+% h(k<pi/3) = 2*pi./k(k<pi/3);
+h = 2*pi./k;
+% h = 1*ones(length(k),1);
 %% Set solver
 method = [order(solver(1)), diff_method(solver(2)), constructAB_method(solver(3))];
 alg = solveGEPmethod(algorithm);
@@ -32,7 +32,7 @@ for i = 1:length(k)
     op = p1.solver(alg, do_balancing);
     call{i} = op/k(i);
     o(i) = op(1);
-%     z_c(i) = p1.zc;
+    z_c(i) = -p1.zc;
     fprintf('k = %.2f, growth rate = %.4f\n', k(i), imag(o(i)));
 end
 toc;
@@ -74,21 +74,21 @@ hold off;
 %     writeVideo(writerObj, frame);
 % end
 % close(writerObj);
-% %% Plot z_c v.s. k
-% fig2 = figure('position',[50,0,1000,720]);
-% plot(k,z_c,'linewidth',2);
-% hold on; yline(inflec_pt, '-.r', 'linewidth', 2); hold off;
-% set(gca,'fontsize',20);
-% xlabel('$\tilde{k}$', 'Interpreter', 'LaTeX','fontsize',30);
-% ylabel('$\tilde{z_c}$', 'Interpreter', 'LaTeX','fontsize',30,'rotation',0);
-% grid on;
-% yt = sort([-3.5:0.5:0 inflec_pt]);
-% yticks(yt);
+%% Plot z_c v.s. k
+fig2 = figure('position',[50,0,1000,720]);
+plot(k,z_c,'linewidth',2);
+hold on; yline(inflec_pt, '-.r', 'linewidth', 2); hold off;
+set(gca,'fontsize',20);
+xlabel('$\tilde{k}$', 'Interpreter', 'LaTeX','fontsize',30);
+ylabel('$\tilde{z_c}$', 'Interpreter', 'LaTeX','fontsize',30,'rotation',0);
+grid on;
+yt = sort([-3.5:0.5:0 inflec_pt]);
+yticks(yt);
 % ind = find(yt==inflec_pt);
 % ax = gca;
 % ax.YTickLabel{ind} = ['\color{red}' ax.YTickLabel{ind}];
-% xlim([0 4]);
-% % ylim([-3.6 0]);
+xlim([0 4]);
+% ylim([-3.6 0]);
 %% Save data & figures
 % save('diffk','phi','z','N','k','cutz','o','z_c');
 % exportgraphics(fig1, 'fig_growthrate\omega_i.png');

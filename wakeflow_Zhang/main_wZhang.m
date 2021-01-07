@@ -9,7 +9,7 @@ solver = [1,1,1]; % [order, diff_method, constructAB_method]
 algorithm = 1; % solveGEPmethod
 do_balancing = 'n';
 N = 400;
-k = 3;
+k = 0.61;
 Re = inf;
 Fr2 = 2.25;
 h = 2*pi/k;
@@ -21,7 +21,7 @@ alg = solveGEPmethod(algorithm);
 t1 = tic;
 case1 = wZhang_solver(N,k,h,Re,Fr2,method);
 % [o, an, cA, errGEP, dob] = case1.solver(zL, 'y', alg, do_balancing);
-[o, an] = case1.solver(zL, 'y', alg, do_balancing);
+[o, an] = case1.solver(alg, do_balancing,zL);
 toc(t1);
 %% Plot
 figtitle = ["$\phi$", "$\phi_ z$", "$\phi_ {zz}$"];

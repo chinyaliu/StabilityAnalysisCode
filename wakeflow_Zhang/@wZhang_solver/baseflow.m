@@ -1,5 +1,5 @@
 function U = baseflow(obj)
-z = [0.5*obj.zL*(obj.zeta-1);0.5*(obj.h-obj.zL)*(obj.zeta-1)-obj.zL];
+z = [0.5*obj.zc*(obj.zeta-1);0.5*(obj.h-obj.zc)*(obj.zeta-1)-obj.zc];
 c1 = 0.9988; c2 = 0.8814;
 U(:,1) = (1-c1*cosh(c2*z).^(-2));
 U(:,2) = 2*c1*c2*tanh(c2*z).*(sech(c2*z)).^2;

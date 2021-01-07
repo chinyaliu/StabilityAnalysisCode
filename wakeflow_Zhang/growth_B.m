@@ -1,38 +1,65 @@
 close all; clear all;% clc
 %% Solver & Algorithm list
-order = ["Ray"];
-diff_method = ["Schimd", "Trefethen"];
-solveGEPmethod = ["qr", "qz", "eig", "eigs", "polyeig", "singgep", "jdqz"];
+wZhangMethod = ["DDM", "Complex"];
+order = ["Ray","D4"];
+diff_meth = ["Schimd", "Trefethen"];
+makeAB_meth = ["D4", "Schimd"];
+solveGEPmeth = ["qr", "qz", "eig"];
+%% Set solver
+meth = wZhangMethod(1);
+method = [order(1), diff_meth(1), makeAB_meth(1)];
+alg = solveGEPmeth(1);
 %% Inputs
-solver = [1,1]; % [order, diff_method, constructAB_method]
-algorithm = 1;
 do_balancing = 'n';
-N = 400;
-k = linspace(0.01,4,400);
 Re = inf;
 Fr2 = 2.25;
-inflec_pt = -0.74708299;
-cutz = NaN(1,length(k)+1);
-cutz(1) = -inflec_pt;
+N = 800;
+k = linspace(0.01,4,400);
 h = 2*pi./k;
 eps = 0.15;
-%% Set solver
-method = [order(solver(1)), diff_method(solver(2))];
-alg = solveGEPmethod(algorithm);
+inflec_pt = -0.74708299;
+c0 = 1./sqrt(k*Fr2);
+% zL = real(wZhang_ddm.g(c0)); 
+zL = 0.74708299*ones(length(k),1);
+cutz = NaN(1,length(k)+1);
+cutz(1) = -inflec_pt;
+addvar = struct('zL1',zL(1),'eps',eps);
+switch lower(meth)
+    case 'ddm' % Additional parameters for DDM
+        wZhang = @wZhang_ddm;
+        numberofDDM = 4;
+        f = wZhang_ddm.ddmtype(numberofDDM);
+        in_init = {N,k,h,Re,Fr2,method};
+        in_solver = {alg, do_balancing, f, addvar};
+    case 'complex' % Additional parameters for complex
+        wZhang = @wZhang_complex;
+        delt = 0.05;
+        h = 0.5*2*pi./k;
+%         h = 2*pi./k/0.6931;
+        in_init = {N(1),k,h,Re,Fr2,method,delt};
+        in_solver = {alg, do_balancing};
+    otherwise
+        error('Method not defined');
+end
 %% Run solver
 tic;
-p1 = wZhang_block(N,1,1,Re,Fr2,method);
+p1 = wZhang(in_init{:});
 o = NaN(1,length(k)); z_c = NaN(1,length(k));
 for i = 1:length(k)
     p1.k = k(i); p1.h = h(i);
-%     [o(i), an] = p1.solver(cutz(i), 'y', alg, do_balancing);
-%     z(:,i) = p1.z; phi{i} = p1.phi; 
-    o(i) = p1.solver(cutz(i), 'y', alg, do_balancing,eps);
-    z_c(i) = p1.zc; cutz(i+1)=p1.zL;
+    addvar.zL1 = zL(i);
+%     addvar.zL1 = cutz(i);
+    in_solver = {alg, do_balancing, f, addvar};
+    o(i) = p1.solver(in_solver{:});
+    z_c(i) = p1.zc; 
+%     if isnan(z_c(i))
+%         cutz(i+1)=cutz(1);
+%     else
+%         cutz(i+1)=-p1.zc;
+%     end
     fprintf('k = %.2f, growth rate = %.4f\n', k(i), imag(o(i)));
 end
 toc;
-cutz = cutz(2:end);
 %% Plot growth rate v.s. k
 fig1 = figure('position',[50,0,1000,720]);
 plot(k,imag(o),'linewidth',2);

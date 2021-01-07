@@ -1,7 +1,7 @@
-function [A, B] = matAB(obj, D, U)
+function [A, B] = matAB(obj, U)
 % D0 = D(:,:,1); D1 = D(:,:,2); D2 = D(:,:,3); D3 = D(:,:,4); D4 = D(:,:,5);
 % U = U(:,1); Uz = U(:,2); Uzz = U(:,3); 
-N = obj.N; k = obj.k;
+N = obj.N; k = obj.k; D = obj.D;
 A = zeros(N+2,N+2);
 B = zeros(N+2,N+2);
 switch obj.method(1)
@@ -21,7 +21,7 @@ switch obj.method(1)
         A(end-1, end) = k/obj.Fr2;
         B(end-1, 1:N+1) = D(1,:,2);
         % z = -h
-        A(end, 1:N+1) = D(end,:,1);
+        A(end, 1:N+1) = D(end,:,2)-k*D(end,:,1);
 %     case 'd4'
 %       %% D4
 %         % Governing equation

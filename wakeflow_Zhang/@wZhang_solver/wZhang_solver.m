@@ -6,7 +6,7 @@ classdef wZhang_solver < handle
         N = 400; method;
     end
     properties (SetAccess = private)
-        z; zc; phi; zL; zeta; Din; ord;
+        z; zc; phi; zeta; Din; ord;
         g = @(x) (5000*acosh((-2497/(625*(x - 1)))^(1/2)/2))/4407;
     end
     methods
@@ -19,7 +19,7 @@ classdef wZhang_solver < handle
             addlistener(obj,'N','PostSet',@obj.chgDM);
             addlistener(obj,'method','PostSet',@obj.chgDM);
         end
-        [o, an, cA, errGEP, dob] = solver(obj, zL1, iter, alg, bal);
+        [o, an, cA, errGEP, dob] = solver(obj, alg, bal, zL1);
     end
     methods (Access = private)
         function chgDM(obj, varargin)

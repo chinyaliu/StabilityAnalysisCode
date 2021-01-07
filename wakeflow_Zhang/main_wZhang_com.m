@@ -8,15 +8,15 @@ solveGEPmethod = ["qr", "qz", "eig"];
 solver = [1,1,1]; % [order, diff_method, constructAB_method]
 algorithm = 1; % solveGEPmethod
 do_balancing = 'n';
-N = 40;
-k = 3.5;
+N = 400;
+k = 1;
 Re = inf;
 Fr2 = 2.25;
-delt = 0.05;
-h = 2*pi/k;
-if k > pi/3
-    h = 6;
-end
+delt = 0;
+h = 10*2*pi/k;
+% if k > pi/3
+%     h = 6;
+% end
 zL = 0.74708299;
 %% Set solver
 method = [order(solver(1)), diff_method(solver(2)), constructAB_method(solver(3))];
@@ -26,6 +26,7 @@ t1 = tic;
 case1 = wZhang_complex(N,k,h,Re,Fr2,method,delt);
 % [o, an, cA, errGEP, dob] = case1.solver(zL, 'y', alg, do_balancing);
 [o, an] = case1.solver(alg, do_balancing);
+[z, phi] = case1.findmodeshape(an(:,1));
 toc(t1);
 %% Plot
 figtitle = ["$\phi$", "$\phi_ z$", "$\phi_ {zz}$"];
@@ -37,10 +38,10 @@ else
 end
 for i = 1:3
     fig(i) = figure('position',[0 0 1680 960]);
-    plotvar = {abs(case1.phi(:,i)),unwrap(angle(case1.phi(:,i))),real(case1.phi(:,i)),imag(case1.phi(:,i))};
+    plotvar = {abs(phi(:,i)),unwrap(angle(phi(:,i))),real(phi(:,i)),imag(phi(:,i))};
     for j = 1:4
         subplot(1,4,j);
-        plot(plotvar{j},case1.z,'-k.','linewidth',1,'markersize',10);
+        plot(plotvar{j},z,'-k.','linewidth',1,'markersize',10);
         hold on;
 %         yline(case1.zc, '-.r', 'linewidth', 1.5);
 %         yline(-zL, '--b', 'linewidth', 1.5);
