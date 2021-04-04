@@ -1,4 +1,4 @@
-close all; clear all;% clc
+% close all; clear all;% clc
 %% Solver & Algorithm list
 order = ["Ray", "D4"];
 diff_method = ["Schimd", "Trefethen"];
@@ -9,9 +9,10 @@ solver = [1,1,1]; % [order, diff_method, constructAB_method]
 algorithm = 1; % solveGEPmethod
 do_balancing = 'n';
 N = 400;
-k = 0.61;
+k = 1;
 Re = inf;
-Fr2 = 2.25;
+% Fr2 = 2.25;
+Fr2 = inf;
 h = 2*pi/k;
 zL = 0.74708299;
 %% Set solver

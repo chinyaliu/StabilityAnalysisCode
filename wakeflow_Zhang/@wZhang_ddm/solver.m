@@ -27,6 +27,7 @@ for i = 1:it
             [o,an,errGEP,cA] = solveGEP(A,B,'max',alg);
             dob = 0;
         else
+%             [o,an] = solveGEP(A,B,'all',alg); %test
             [o,an] = solveGEP(A,B,'max',alg);
         end
     end

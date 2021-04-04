@@ -4,7 +4,7 @@ order = ["Ray", "D4"];
 diff_method = ["Schimd", "Trefethen"];
 constructAB_method = ["D4", "Schimd"];%, "Herbert"];
 solveGEPmethod = ["qr", "qz", "eig", "eigs", "polyeig", "singgep", "jdqz"];
-%% Inputs
+% Inputs
 solver = [1,1,1]; % [order, diff_method, constructAB_method]
 algorithm = 1;
 do_balancing = 'n';
@@ -18,7 +18,7 @@ inflec_pt = -0.74708299;
 % h(k<pi/3) = 2*pi./k(k<pi/3);
 h = 2*pi./k;
 % h = 1*ones(length(k),1);
-%% Set solver
+% Set solver
 method = [order(solver(1)), diff_method(solver(2)), constructAB_method(solver(3))];
 alg = solveGEPmethod(algorithm);
 %% Run solver

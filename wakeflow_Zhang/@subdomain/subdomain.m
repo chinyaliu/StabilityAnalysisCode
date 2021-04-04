@@ -36,11 +36,12 @@ classdef subdomain < handle
             phi = reshape(reshape(permute(obj.D(:,:,1:3),[1 3 2]),[],size(obj.D,2))*an,[],3);
         end
         function [A, B] = BC0(obj,Fr2,N)
-            A = [[obj.k*obj.D(1,:,1); obj.k*obj.U(1,1).*obj.D(1,:,2) - obj.k*obj.U(1,2).*obj.D(1,:,1)],zeros(2,N-obj.N-1),[obj.k*obj.U(1,1); obj.k/Fr2]];
+            A = [[obj.k*obj.D(1,:,1); (obj.k*obj.U(1,1).*obj.D(1,:,2)-obj.k*obj.U(1,2).*obj.D(1,:,1))],zeros(2,N-obj.N-1),[obj.k*obj.U(1,1); obj.k/Fr2]];
             B = [zeros(1,N),1; obj.D(1,:,2),zeros(1,N-obj.N-1),0];
         end
         function A = BCh(obj)
-            A = obj.D(end,:,1);
+%             A = obj.D(end,:,1);
+            A = obj.D(end,:,2)-obj.k*obj.D(end,:,1);
         end
     end
     methods (Access = private)
