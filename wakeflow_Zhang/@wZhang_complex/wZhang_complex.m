@@ -28,13 +28,13 @@ classdef wZhang_complex < handle
             phi = reshape(reshape(permute(obj.D(:,:,1:3),[1 3 2]),[],M)*an(1:M,1),[],3);
             z = obj.z;
         end
+        U = baseflow(obj);
     end
     methods (Access = private)
         function chgDM(obj, varargin)
             obj.diffmat();
         end
         diffmat(obj);
-        U = baseflow(obj);
         [A, B] = matAB(obj, U);
     end
 end

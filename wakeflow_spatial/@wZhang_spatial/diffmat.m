@@ -1,7 +1,7 @@
 function diffmat(obj)
 %% Order of governing equation
 switch obj.method(1)
-    case 'ray'
+    case {'ray', 'ray2'}
         obj.ord = 2;
     case 'd4'
         obj.ord = 4;
