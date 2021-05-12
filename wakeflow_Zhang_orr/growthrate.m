@@ -1,72 +1,68 @@
-close all; clear all;% clc
-%% Solver & Algorithm list
-order = ["Ray", "D4"];
-diff_method = ["Schimd", "Trefethen"];
-constructAB_method = ["D4", "Schimd"];%, "Herbert"];
-solveGEPmethod = ["qr", "qz", "eig", "eigs", "polyeig", "singgep", "jdqz"];
-%% Inputs
-solver = [1,1,1]; % [order, diff_method, constructAB_method]
-algorithm = 1;
+% close all; clear all;% clc
+%% Set Solver & Algorithm
+diff_meth = ["Schimd", "Trefethen"];
+method = diff_meth(1);
+solveGEPmeth = ["qr", "qz", "eig"];
+alg = solveGEPmeth(1);
 do_balancing = 'n';
-N = 400;
-k = linspace(0.01,4,400);
+eig_spectrum = 'max';
+% Re = 1e3;
 Re = inf;
 Fr2 = 2.25;
+N = 600;
+k = linspace(0.01,4,100);
+h = 4*pi./k;
+% h(h<10) = 10;
 inflec_pt = -0.74708299;
-cutz = NaN(1,length(k)+1);
+% c0 = 1./sqrt(k*Fr2);
+% zL = real(wZhang_ddm.g(c0)); 
+zL = 0.74708299*ones(length(k),1);
+cutz = NaN(1,length(k));
 cutz(1) = -inflec_pt;
-% h = 6*ones(1,length(k));
-% h(k<pi/3) = 2*pi./k(k<pi/3);
-h = 2*pi./k;
-%% Set solver
-method = [order(solver(1)), diff_method(solver(2)), constructAB_method(solver(3))];
-alg = solveGEPmethod(algorithm);
+numberofDDM = 2;
+eps = 0.01;
+f = wZhang_ddm.ddmtype(numberofDDM);
+in_init = {N,k(1),h(1),Re,Fr2};
+addvar = struct('zL1',zL(1),'eps',eps);
 %% Run solver
 tic;
-p1 = wZhang_solver(N,1,1,Re,Fr2,method);
-o = NaN(1,length(k)); z_c = NaN(1,length(k));
+p1 = wZhang_ddm(in_init{:});
+p1.numMeth(method);
+o = NaN(1,length(k));
 for i = 1:length(k)
     p1.k = k(i); p1.h = h(i);
-%     [o(i), an] = p1.solver(cutz(i), 'y', alg, do_balancing);
-%     z(:,i) = p1.z; phi{i} = p1.phi; 
-    o(i) = p1.solver(alg, do_balancing, cutz(i));
-    z_c(i) = p1.zc; 
-    if isnan(z_c(i))
-        cutz(i+1)=cutz(1);
+%     addvar.zL1 = zL(i);
+    o(i) = p1.solver(alg, do_balancing, eig_spectrum, f, addvar);
+    if isnan(p1.zc)
+        cutz(i)=cutz(1);
     else
-        cutz(i+1)=-p1.zc;
+        cutz(i)=-p1.zc;
     end
-    fprintf('k = %.2f, growth rate = %.4f\n', k(i), imag(o(i)));
+    addvar.zL1 = cutz(i);
+    fprintf('k = %.2f\n', k(i));
 end
 toc;
-cutz = cutz(2:end);
-%% Plot growth rate v.s. k
+
+%% Plot oi vs or
 fig1 = figure('position',[50,0,1000,720]);
-plot(k,imag(o),'linewidth',2);
-% ylim([0 0.04]);
-xlim([0 4]);
-set(gca,'fontsize',20);
-xlabel('$\tilde{k}$', 'Interpreter', 'LaTeX','fontsize',30);
-ylabel('$\tilde{\omega_i}$', 'Interpreter', 'LaTeX','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
-ax = gca;
-ax.YAxis.Exponent = -2;
-grid on;
-%% Plot z_c v.s. k
+plot(real(o),imag(o),'k.','Markersize',6);
+hold on; yline(0,'linewidth',1.5,'color','#898989'); hold off;
+xlabel('$\tilde{\omega _r}$','fontsize',30);
+ylabel('$\tilde{\omega _i}$','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
+
+%% Plot oi vs k
 fig2 = figure('position',[50,0,1000,720]);
-plot(k,z_c,'linewidth',2);
-hold on; yline(inflec_pt, '-.r', 'linewidth', 2); hold off;
-set(gca,'fontsize',20);
-xlabel('$\tilde{k}$', 'Interpreter', 'LaTeX','fontsize',30);
-ylabel('$\tilde{z_c}$', 'Interpreter', 'LaTeX','fontsize',30,'rotation',0);
-grid on;
-yt = sort([-3.5:0.5:0 inflec_pt]);
-yticks(yt);
-ind = find(yt==inflec_pt);
-ax = gca;
-ax.YTickLabel{ind} = ['\color{red}' ax.YTickLabel{ind}];
+plot(k,imag(o),'k.','Markersize',6);
+hold on; yline(0,'linewidth',1.5,'color','#898989'); hold off;
 xlim([0 4]);
-% ylim([-3.6 0]);
-%% Save data & figures
-% save('diffk','phi','z','N','k','cutz','o','z_c');
-% exportgraphics(fig1, 'fig_growthrate\omega_i.png');
-% exportgraphics(fig2, 'fig_growthrate\criticalheight.png');
+xlabel('$\tilde{k}$','fontsize',30);
+ylabel('$\tilde{\omega _i}$','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
+
+%% Plot critical height vs k
+fig3 = figure('position',[50,0,1000,720]);
+plot(k,-cutz,'k.','Markersize',6);
+hold on; 
+yline(inflec_pt,'linewidth',1.5,'color','b');
+xlim([0 4]);
+xlabel('$\tilde{k}$','fontsize',30);
+ylabel('$\tilde{z_c}$','fontsize',30,'rotation',0, 'HorizontalAlignment','right');

@@ -9,8 +9,8 @@ method = [order(1), diff_meth(1), makeAB_meth(1)];
 alg = solveGEPmeth(1);
 % Inputs
 do_balancing = 'n';
-N = 800;
-k = 0.5;
+N = 220;
+k = 3;
 Re = inf;
 Fr2 = 2.25;
 h = 2*pi/real(k);
@@ -45,7 +45,7 @@ for i = 1:3
         hold on;
         plot(plotvar{j},z,'-k.','linewidth',1,'markersize',10);
         yline(case1.zc, '-r', 'linewidth', 1.5);
-        arr = -case1.getarr;
+        arr = -case1.getcut;
         for k = 2:length(arr)-1
             yline(arr(k), '--r', 'linewidth', 1);
         end

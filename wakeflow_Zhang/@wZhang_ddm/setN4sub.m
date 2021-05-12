@@ -9,10 +9,14 @@ else
         cL = obj.zc;
     end
 end
-if cL > 0.5*obj.zc
-    arr = [0 obj.zc 2*obj.zc obj.h];
+if cL > 0.5*obj.h
+    arr = [0 obj.zc obj.h];
 else
-    arr = [0 obj.zc-cL obj.zc obj.zc+cL obj.h];
+    if cL > 0.5*obj.zc
+        arr = [0 obj.zc 2*obj.zc obj.h];
+    else
+        arr = [0 obj.zc-cL obj.zc obj.zc+cL obj.h];
+    end
 end
 N = zeros(1,length(arr)-1);
 a = diff(arr)/obj.h < 0.2;

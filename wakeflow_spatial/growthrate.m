@@ -65,8 +65,8 @@ for i = 1:length(o)
     set(gca,'fontsize',20);
     xlabel('$c_r$','fontsize',30);
     ylabel('$c_i$','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
-   ylim([-1.5 1.5]);
-   xlim([-1 1]);
+    ylim([-1.5 1.5]);
+    xlim([-1 1]);
     grid on;
     titext = sprintf('o = %.3f',o(i));
     title(titext,'FontSize',30);

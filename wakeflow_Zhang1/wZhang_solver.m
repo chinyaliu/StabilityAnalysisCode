@@ -1,4 +1,4 @@
-function [o, an, cA, errGEP, dobalance] = wZhang_solver(N,k,h,Re,Fr2,method,alg,balance)
+function [o, an, cA, errGEP] = wZhang_solver(N,k,h,Re,Fr2,method,alg)
 %% Differential order of solving method
 switch lower(method(1))
     case 'd2'
@@ -51,5 +51,5 @@ else
     end
 end
 %% Find eigenvalue(s)
-[o,an,dobalance,errGEP,cA] = solveGEP(A,B,'max','y',alg,balance);
+[o,an,errGEP,cA] = solveGEP(A,B,'max',alg);
 end

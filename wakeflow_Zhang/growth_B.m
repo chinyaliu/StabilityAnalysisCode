@@ -11,7 +11,7 @@ alg = solveGEPmeth(1);
 do_balancing = 'n';
 Re = inf;
 Fr2 = 2.25;
-N = 600;
+N = 400;
 k = linspace(0.01,4,100);
 h = 2*pi./real(k);
 eps = 0.15;
@@ -31,13 +31,13 @@ p1 = wZhang_ddm(in_init{:});
 o = NaN(1,length(k)); z_c = NaN(1,length(k));
 for i = 1:length(k)
     p1.k = k(i); p1.h = h(i);
-    addvar.zL1 = zL(i);
-%     addvar.zL1 = cutz(i);
+%     addvar.zL1 = zL(i);
+    addvar.zL1 = cutz(i);
 %     o(i) = p1.solver(alg, do_balancing, f, addvar);
     % test
     oall{i} = p1.solver(alg, do_balancing, f, addvar);
     o(i) = oall{i}(1);
-    %
+    
     z_c(i) = p1.zc; 
     if isnan(z_c(i))
         cutz(i+1)=cutz(1);
@@ -80,7 +80,7 @@ for i = 1:length(k)
     F(i) = getframe(gcf);
 end
 hold off;
-writerObj = VideoWriter('test4.mp4','MPEG-4');
+writerObj = VideoWriter('test3.mp4','MPEG-4');
 writerObj.FrameRate = 10;
 writerObj.Quality = 100;
 open(writerObj);
@@ -112,9 +112,10 @@ ax = gca;
 ax.YAxis.Exponent = -2;
 grid on;
 %% Plot z_c v.s. k
+z_c(isnan(imag(o))) = NaN;
 fig2 = figure('position',[50,0,1000,720]);
-plot(k,z_c,'linewidth',2);
-hold on; yline(inflec_pt, '-.r', 'linewidth', 2); hold off;
+plot(k,z_c,'-ko','linewidth',2,'markersize',2);
+hold on; yline(inflec_pt, '-.b', 'linewidth', 2); hold off;
 set(gca,'fontsize',20);
 xlabel('$\tilde{k}$', 'Interpreter', 'LaTeX','fontsize',30);
 ylabel('$\tilde{z_c}$', 'Interpreter', 'LaTeX','fontsize',30,'rotation',0);

@@ -1,28 +1,36 @@
 classdef wZhang_ddm < handle
     properties
-        k = 1; h = -6; Re = inf; Fr2 = 0;
-    end
-    properties(SetObservable)
-        N = 400; method;
+        k = 1; h = -6; Fr2 = 2.25; N = 400;
     end
     properties (SetAccess = private)
-        zc;
+        zc; Re = inf; 
+        method; ord; dm; subD;
     end
     properties (Constant)
         g = @(x) (5000*acosh((-2497./(625*(x - 1))).^(1/2)/2))./4407;
     end
-    properties (Access = private)
-        ord; dm; mm; subD;
-    end
     methods
-        function obj = wZhang_ddm(N,k,h,Re,Fr2,meth)
-            if (nargin == 6)
+        function obj = wZhang_ddm(N,k,h,Re,Fr2)
+            if (nargin >= 5)
                 obj.N = N; obj.k = k; obj.h = h; obj.Re = Re;
-                obj.Fr2 = Fr2; obj.method = lower(meth); obj.chgM();
+                obj.Fr2 = Fr2; 
             end
-            addlistener(obj,'method','PostSet',@obj.chgM);
         end
-        [o, an, cA, errGEP, dob] = solver(obj, alg, bal, funcN, zL1, eps);
+        [o, an, cA, errGEP, dob] = solver(obj, alg, bal, eigspec, funcN, addvar);
+        numMeth(obj,meth);
+        function chgRe(obj,Re)
+            obj.Re = Re;
+            if isinf(obj.Re)
+                obj.method(1) = 'Ray';
+                obj.ord = 2;
+            else
+                if strcmpi(obj.method(2),'trefethen')
+                    error('Trefethen''s differential method can''t be used for M = N-2\n');
+                end
+                obj.method(1) = 'd4';
+                obj.ord = 4;
+            end
+        end
         function [z, phi] = findmodeshape(obj, an)
             num = 0; z = []; phi = [];
             for i = 1:length(obj.subD)
@@ -31,46 +39,17 @@ classdef wZhang_ddm < handle
                 num = num + obj.subD(i).N + 1;
             end
         end
-        function out = getarr(obj)
+        function out = getcut(obj)
             for i = 1:length(obj.subD)
                 out(i) = obj.subD(i).ztop;
             end
             out(i+1) = obj.subD(end).zbot;
         end
-    end 
-    methods (Access = private)
-        function chgM(obj, varargin)
-            switch obj.method(1)
-                case 'ray'
-                    obj.ord = 2;
-                otherwise
-                    error('Invalid method(1) name');
-            end
-            obj.diffmat();
-        end
-        diffmat(obj);
     end
     methods (Static)
-        function out = ddmtype(name)
-            switch(name)
-                case 1
-                    out = @wZhang_ddm.setN1sub;
-                case 2
-                    out = @wZhang_ddm.setN2sub;
-                case 4
-                    out = @wZhang_ddm.setN4sub;
-                otherwise
-                    error('Function for domain number not specified.');
-            end
-        end
-        [N, arr] = setN4sub(obj,init,o,eps,varargin);
-        function [N, arr] = setN2sub(obj,varargin)
-            arr = [0 obj.zc obj.h];
-            N = 0.5*obj.N*ones(1,2);
-        end
-        function [N, arr] = setN1sub(obj,varargin)
-            arr = [0 obj.h];
-            N = obj.N;
+        out = ddmtype(name);
+        function out = criticalH(x)
+            out = -(5000*acosh((-2497./(625*(x - 1))).^(1/2)/2))./4407;
         end
     end
 end

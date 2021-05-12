@@ -19,7 +19,7 @@ if (strcmpi(modenum,'all'))
     w = ev(ev_ind);
     xv = V(:,ev_ind);
 else
-    ev_ind = a(abs(ev)<1e+3 & abs(ev)>1e-5 & abs(imag(ev)) > 1e-10);
+    ev_ind = a(abs(ev)<1e+3 & abs(ev)>1e-5 & abs(imag(ev)) > 1e-10 & real(ev)>0);
     if isempty(ev_ind)
         w = NaN*(1+1i);
         xv = NaN(length(A),1)*(1+1i);
