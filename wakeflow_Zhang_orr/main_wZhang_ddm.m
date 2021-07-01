@@ -6,18 +6,18 @@ solveGEPmeth = ["qr", "qz", "eig"];
 alg = solveGEPmeth(1);
 % Inputs
 do_balancing = 'n';
-eig_spectrum = 'all';
-N = 400;
-k = 0.25;
-Re = 1e3;
+eig_spectrum = 'max';
+N = 600;
+k = 0.3;
+Re = inf;
 Fr2 = 1.5^2;
-h = 2*pi/real(k);
+h = 2*2*pi/real(k);
 c0 = 1./sqrt(k*Fr2);
 % zL = wZhang_ddm.criticalH(c0); 
 zL = 0.74708299;
 % DDM numbers
-numberofDDM = 4;
-eps = 0.01;
+numberofDDM = 1;
+eps = 0.15;
 f = wZhang_ddm.ddmtype(numberofDDM);
 
 %% Run solver
@@ -67,7 +67,6 @@ title(titext);
 
 %% Plot modeshape
 [z, phi] = case1.findmodeshape(an(:,1));
-phi = -phi;
 figtitle = ["$\phi$", "$\phi_ z$", "$\phi_ {zz}$"];
 xlab = {'$magnitude$','$angle$','$real$','$imag$'};
 if (h > 6)
@@ -91,11 +90,10 @@ for i = 1:3
             yline(arr(k), '--r', 'linewidth', 1);
         end
         hold off;
-        set(gca,'fontsize',20);
-        xlabel(xlab{j},'FontSize',30, 'Interpreter', 'LaTeX');
-        ylabel('$z$','FontSize',30, 'Interpreter', 'LaTeX','rotation',0, 'HorizontalAlignment','right');
+        xlabel(xlab{j});
+        ylabel('$z$','rotation',0, 'HorizontalAlignment','right');
         ylim([blim 0]);
         grid on; box on;
     end
-    sgtitle(figtitle(i),'FontSize',32, 'Interpreter', 'LaTeX');
+    sgtitle(figtitle(i), 'Interpreter', 'LaTeX');
 end

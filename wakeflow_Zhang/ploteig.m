@@ -9,8 +9,8 @@ method = [order(1), diff_meth(1), makeAB_meth(1)];
 alg = solveGEPmeth(1);
 % Inputs
 do_balancing = 'all';
-N = 2000;
-k = 1.15-2.7i;
+N = 1000;
+k = 0.2;
 Re = inf;
 Fr2 = 2.25;
 % Fr2 = 30.25;
@@ -66,6 +66,7 @@ ylim([-1.5*ymax 1.5*ymax]);
 titext = sprintf('$k=%.2f%+.2fi$',real(k),imag(k));
 % titext = sprintf('$k=%.2f%+.2fi,\\ \\omega =%.2f%+.2fi$',real(k),imag(k),real(o_chosen),imag(o_chosen));
 title(titext);
+box on;
 %% Plot oi_or
 figure;
 scatter(real(o),imag(o),'ok');

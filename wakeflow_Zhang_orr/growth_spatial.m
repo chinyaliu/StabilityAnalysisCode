@@ -6,12 +6,12 @@ solveGEPmeth = ["qr", "qz", "eig"];
 method = diff_meth(1);
 alg = solveGEPmeth(1);
 % Inputs
-Re = 1e3;
+Re = 100;
 Fr2 = 1.5^2;
-N = 600;
+N = 400;
 % Cusp method from k_i
-kr = linspace(0.01,4,100);
-ki = [-0.5 -1 -1.5 -1.7];
+kr = linspace(0.01,4,400);
+ki = [0 -0.5 -1 -1.5 -1.7];
 % ki = -2.5;
 % Cusp method from k_i
 % kr = [0.5 0.55 0.6 0.65 0.7];
@@ -25,7 +25,7 @@ zL = 0.74708299*ones(length(kr),1);
 cutz = NaN(1,length(kr)+1);
 cutz(1) = -inflec_pt;
 addvar = struct('zL1',zL(1),'eps',eps);
-numberofDDM = 4;
+numberofDDM = 1;
 f = wZhang_ddm.ddmtype(numberofDDM);
 in_init = {N,kr,h,Re,Fr2};
 p1 = wZhang_ddm(in_init{:});
@@ -35,8 +35,8 @@ imagedata = imread('dimas_fr15.bmp');
 im2 = imbinarize(imagedata).*255;
 im2(im2==0) = 200;
 im2 = cast(im2,'uint8');
-fig1 = figure('position',[50,50,1280,720]);
-% imagesc([0,1],[0.15,-0.1],im2); % Fr = 4.5
+% fig1 = figure('position',[50,50,1280,720]);
+% imagesc([0,1],[0.15,-0.1],im2); % Fr = 4.5, 5.5
 % imagesc([0,1],[0.15,-0.1],im2); % Fr = 3.5
 % imagesc([0,1],[0.1,-0.4],im2); % Fr = 2.5
 imagesc([0,1.4],[0.1,-0.6],im2); % Fr = 1.5
@@ -44,7 +44,7 @@ imagesc([0,1.4],[0.1,-0.6],im2); % Fr = 1.5
 set(gca,'YDir','normal');
 hold on;
 %% Plot real k
-kk = linspace(0.01,4,100);
+kk = kr;
 hk = 2*pi./kk;
 cutz = NaN(1,length(kk)+1);
 cutz(1) = -inflec_pt;
@@ -53,7 +53,7 @@ for i = 1:length(kk)
     p1.k = kk(i); p1.h = hk(i);
 %     addvar.zL1 = zL(i);
     addvar.zL1 = cutz(i);
-    o(i) = p1.solver(alg, 'n', f, addvar);
+    o(i) = p1.solver(alg, 'n', 'max', f, addvar);
     if isnan(p1.zc)
         cutz(i+1)=cutz(1);
     else
@@ -78,36 +78,15 @@ for j = 1:length(ki)
 %     od = NaN(1,length(k));
     od = [];
     for i = 1:length(k)
-%         p1.k = k(i);
         p1.k = k(i); p1.h = h(i);
-        addvar.zL1 = zL(i);
+        addvar.zL1 = cutz(i);
         % test
-        oall = p1.solver(alg, 'all', f, addvar);
+        oall = p1.solver(alg, 'n', 'all', f, addvar);
         o(i) = oall(1);
         od = [od; oall];
-%         ca = oall/k(i);
-        
-%         % Criteria 1
-%         aa = abs(imag(ca))>5e-3;% & real(oall)>0;
-%         suma = sum(aa);
-%         if suma ~= 0
-% %             [~,bb] = max(abs(imag(ca.*aa)));
-% %             od(i) = oall(bb);
-%             oo = oall(aa);
-%             od = [od; oo];
-%         end
-        
-%             % Criteria 2
-%             a = 1:length(ca); 
-%             crange = ((real(ca)-0.0012>-1e-5) & (real(ca)-1<=1e-5));
-%             dis = ((real(ca)-1).^2 +imag(ca).^2)>1e-5;
-%             aa = a(crange&dis);
-%             abch = isoutlier(imag(ca(aa)),'movmedian',20);
-%             aa = [a(dis&~crange) aa(abch)];
-%             od = [od; oall(aa)];
 
-            fprintf('k = %.2f, growth rate = %.4f\n', k(i), imag(o(i)));
-        end
+        fprintf('k = %.2f, growth rate = %.4f\n', k(i), imag(o(i)));
+    end
     textk = sprintf('$k_i=%+.3fi$',imag(k(i)));
 %     textk = sprintf('$k_r=%.3fi$',real(k(i)));
     plot(real(od),imag(od),'.','Markersize',8,'DisplayName',textk);

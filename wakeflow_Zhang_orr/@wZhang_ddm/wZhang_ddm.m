@@ -6,9 +6,6 @@ classdef wZhang_ddm < handle
         zc; Re = inf; 
         method; ord; dm; subD;
     end
-    properties (Constant)
-        g = @(x) (5000*acosh((-2497./(625*(x - 1))).^(1/2)/2))./4407;
-    end
     methods
         function obj = wZhang_ddm(N,k,h,Re,Fr2)
             if (nargin >= 5)

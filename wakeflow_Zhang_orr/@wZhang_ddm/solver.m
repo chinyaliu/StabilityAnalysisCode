@@ -50,7 +50,8 @@ for i = 1:it
     if(abs(ztemp+obj.zc) < 1e-8) % converged
         fprintf('converged to zL = %.8f\n', obj.zc);
         break;
-    elseif(imag(o(1)) > 0 && i ~= it && ~strcmp(eigspec,'all')) % keep iterating
+    elseif(imag(o(1)) > 0 && i ~= it && real(o(1))>0) % keep iterating
+%     elseif(imag(o(1)) > 0 && i ~= it && ~strcmp(eigspec,'all') && real(o(1))>0) % keep iterating
         fprintf('iter %2d, zL = %.8f\n', i, obj.zc);
         obj.zc = -ztemp;
     else
