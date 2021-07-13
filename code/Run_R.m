@@ -1,6 +1,6 @@
 %% Rayleigh equation solver by eq. finite difference (linear spacing)
 %% use derivative matrix (more flexible)
-clear;
+% clear;
 %% Initialize
 [Test_type,k,N,klist,Nlist,w_FD_eq,count,Testlist] = ToInitialize;
 Fr2 = 2.25;

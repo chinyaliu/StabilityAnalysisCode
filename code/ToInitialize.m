@@ -26,9 +26,9 @@ switch Test_type
     case 'k'
         N = 1000;
 %         klist = linspace(0.01,4,200);
-        klist = 0.01:0.05:0.6;
-        klist = klist - 0.5i;
-%         klist = 1.6-0.5i;
+%         klist = 0.01:0.05:0.6;
+%         klist = klist - 0.5i;
+        klist = 0.1;
         w = NaN(size(klist));
         wr = NaN(size(klist));
         L1list = NaN(size(klist));
