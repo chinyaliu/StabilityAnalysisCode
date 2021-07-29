@@ -1,7 +1,7 @@
 function [w,xv,err,cA] = solveGEP(A,B,modenum,algorithm)
 switch algorithm
     case 'qr'
-        [V,D] = eig(full(A\B));
+        [V,D] = eig(A\B);
         ev = 1./diag(D);
     case 'qz'
         [AA,BB,~,~,V,~] = qz(A,B);

@@ -13,7 +13,10 @@ classdef subRay < subdomain
            B = [zeros(1,N),1; obj.D(1,:,2),zeros(1,N-obj.N-1),0];
        end
        function [A,B] = BCh(obj,N)
-           A = [zeros(1,N-obj.N-1), obj.D(end,:,2)-obj.k*obj.D(end,:,1), 0];
+%            % Exponential decay
+%            A = [zeros(1,N-obj.N-1), obj.D(end,:,2)-obj.k*obj.D(end,:,1), 0];
+           % Free slip
+           A = [zeros(1,N-obj.N-1), obj.D(end,:,1), 0];
            B = zeros(1,N+1);
        end
        function makeAB(obj)

@@ -1,11 +1,14 @@
 clear all;
+if ~contains(path,'code_Dimas;')
+    addpath('code_Dimas');
+end    
 %% Inout arguments
 meth = ["qr", "qz", "eig"];
 alg = meth(1);
-bal = 'n';
+bal = 'y';
 eigspec = 'all';
 N = 1000;
-k = 3;
+k = 3.2;
 Fr = 1.5;
 h = @(k) 2*pi/real(k);
 
@@ -13,9 +16,9 @@ h = @(k) 2*pi/real(k);
 tic;
 [A, B] = makeAB(k, N, h(k), Fr);
 if strcmpi(bal,'y')
-    [o, an] = balanceABs(A, B, eigspec, alg);
+    [o, an] = balanceAB(A, B, eigspec, alg);
 else
-    [o, an] = solveGEPs(A, B, eigspec, alg);
+    [o, an] = solveGEP(A, B, eigspec, alg);
 end
 if  strcmpi(eigspec,'all')
     c = o./k;

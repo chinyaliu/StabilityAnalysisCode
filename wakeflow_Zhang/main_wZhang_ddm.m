@@ -9,12 +9,12 @@ method = [order(1), diff_meth(1), makeAB_meth(1)];
 alg = solveGEPmeth(1);
 % Inputs
 do_balancing = 'n';
-N = 220;
-k = 3;
+N = 1000;
+k = 0.3;
 Re = inf;
 Fr2 = 2.25;
 h = 2*pi/real(k);
-numberofDDM = 4;
+numberofDDM = 1;
 eps = 0.01;
 c0 = 1./sqrt(k*Fr2);
 % zL = wZhang_ddm.g(c0); 

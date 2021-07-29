@@ -1,4 +1,7 @@
 clear all;
+if ~contains(path,'code_Dimas;')
+    addpath('code_Dimas');
+end    
 %% Inout arguments
 meth = ["qr", "qz", "eig"];
 alg = meth(1);
