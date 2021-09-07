@@ -15,7 +15,8 @@ classdef wZhang_ddm < handle
         end
         [o, an, cA, errGEP, dob] = solver(obj, alg, bal, eigspec, funcN, addvar);
         numMeth(obj,meth);
-        function chgRe(obj,Re)
+        function chgRe(obj,Re,meth)
+            obj.method = ['d4', lower(meth)];
             obj.Re = Re;
             if isinf(obj.Re)
                 obj.method(1) = 'Ray';
@@ -24,7 +25,6 @@ classdef wZhang_ddm < handle
                 if strcmpi(obj.method(2),'trefethen')
                     error('Trefethen''s differential method can''t be used for M = N-2\n');
                 end
-                obj.method(1) = 'd4';
                 obj.ord = 4;
             end
         end

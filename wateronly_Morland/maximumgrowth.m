@@ -17,20 +17,18 @@ ddm_number = 4;
 f = wMorland.ddmtype(ddm_number);
 
 %% change delta
-delta_list = linspace(0.11,0.8,70);
+delta_list = linspace(0,0.8,100);
 lambda_list = NaN(1,length(delta_list));
 c_list = NaN(1,length(delta_list));
 t1 = tic;
-inilam = 0.4;
 for i = 1:length(delta_list)
     fprintf('delta = %.2f\n', delta_list(i));
     init_var = {N,6,ud_nd,delta_list(i),1,method,bflow};
-    sol_var = {alg, do_balancing, eig_spectrum, f, struct('zL1',delta_list(i),'eps',0.2)};
-    [lambda,c] = findmaxgrowth(init_var, sol_var, 10, inilam, 0.2);
+    sol_var = {alg, do_balancing, eig_spectrum, f, struct('zL1',delta_list(i),'eps',1)};
+    [lambda,c] = findmaxgrowth(init_var, sol_var, 10);
     if ~isnan(lambda)
         lambda_list(i) = lambda;
         c_list(i) = c;
-        inilam = lambda;
     end
 end
 toc(t1);

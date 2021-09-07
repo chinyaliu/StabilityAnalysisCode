@@ -5,21 +5,21 @@ end
 %% Set Solver & Algorithm
 diff_meth = ["Schimd", "Trefethen"];
 method = diff_meth(1);
-solveGEPmeth = ["qr", "qz", "eig"];
-alg = solveGEPmeth(1);
+solveGEPmeth = ["qr", "qz", "eig", "invB"];
+alg = solveGEPmeth(4);
 baseflowlist = ["exponential", "error function"];
 bflow = baseflowlist(1);
 % Inputs
+de_singularize = 'y';
 do_balancing = 'y';
 eig_spectrum = 'all';
 N = 1000;
 ud_nd = 2;
 delta_nd = 0.291;
-lambda_nd = 0.25;
-% h =1*lambda_nd;
-h = 3*delta_nd;
-ddm_number = 2;
-addvar = struct('zL1',delta_nd,'eps',0.2);
+lambda_nd = 0.817;
+h =5*lambda_nd;
+ddm_number = 44;
+c0 = sqrt(0.5*(lambda_nd+1./lambda_nd));
 f = wMorland.ddmtype(ddm_number);
 fprintf('u_d = %1.2f, delta = %1.3f, lambda = %1.3f\n',ud_nd,delta_nd,lambda_nd);
 
@@ -27,8 +27,14 @@ fprintf('u_d = %1.2f, delta = %1.3f, lambda = %1.3f\n',ud_nd,delta_nd,lambda_nd)
 t1 = tic;
 case1 = wMorland(N,h,ud_nd,delta_nd,lambda_nd,method,bflow);
 % case1.k = case1.k-0.1i;
-[c, an] = case1.solver(alg, do_balancing, eig_spectrum, f, addvar);
+% [c,an,cA,errz,dob] = case1.solver(alg, do_balancing, eig_spectrum, f, addvar);
+addvar = struct('zL1',-case1.criticalH(c0),'eps',0.1);
+[c1,an,cA,errz,dob] = case1.solvers(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
 toc(t1);
+% Discard eigenvalues set by de-singularizing process
+if strcmpi(de_singularize,'y')
+    c = c1(imag(c1)>-100);
+end
 
 %% Choose eigenvalue
 a = 1:length(c); 
@@ -60,7 +66,7 @@ title(titext);
 %% Plot eigenvalue spectrum oi_or
 figure;
 plot(real(o),imag(o),'ok');
-hold on; 
+hold on;       
 yline(0,'linewidth',1.5,'color','#898989'); 
 scatter(real(o_chosen),imag(o_chosen),'b','filled');
 hold off;

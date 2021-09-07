@@ -23,10 +23,10 @@ end
 dob = 0; errGEP = []; cA = [];
 if strcmpi(bal,'y')
     solfunc = @balanceAB;
-    vout = {dob,errGEP,cA};
+    vout = cell(3,1);
 else
     solfunc = @solveGEP;
-    vout = {errGEP,cA};
+    vout = cell(2,1);
 end
 it = 21; % maximum iteratiom
 for i = 1:it
@@ -34,11 +34,15 @@ for i = 1:it
     % Governing equation
     [Age, Bge] = obj.subD(1).match(obj.subD);
     % BC (free surface)
-    [Abc1, Bbc1] = obj.subD(1).BC0(obj.Fr2,size(Age,2)-1);
+    [Abc1, Bbc1] = obj.subD(1).BC0(obj.Fr2,obj.N+length(N));
     % BC (truncated)
-    [Abc2, Bbc2] = obj.subD(end).BCh(size(Age,2)-1);
+    [Abc2, Bbc2] = obj.subD(end).BCh(obj.N+length(N));
     A = [Age; Abc1; Abc2];
     B = [Bge; Bbc1; Bbc2];
+    %% De-singularize
+    er = 200i;
+    sinB = all(B<eps,2);
+    B(sinB,:) = er*A(sinB,:);
     %% Find the eigenvalue(s)
     if nargout > 2
         [o,an,vout{:}] = solfunc(A,B,eigspec,alg);
@@ -72,6 +76,11 @@ for i = 1:it
     if length(N) < length(obj.subD)
         obj.subD = obj.subD(1:length(N));
     end
+end
+if strcmpi(bal,'y')
+    [dob,errGEP,cA] = deal(vout{:});
+else
+    [errGEP,cA] = deal(vout{:});
 end
 obj.zc = -obj.zc;
 end      

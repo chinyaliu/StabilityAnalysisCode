@@ -13,7 +13,6 @@ classdef wMorland < handle
             if (nargin >= 7)
                 obj.N = N; obj.k = 2*pi/lambda; obj.h = h;
                 obj.ud = ud; obj.delta = delta; 
-                obj.criticalH = @(c) 0.5*delta*log(c/ud);
                 obj.numMeth(meth);
                 obj.setbaseflow(bf);
             end
@@ -22,13 +21,16 @@ classdef wMorland < handle
             switch(lower(bftype))
                 case 'exponential'
                     obj.subDclass = @subRay;
+                    obj.criticalH = @(c) 0.5*obj.delta*log(c/obj.ud);
                 case 'error function'
                     obj.subDclass = @subErf;
+                    obj.criticalH = @(c) -erfcinv(c/obj.ud)*sqrt(pi)*obj.delta/2;
                 otherwise
                     error('Undifined base flow name.');
             end
         end
-        [o, an, cA, errGEP, dob] = solver(obj, alg, bal, eigspec, funcN, addvar);
+        [c, an, cA, errGEP, dob] = solver(obj, alg, bal, eigspec, funcN, addvar);
+        [c, an, cA, errGEP, dob] = solvers(obj, alg, des, bal, eigspec, funcN, addvar);
         numMeth(obj,meth);
         function [z, phi] = findmodeshape(obj, an)
             num = 0; z = []; phi = [];

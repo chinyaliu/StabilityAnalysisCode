@@ -4,10 +4,10 @@ diff_meth = ["Schimd", "Trefethen"];
 method = diff_meth(1);
 solveGEPmeth = ["qr", "qz", "eig"];
 alg = solveGEPmeth(1);
-do_balancing = 'n';
+do_balancing = 'y';
 eig_spectrum = 'max';
-N = 600:100:1500;
-k = 3.2;
+N = 300:100:1500;
+k = 3;
 Re = inf;
 Fr2 = 2.25;
 c0 = 1./sqrt(k*Fr2);
@@ -18,7 +18,7 @@ numberofDDM = 4;
 eps = 0.15;
 f = wZhang_ddm.ddmtype(numberofDDM);
 % truncation height
-nh = linspace(1,8.2,30);
+nh = linspace(0.5,5,20);
 % nh = linspace(0.1,8,30);
 h = 2*pi/k*nh;
 in_init = {N(1),k(1),h(1),Re,Fr2};
@@ -48,6 +48,13 @@ for j = 1:length(nh)
     oih(j) = oi(i);
 end
 toc;
+%% Plot diff(c_i) vs h
+dc = abs(diff(imag(oih)));
+figure;
+semilogy(nh(1:end-1),dc,'-bo');
+xlabel('$n\lambda$');
+ylabel('$\| \omega_i(m)-\omega_i(m+1) \|$');
+grid on;
 %% Plot figure
 % dall = abs(oih-oih(end))./oih(end);
 dall = abs(oih-oih(end));

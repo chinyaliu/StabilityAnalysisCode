@@ -29,6 +29,6 @@ function [w,xv,dobalance,bakerr,cA] = balanceAB(A,B,modenum,algorithm)
     end
 
     if nargout > 3
-        bakerr = max(max(abs(A*xv(:,:,1)-w(1)*B*xv(:,:,1))));
+        bakerr = max(abs(A*xv(:,1)-w(1)*B*xv(:,1)));
     end
 end

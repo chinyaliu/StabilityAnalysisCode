@@ -6,18 +6,18 @@ solveGEPmeth = ["qr", "qz", "eig"];
 alg = solveGEPmeth(1);
 % Inputs
 do_balancing = 'n';
-eig_spectrum = 'max';
+eig_spectrum = 'all';
 N = 600;
 k = 0.3;
-Re = inf;
+Re = 1e7;
 Fr2 = 1.5^2;
 h = 2*2*pi/real(k);
 c0 = 1./sqrt(k*Fr2);
 % zL = wZhang_ddm.criticalH(c0); 
 zL = 0.74708299;
 % DDM numbers
-numberofDDM = 1;
-eps = 0.15;
+numberofDDM = 4;
+eps = 0.2;
 f = wZhang_ddm.ddmtype(numberofDDM);
 
 %% Run solver

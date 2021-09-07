@@ -5,30 +5,37 @@ end
 %% Set Solver & Algorithm
 diff_meth = ["Schimd", "Trefethen"];
 method = diff_meth(1);
-solveGEPmeth = ["qr", "qz", "eig"];
+solveGEPmeth = ["qr", "qz", "eig", "invB"];
 alg = solveGEPmeth(1);
 baseflowlist = ["exponential", "error function"];
-bflow = baseflowlist(2);
+bflow = baseflowlist(1);
 % Inputs
+de_singularize = 'y';
 do_balancing = 'y';
 eig_spectrum = 'all';
 N = 1000;
 ud_nd = 2;
 delta_nd = 0.291;
-lambda_nd = 0.1;
-h = max(lambda_nd,3*delta_nd);
-ddm_number = 2;
-addvar = struct('zL1',delta_nd,'eps',0.2);
+lambda_nd = 0.817;
+h = 5*lambda_nd;
+ddm_number = 92;
+addvar = struct('zL1',delta_nd/2,'eps',0.2);
 f = wMorland.ddmtype(ddm_number);
 fprintf('u_d = %1.2f, delta = %1.3f, lambda = %1.3f\n',ud_nd,delta_nd,lambda_nd);
 
 %% Run solver
 t1 = tic;
 case1 = wMorland(N,h,ud_nd,delta_nd,lambda_nd,method,bflow);
-[c, an] = case1.solver(alg, do_balancing, eig_spectrum, f, addvar);
+% [c, an] = case1.solver(alg, do_balancing, eig_spectrum, f, addvar);
+c = case1.solvers(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
 case1.N = N+20;
-c2 = case1.solver(alg, do_balancing, eig_spectrum, f, addvar);
+% c2 = case1.solver(alg, do_balancing, eig_spectrum, f, addvar);
+c2 = case1.solvers(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
 toc(t1);
+if strcmpi(de_singularize,'y')
+    c = c(imag(c)>-100);
+    c2 = c2(imag(c2)>-100);
+end
 
 %% Compare between eigenvalues of N and N2
 C = repmat(c,1,length(c2));

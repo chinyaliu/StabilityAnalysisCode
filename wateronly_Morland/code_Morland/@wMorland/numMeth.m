@@ -1,5 +1,6 @@
 function numMeth(obj,meth)
     obj.method = ['Ray', lower(meth)];
+    obj.ord = 2;
     %% Differential matrix & BC
     switch obj.method(2)
         case 'schimd'
@@ -11,7 +12,7 @@ function numMeth(obj,meth)
     end
 
     function [z, D] = shD(obj2)
-        [z, D] = Dcheb(obj2.N,obj.ord,obj.method(1));
+        [z, D] = Dchebnew(obj2.N,obj2.N,obj.ord);
     end
     function [z, D] = trD(obj2)
         [Du,z]=cheb(obj2.N);

@@ -2,23 +2,23 @@ clear all;% clc
 %% Set Solver & Algorithm
 diff_meth = ["Schimd", "Trefethen"];
 method = diff_meth(1);
-solveGEPmeth = ["qr", "qz", "eig"];
-alg = solveGEPmeth(1);
+solveGEPmeth = ["qr", "qz", "eig","invB"];
+alg = solveGEPmeth(4);
 % Inputs
-do_balancing = 'n';
+do_balancing = 'y';
 eig_spectrum = 'all';
 N = 600;
-k = 0.01;
-Re = inf;
+k = 3;
+Re = 1e10;
 Fr2 = 1.5^2;
-h = 2*pi/real(k);
+h = 3*2*pi/real(k);
 % h = 6;
 c0 = 1./sqrt(k*Fr2);
 % zL = wZhang_ddm.criticalH(c0); 
 zL = 0.74708299;
 % DDM numbers
 numberofDDM = 4;
-eps = 0.01;
+eps = 0.2;
 f = wZhang_ddm.ddmtype(numberofDDM);
 
 %% Run solver

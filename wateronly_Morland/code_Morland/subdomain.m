@@ -9,7 +9,7 @@ classdef (Abstract) subdomain < handle
                 obj.N = N; obj.ztop = ztop; obj.k = k;
                 obj.zbot = zbot;
                 obj.setD(ztop,zbot,dm);
-                obj.baseflow(ud,delta);
+                obj.U = obj.baseflow(obj.z,ud,delta);
             end
         end
         function setD(obj,ztop,zbot,dm)
@@ -33,7 +33,7 @@ classdef (Abstract) subdomain < handle
                 obj.z = (obj.z+obj.ztop)*(zbot-ztop)/(obj.zbot-obj.ztop)-ztop;
             end
             obj.ztop = ztop; obj.zbot = zbot;
-            obj.baseflow(ud,delta);
+            obj.U = obj.baseflow(obj.z,ud,delta);
             obj.makeAB();
         end
         function phi = modeshape(obj,an)
@@ -41,10 +41,12 @@ classdef (Abstract) subdomain < handle
         end
     end
     methods(Abstract)
-        baseflow(obj,ud,delta)      
         [A, B] = BC0(obj,N)
         [A, B] = BCh(obj,N)
         makeAB(obj)
+    end
+    methods(Abstract, Static)
+        out = baseflow(z,ud,delta)      
     end
     methods (Static)
         function [A, B] = match(subd)

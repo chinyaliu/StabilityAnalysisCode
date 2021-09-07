@@ -9,6 +9,9 @@ switch algorithm
     case 'eig'
         [V,D] = eig(A,B,'qz');
         ev = diag(D);
+    case 'invB'
+        [V,D] = eig(B\A);
+        ev = diag(D);
 end
 % find unstable modes
 a = 1:length(ev);
