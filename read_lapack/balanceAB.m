@@ -1,7 +1,7 @@
 function [w,xv,dobalance,bakerr,cA] = balanceAB(A,B,modenum,algorithm)
     n = length(A);
     % balance
-    if isdouble(fi(A)) && isdouble(fi(B))
+    if isreal(A) && isreal(B) && isa(A,'double') && isa(B,'double')
         [Ab,Bb,rscale,info] = lapack('DGGBAL(h,i,D,i,D,i,i,i,d,D,d,I)',...
             'S',n,A,n,B,n,0,0,zeros(n,1),zeros(n,1),zeros(6*n,1),0);
         if info ~= 0

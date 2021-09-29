@@ -3,27 +3,13 @@ if ~contains(path,'code_Morland;')
     addpath('code_Morland');
 end    
 %% Set Solver & Algorithm
-diff_meth = ["Schimd", "Trefethen"];
-method = diff_meth(1);
-solveGEPmeth = ["qr", "qz", "eig"];
-alg = solveGEPmeth(1);
-baseflowlist = ["exponential", "error function"];
-bflow = baseflowlist(2);
-% Inputs
-do_balancing = 'y';
-eig_spectrum = 'all';
-N = 1000;
-ud_nd = 2;
-delta_nd = 0.291;
-% h = @(x) 3*x;
-h = 3*delta_nd;
-ddm_number = 4;
-f = wMorland.ddmtype(ddm_number);
+[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,ud_nd,delta_nd,~,~,h,f] = pars_Morland(1);
 
 %% Run solver
 col = repmat(get(gca,'colororder'),5,1);
-lambda_list = [linspace(0.13,1.5,200) linspace(1.5,4,100)];
-ki_list = [1.7 2 2.3 2.5];
+[lmin, lmax] = findneutral(ud_nd,delta_nd); % for exponential profile
+lambda_list = linspace(lmax,lmin,200);
+ki_list = [0 0.1 0.5 1 1.5];
 o_list = cell(length(ki_list),1);
 t1 = tic;
 
@@ -39,7 +25,9 @@ for i = 1:length(ki_list)
         lam = lambda_list(j);
         fprintf('wavelength = %.2f\n', lam);
         flow1.k = 2*pi/lam-ki*1i;
-        c_all = flow1.solver(alg, do_balancing, eig_spectrum, f, addvar);
+        flow1.h = 3*lam;
+%         c_all = flow1.solver(alg, do_balancing, eig_spectrum, f, addvar);
+        c_all = flow1.solvers(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
         if isnan(flow1.zc)
             addvar.zL1 = delta_nd;
         else
@@ -70,6 +58,7 @@ hold off;
 toc(t1);
 
 %%
+figure;
 yline(0,'linewidth',1.5,'color','#898989','HandleVisibility','off');
 hold on;
 xline(0,'linewidth',1.5,'color','#898989','HandleVisibility','off');

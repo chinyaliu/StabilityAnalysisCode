@@ -3,22 +3,8 @@ if ~contains(path,'code_Morland;')
     addpath('code_Morland');
 end    
 %% Set Solver & Algorithm
-diff_meth = ["Schimd", "Trefethen"];
-method = diff_meth(1);
-solveGEPmeth = ["qr", "qz", "eig", "invB"];
-alg = solveGEPmeth(4);
-baseflowlist = ["exponential", "error function"];
-bflow = baseflowlist(1);
-% Inputs
-de_singularize = 'y';
-do_balancing = 'y';
-eig_spectrum = 'max';
-N = 1000;
-ud_nd = 2;
-delta_nd = 0.291;
-lambda_nd = [0.817, 0.4, 1.4];
-ddm_number = 44;
-f = wMorland.ddmtype(ddm_number);
+[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,ud_nd,delta_nd,~,~,~,f] = pars_Morland(2);
+lambda_nd = [0.8 1 1.4];
 sol_vars = {alg, de_singularize, do_balancing, eig_spectrum, f, struct('zL1',delta_nd,'eps',0.1)};
 
 %% Run solver
@@ -33,6 +19,8 @@ for i = 1:length(h_list)
     fprintf('h = %.2f times wave length.\n',h_list(i));
     for j = 1:length(lambda_nd)
         wcase(j).h = h_list(i)*lambda_nd(j);
+        c0 = sqrt(0.5*(lambda_nd(j)+1./lambda_nd(j)));
+        sol_vars{6}.zL1 = -wcase(j).criticalH(c0);
         c = wcase(j).solvers(sol_vars{:});
         c_list{j}(i) = c;
     end

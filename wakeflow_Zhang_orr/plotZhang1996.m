@@ -1,4 +1,7 @@
-close all;
+clear all;
+if ~contains(path,'code_wake;')
+    addpath('code_wake');
+end 
 %% Load results from redoZhang1996_2
 % load('save06102114.mat');
 %% Parameters

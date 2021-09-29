@@ -3,36 +3,20 @@ if ~contains(path,'code_Morland;')
     addpath('code_Morland');
 end
 %% Set Solver & Algorithm
-diff_meth = ["Schimd", "Trefethen"];
-method = diff_meth(1);
-solveGEPmeth = ["qr", "qz", "eig", "invB"];
-alg = solveGEPmeth(1);
-baseflowlist = ["exponential", "error function"];
-bflow = baseflowlist(1);
-% Inputs
-de_singularize = 'y';
-do_balancing = 'y';
-eig_spectrum = 'max';
-ud_nd = 2;
-delta_nd = 0.291;
-lambda_nd = 0.817;
-h =5*lambda_nd;
-ddm_number = 92;
+[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,~,ud_nd,delta_nd,lambda_nd,c0,h,f] = pars_Morland(2);
 addvar = struct('zL1',delta_nd,'eps',0.2);
-f = wMorland.ddmtype(ddm_number);
 init_var = {1000,h,ud_nd,delta_nd,lambda_nd,method,bflow};
-sol_var = {alg, do_balancing, eig_spectrum, f, addvar};
 sol_vars = {alg, de_singularize, do_balancing, eig_spectrum, f, addvar};
 %% Run solver
 N_list = 300:50:1500;
 c_list = NaN(1,length(N_list));
 tic;
 case1 = wMorland(init_var{:});
+addvar.zL1 = -case1.criticalH(c0);
 for i = 1:length(N_list)
     fprintf('N = %3d\n', N_list(i));
     case1.N = N_list(i);
     c_list(i) = case1.solvers(sol_vars{:});
-%     c_list(i) = case1.solver(sol_var{:});
 end
 ci = imag(c_list);
 dci = abs(ci - ci(end).*ones(1,length(ci)))./ci(end);

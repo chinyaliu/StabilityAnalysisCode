@@ -1,35 +1,19 @@
-clear all;% clc
+clear all;
+if ~contains(path,'code_wake;')
+    addpath('code_wake');
+end 
 %% Set Solver & Algorithm
-diff_meth = ["Schimd", "Trefethen"];
-method = diff_meth(1);
-solveGEPmeth = ["qr", "qz", "eig","invB"];
-alg = solveGEPmeth(4);
-% Inputs
-do_balancing = 'y';
-eig_spectrum = 'all';
-N = 600;
-k = 3;
-Re = 1e10;
-Fr2 = 1.5^2;
-h = 3*2*pi/real(k);
-% h = 6;
-c0 = 1./sqrt(k*Fr2);
-% zL = wZhang_ddm.criticalH(c0); 
-zL = 0.74708299;
-% DDM numbers
-numberofDDM = 4;
-eps = 0.2;
-f = wZhang_ddm.ddmtype(numberofDDM);
+[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,k,Fr2,Re,eps,c0,h,f] = pars_wake;
 
 %% Run solver
 t1 = tic;
 case1 = wZhang_ddm(N,k,h,Re,Fr2);
 case1.numMeth(method);
-[o, an] = case1.solver(alg, do_balancing, eig_spectrum, f, struct('zL1',zL,'eps',eps));
-c = o/k;
+addvar = struct('zL1',-case1.criticalH(c0),'eps',eps);
+o = case1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
 % Run second time with different N
 case1.N = N+50;
-o2 = case1.solver(alg, do_balancing, eig_spectrum, f, struct('zL1',zL,'eps',eps));
+o2 = case1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
 toc(t1);
 
 %% Compare between eigenvalues of N and N2

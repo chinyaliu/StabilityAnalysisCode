@@ -1,24 +1,13 @@
-% close all; clear all;% clc
+clear all;
+if ~contains(path,'code_wake;')
+    addpath('code_wake');
+end 
 %% Set Solver & Algorithm
-diff_meth = ["Schimd", "Trefethen"];
-method = diff_meth(1);
-solveGEPmeth = ["qr", "qz", "eig"];
-alg = solveGEPmeth(1);
-do_balancing = 'n';
-eig_spectrum = 'all';
-Re = 1000;
-Fr2 = 2.25;
-N = 600;
-k = linspace(0.01,4,200);
-% h = 6*ones(1,length(k));
-h = 2*pi./k;
+[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,k,Fr2,Re,eps,c0,h,f] = pars_wake(3);
 inflec_pt = -0.74708299;
-zL = 0.74708299;
+zL = -inflec_pt;
 cutz = NaN(1,length(k));
 cutz(1) = -inflec_pt;
-numberofDDM = 4;
-eps = 0.01;
-f = wZhang_ddm.ddmtype(numberofDDM);
 in_init = {N,k(1),h(1),Re,Fr2};
 %% Select specific modes to observe
 % 100
@@ -43,14 +32,14 @@ css = cell(3,1);
 oss = cell(3,1);
 for j = 1:length(R)
     fprintf('Re = %4d\n', R(j));
-    p1.chgRe(R(j));
+    p1.chgRe(R(j),method);
     addvar = struct('zL1',zL,'eps',eps);
     css{j} = NaN(3,length(k));
     oss{j} = NaN(3,length(k));
     for i = 1:length(k)
         fprintf('k = %.2f\n', k(i));
         p1.k = k(i); p1.h = h(i);
-        oall = p1.solver(alg, do_balancing, eig_spectrum, f, addvar);
+        oall = p1.solver(alg, de_singularize, do_balancing, 'all', f, addvar);
         o = maxeig(oall);
         if real(o) > 0
             cutz(i)=-p1.criticalH(real(o)/k(i));

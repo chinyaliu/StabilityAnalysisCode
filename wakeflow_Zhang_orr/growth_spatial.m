@@ -1,32 +1,16 @@
-% close all; clear all;% clc
+clear all;
+if ~contains(path,'code_wake;')
+    addpath('code_wake');
+end 
 %% Solver & Algorithm list
-diff_meth = ["Schimd", "Trefethen"];
-solveGEPmeth = ["qr", "qz", "eig"];
-% Set solver
-method = diff_meth(1);
-alg = solveGEPmeth(1);
-% Inputs
-Re = 100;
-Fr2 = 1.5^2;
-N = 400;
+[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,~,Fr2,Re,eps,c0,~,f] = pars_wake(2);
 % Cusp method from k_i
 kr = linspace(0.01,4,400);
 ki = [0 -0.5 -1 -1.5 -1.7];
-% ki = -2.5;
-% Cusp method from k_i
-% kr = [0.5 0.55 0.6 0.65 0.7];
-% ki = linspace(-2,-0.01,100);
 h = 2*pi./kr;
-eps = 0.01;
 inflec_pt = -0.74708299;
-% c0 = 1./sqrt(kr*Fr2);
-% zL = real(wZhang_ddm.g(c0)); 
 zL = 0.74708299*ones(length(kr),1);
-cutz = NaN(1,length(kr)+1);
-cutz(1) = -inflec_pt;
 addvar = struct('zL1',zL(1),'eps',eps);
-numberofDDM = 1;
-f = wZhang_ddm.ddmtype(numberofDDM);
 in_init = {N,kr,h,Re,Fr2};
 p1 = wZhang_ddm(in_init{:});
 p1.numMeth(method);
@@ -53,7 +37,7 @@ for i = 1:length(kk)
     p1.k = kk(i); p1.h = hk(i);
 %     addvar.zL1 = zL(i);
     addvar.zL1 = cutz(i);
-    o(i) = p1.solver(alg, 'n', 'max', f, addvar);
+    o(i) = p1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
     if isnan(p1.zc)
         cutz(i+1)=cutz(1);
     else
@@ -81,7 +65,7 @@ for j = 1:length(ki)
         p1.k = k(i); p1.h = h(i);
         addvar.zL1 = cutz(i);
         % test
-        oall = p1.solver(alg, 'n', 'all', f, addvar);
+        oall = p1.solver(alg, de_singularize, do_balancing, 'all', f, addvar);
         o(i) = oall(1);
         od = [od; oall];
 

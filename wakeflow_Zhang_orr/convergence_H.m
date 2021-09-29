@@ -1,38 +1,25 @@
-close all; clear all;% clc
+clear all;
+if ~contains(path,'code_wake;')
+    addpath('code_wake');
+end 
 %% Solver & Algorithm list
-diff_meth = ["Schimd", "Trefethen"];
-method = diff_meth(1);
-solveGEPmeth = ["qr", "qz", "eig"];
-alg = solveGEPmeth(1);
-do_balancing = 'y';
-eig_spectrum = 'max';
+[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,~,k,Fr2,Re,eps,c0,~,f] = pars_wake(2);
 N = 300:100:1500;
-k = 3;
-Re = inf;
-Fr2 = 2.25;
-c0 = 1./sqrt(k*Fr2);
-zL = -wZhang_ddm.criticalH(c0); 
-% zL = 0.74708299;
-% DDM numbers
-numberofDDM = 4;
-eps = 0.15;
-f = wZhang_ddm.ddmtype(numberofDDM);
-% truncation height
 nh = linspace(0.5,5,20);
-% nh = linspace(0.1,8,30);
 h = 2*pi/k*nh;
 in_init = {N(1),k(1),h(1),Re,Fr2};
-addvar = struct('zL1',zL,'eps',eps);
 %% Run solver
 tic;
 case1 = wZhang_ddm(in_init{:});
 case1.numMeth(method);
+addvar = struct('zL1',-case1.criticalH(c0),'eps',eps);
 for j = 1:length(nh)
     fprintf('h = %.2f times wave length.\n',nh(j));
     case1.h = h(j); 
     for i = 1:length(N)
         case1.N = N(i);
-        o = case1.solver(alg, do_balancing, eig_spectrum, f, addvar);
+%         o = case1.solver(alg, do_balancing, eig_spectrum, f, addvar);
+        o = case1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
         oi(i) = imag(o);
         fprintf('N = %3d, growth rate = %.8f\n', N(i), oi(i));
         if i~=1

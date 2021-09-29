@@ -3,24 +3,7 @@ if ~contains(path,'code_Morland;')
     addpath('code_Morland');
 end
 %% Set Solver & Algorithm
-diff_meth = ["Schimd", "Trefethen"];
-method = diff_meth(1);
-solveGEPmeth = ["qr", "qz", "eig", "invB"];
-alg = solveGEPmeth(4);
-baseflowlist = ["exponential", "error function"];
-bflow = baseflowlist(1);
-% Inputs
-de_singularize = 'y';
-do_balancing = 'y';
-eig_spectrum = 'all';
-N = 1000;
-ud_nd = 2;
-delta_nd = 0.291;
-lambda_nd = 0.817;
-h =5*lambda_nd;
-ddm_number = 44;
-c0 = sqrt(0.5*(lambda_nd+1./lambda_nd));
-f = wMorland.ddmtype(ddm_number);
+[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,ud_nd,delta_nd,lambda_nd,c0,h,f] = pars_Morland(1);
 fprintf('u_d = %1.2f, delta = %1.3f, lambda = %1.3f\n',ud_nd,delta_nd,lambda_nd);
 
 %% Run solver
@@ -33,7 +16,9 @@ addvar = struct('zL1',-case1.criticalH(c0),'eps',0.1);
 toc(t1);
 % Discard eigenvalues set by de-singularizing process
 if strcmpi(de_singularize,'y')
-    c = c1(imag(c1)>-100);
+    c = c1(real(c1)>-100);
+else
+    c = c1;
 end
 
 %% Choose eigenvalue

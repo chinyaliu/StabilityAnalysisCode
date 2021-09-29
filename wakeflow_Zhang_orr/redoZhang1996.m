@@ -1,24 +1,14 @@
-% close all; clear all;% clc
+clear all;
+if ~contains(path,'code_wake;')
+    addpath('code_wake');
+end 
 %% Set Solver & Algorithm
-diff_meth = ["Schimd", "Trefethen"];
-method = diff_meth(1);
-solveGEPmeth = ["qr", "qz", "eig"];
-alg = solveGEPmeth(1);
-do_balancing = 'n';
-eig_spectrum = 'max';
-Re = 1000;
-Fr2 = 2.25;
-N = 600;
-% k = linspace(0.01,4,400);
+[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,k,Fr2,Re,eps,c0,~,f] = pars_wake(3);
 h = 6*ones(1,length(k));
-% h = 3*2*pi./k;
 inflec_pt = -0.74708299;
 zL = 0.74708299;
 cutz = NaN(1,length(k));
 cutz(1) = -inflec_pt;
-numberofDDM = 4;
-eps = 0.01;
-f = wZhang_ddm.ddmtype(numberofDDM);
 in_init = {N,k(1),h(1),Re,Fr2};
 %% Run solver
 tic;
@@ -28,12 +18,12 @@ oall = cell(1,3);
 R = [1e2,1e3,inf];
 for j = 1:length(R)
     fprintf('Re = %4d\n', R(j));
-    p1.chgRe(R(j));
+    p1.chgRe(R(j),method);
     o = NaN(1,length(k));
     addvar = struct('zL1',zL,'eps',eps);
     for i = 1:length(k)
         p1.k = k(i); p1.h = h(i);
-        o(i) = p1.solver(alg, do_balancing, eig_spectrum, f, addvar);
+        o(i) = p1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
         if isnan(p1.zc)
             cutz(i)=cutz(1);
         else
