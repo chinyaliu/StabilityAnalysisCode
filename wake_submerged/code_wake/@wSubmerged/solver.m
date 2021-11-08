@@ -1,7 +1,7 @@
 function [o, an, cA, errGEP, dob] = solver(obj, alg, des, bal, eigspec, funcN, addvar)
 % Set initial critical height guess
 if isfield(addvar,'zL1')
-    obj.zc = addvar.zL1;
+    obj.zc = max([addvar.zL1 2*obj.H-addvar.zL1]);
 else
     obj.zc = 0;
 end
@@ -38,10 +38,10 @@ for i = 1:it
     if(abs(c_temp-c(1)) < 1e-8) % converged
         fprintf('converged to zL = %.8f\n', obj.zc);
         break;
-    elseif(c_good && i ~= it && -obj.criticalH(real(c(1)))<obj.h) % keep iterating
+    elseif(c_good && i ~= it && obj.criticalH(real(c(1)))<obj.h) % keep iterating
         fprintf('iter %2d, zL = %.8f\n', i, obj.zc);
         c_temp = c(1);
-        obj.zc = -obj.criticalH(real(c(1)));
+        obj.zc = obj.criticalH(real(c(1)));
     else
         obj.zc = nan;
         fprintf('Didn''t converge.\n');
@@ -58,5 +58,4 @@ else
     [errGEP,cA] = deal(vout{:});
     dob = 'n';
 end
-obj.zc = -obj.zc;
 end

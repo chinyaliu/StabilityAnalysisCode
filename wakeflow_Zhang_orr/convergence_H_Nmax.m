@@ -36,8 +36,7 @@ end
 toc;
 %% Plot diff(c_i) vs h
 dc = abs(diff(imag(oih)));
-hold on;
-% figure;
+figure;
 semilogy(nh(1:end-1),dc,'-go', 'Displayname', sprintf('$k = %.1f$',k));
 xlabel('$n\lambda$');
 ylabel('$\| \omega_i(m)-\omega_i(m+1) \|$');

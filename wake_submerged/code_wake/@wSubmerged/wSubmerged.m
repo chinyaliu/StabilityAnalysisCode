@@ -1,12 +1,13 @@
-classdef wZhang_ddm < handle
+classdef wSubmerged < handle
     properties
+        H = 5;                    % Submerge depth
         k = 1;                    % Wavenumber
         Fr2 = 2.25;               % Squared Froude number
         h = 6;                    % Truncation height
         N = 400;                  % Number of collocation points
     end
     properties (SetAccess = private)
-        criticalH = @(x) -(5000*acosh((-2497./(625*(x - 1))).^(1/2)/2))./4407;
+        criticalH = @(x) (5000*acosh((-2497./(625*(x-1))).^(1/2)/2))./4407; % Critical height (large one)
         Re = inf;                 % Reynolds number
         zc;                       % Critical height
         subD; subDclass;          % Subdomains and its corresponding class function 
@@ -15,14 +16,18 @@ classdef wZhang_ddm < handle
         dm;                       % Differential matrix constructing method (function handle)
     end
     methods
-        function obj = wZhang_ddm(N,k,h,Re,Fr2)
-            if (nargin >= 5)
+        function obj = wSubmerged(N,H,k,h,Re,Fr2)
+            if (nargin >= 6)
                 obj.N = N; obj.k = k; obj.h = h; obj.Re = Re;
-                obj.Fr2 = Fr2; 
+                obj.Fr2 = Fr2; obj.H = H; 
+                obj.criticalH = @(x) H+abs((5000*acosh((-2497./(625*(x-1))).^(1/2)/2))./4407);
             end
+            obj.method = strings(1,2);
         end
         % Solve the stability equations of the flow
         [c, an, cA, errGEP, dob] = solver(obj, alg, des, bal, eigspec, funcN, addvar);
+        % Solve the stability equations of the flow
+        [c, an, cA, errGEP, dob] = solverGPU(obj, alg, des, bal, eigspec, funcN, addvar);
         % Select numerical methods and governing equations
         numMeth(obj,meth);
         % Construct and modify subdomains with specified DD methods
@@ -41,7 +46,7 @@ classdef wZhang_ddm < handle
                         obj.subD(j) = obj.subDclass(Na(j),arr(j),arr(j+1),obj);
                         obj.subD(j).makeAB();
                     else
-                        obj.subD(j).chgL(Na(j),arr(j),arr(j+1));
+                        obj.subD(j).chgL(Na(j),arr(j),arr(j+1),obj.H);
                     end
                 end
                 % Remove redundant subdomains
@@ -51,17 +56,14 @@ classdef wZhang_ddm < handle
             end
         end
         % Set the Reynolds number of the flow
-        function chgRe(obj,Re,meth)
-            obj.method = ['d4', lower(meth)];
+        function chgRe(obj,Re)
+            obj.method(1) = "d4";
             obj.Re = Re;
             if isinf(obj.Re)
-                obj.method(1) = 'Ray';
+                obj.method(1) = "Ray";
                 obj.subDclass = @subRay;
                 obj.ord = 2;
             else
-                if strcmpi(obj.method(2),'trefethen')
-                    error('Trefethen''s differential method can''t be used for M = N-2\n');
-                end
                 obj.subDclass = @subOrr;
                 obj.ord = 4;
             end
@@ -82,9 +84,6 @@ classdef wZhang_ddm < handle
             end
             out(i+1) = obj.subD(end).zbot;
         end
-        % Calculate pseudospectrum
-        c = solverE(obj, alg, des, bal, funcN, addvar, errE, loopnum);
-        [A,B] = getAB(obj, funcN, addvar);
     end
     methods (Static)
         % Select the domain decompose strategy (meth, ord, dm)

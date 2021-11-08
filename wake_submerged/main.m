@@ -3,13 +3,13 @@ if ~contains(path,'code_wake;')
     addpath('code_wake');
 end 
 %% Set Solver & Algorithm
-[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,k,Fr2,Re,eps,c0,h,f] = pars_wake;
+[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,H,k,Fr2,Re,eps,c0,h,f] = pars_wake;
 
 %% Run solver
 t1 = tic;
-case1 = wZhang_ddm(N,k,h,Re,Fr2);
+case1 = wSubmerged(N,H,k,h,Re,Fr2);
 case1.numMeth(method);
-zL = 0.74708299;
+zL = 0.74708299+H;
 [o, an] = case1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, struct('zL1',zL,'eps',eps));
 o = o(real(o)>-50);
 c = o/k;
@@ -35,7 +35,9 @@ hold off;
 xlabel('$c_r$','fontsize',30);
 ylabel('$c_i$','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
 ymax = max(abs(imag(c)));
-ylim([-1.5*ymax 1.5*ymax]);
+if ymax>0
+    ylim([-1.5*ymax 1.5*ymax]);
+end
 titext = sprintf('$k=%.2f%+.2fi$',real(k),imag(k));
 title(titext);
 
@@ -57,7 +59,7 @@ title(titext);
 figtitle = ["$\phi$", "$\phi_ z$", "$\phi_ {zz}$"];
 xlab = {'$magnitude$','$angle$','$real$','$imag$'};
 if (h > 6)
-    blim = -6;
+    blim = -6-H;
 else
     blim = fix(-h);
 end
@@ -70,7 +72,8 @@ for i = 1:3
         hold on;
         plot(plotvar{j},z,'-k.','linewidth',1,'markersize',10);
         if ~isnan(case1.zc)
-            yline(case1.zc, '-r', 'linewidth', 1.5);
+            yline(-case1.zc, '-r', 'linewidth', 1.5);
+            yline(case1.zc-2*H, '-r', 'linewidth', 1.5);
         end
         arr = -case1.getcut;
         for k = 2:length(arr)-1

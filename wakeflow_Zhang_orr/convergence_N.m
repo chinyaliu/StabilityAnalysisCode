@@ -3,9 +3,9 @@ if ~contains(path,'code_wake;')
     addpath('code_wake');
 end 
 %% Solver & Algorithm list
-[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,~,~,Fr2,Re,eps,~,~,f] = pars_wake(2);
+[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,~,k,Fr2,Re,eps,~,~,f] = pars_wake(2);
 N = 300:100:1500;
-k = linspace(0.1,4,10);
+% k = linspace(0.1,4,10);
 h = 3*2*pi./real(k);
 c0 = min(0.99,1./sqrt(k*Fr2));
 in_init = {N(1),k(1),h(1),Re,Fr2};
