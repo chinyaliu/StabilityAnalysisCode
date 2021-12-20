@@ -30,7 +30,7 @@ function out = ddmtype(name)
     function [N,arr] = setN3sub(obj,varargin)
         if obj.zc > obj.h
             arr = [0 obj.H obj.h];
-        elseif obj.zc-obj.H < 0
+        elseif obj.zc-obj.H < 0 || 2*obj.H-obj.zc < 0
             arr = [0 obj.zc obj.h];
         else
             arr = [0 2*obj.H-obj.zc obj.zc obj.h];

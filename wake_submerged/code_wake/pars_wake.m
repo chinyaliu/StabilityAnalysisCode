@@ -10,26 +10,27 @@ de_singularize = 'y';
 do_balancing = 'y';
 eig_spectrum = 'all';
 N = 800;
-k = 0.04;
+k = 0.1;
+% Re = 100;
 Re = inf;
-Fr2 = 1.5^2;
-% zL = 0.74708299;
-H = 5;
+Fr2 = 4^2;
+H = 0;
 h = 3*2*pi/real(k)+H;
 % h = 12;
 ddm_number = 3;
-c0 = min(0.99,1./sqrt(k*Fr2));
+c0 = min(0.99, 1./sqrt(k*Fr2));
 f = wSubmerged.ddmtype(ddm_number);
 eps = 0.1;
 if ~isempty(varargin)
     switch(varargin{1})
         case(2)
             eig_spectrum = 'max';
-            k = [0.1 0.4 0.8 1.5];
+            k = [0.1 0.8 1.4 1.7];
             h = 3*2*pi./real(k)+H;
         case(3)
             eig_spectrum = 'max';
-            k = linspace(0.04,2.5,400);
+            k = [linspace(0.01,2.6,100) linspace(2.8, 4, 10)];
+%             k = linspace(0.01, 4, 100);
             h = 3*2*pi./real(k)+H;
     end
 end

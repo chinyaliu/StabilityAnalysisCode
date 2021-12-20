@@ -4,7 +4,7 @@ if ~contains(path,'code_wake;')
 end 
 %% Set Solver & Algorithm
 [method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,H,k,Fr2,Re,eps,c0,h,f] = pars_wake;
-h = 18;
+
 %% Run solver
 t1 = tic;
 case1 = wSubmerged(N,H,k,h,Re,Fr2);

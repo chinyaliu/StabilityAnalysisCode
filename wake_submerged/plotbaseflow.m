@@ -8,7 +8,7 @@ inflec_pt = [-H-0.74708299 -H+0.74708299];
 
 %% plot
 figure('position',[200 100 360 720]);
-plot(U(:,1),z,'k','linewidth',3);
+plot(U(:,3),z,'k','linewidth',3);
 hold on;
 yline(inflec_pt(1),'--r','linewidth',2); 
 yline(inflec_pt(2),'--r','linewidth',2); 

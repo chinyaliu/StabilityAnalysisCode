@@ -84,6 +84,14 @@ classdef wSubmerged < handle
             end
             out(i+1) = obj.subD(end).zbot;
         end
+        % Return the baseflow
+        function [z, U] = getU(obj)
+            num = 0; z = []; U = [];
+            for i = 1:length(obj.subD)
+                z = [z;obj.subD(i).z];
+                U = [U;obj.subD(i).U];
+            end
+        end
     end
     methods (Static)
         % Select the domain decompose strategy (meth, ord, dm)

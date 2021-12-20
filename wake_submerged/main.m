@@ -55,7 +55,8 @@ titext = sprintf('$k=%.2f%+.2fi$',real(k),imag(k));
 title(titext);
 
 %% Plot modeshape
-[z, phi] = case1.findmodeshape(an(:,1));
+[z, phi] = case1.findmodeshape(an_c(:,1));
+% phi = -phi;
 figtitle = ["$\phi$", "$\phi_ z$", "$\phi_ {zz}$"];
 xlab = {'$magnitude$','$angle$','$real$','$imag$'};
 if (h > 6)
@@ -63,7 +64,7 @@ if (h > 6)
 else
     blim = fix(-h);
 end
-for i = 1:3
+for i = 1:1
     fig(i) = figure('position',[0 0 1680 960]);
     plotvar = {abs(phi(:,i)),unwrap(angle(phi(:,i))),real(phi(:,i)),imag(phi(:,i))};
     for j = 1:4
@@ -76,8 +77,8 @@ for i = 1:3
             yline(case1.zc-2*H, '-r', 'linewidth', 1.5);
         end
         arr = -case1.getcut;
-        for k = 2:length(arr)-1
-            yline(arr(k), '--r', 'linewidth', 1);
+        for kk = 2:length(arr)-1
+            yline(arr(kk), '--r', 'linewidth', 1);
         end
         hold off;
         xlabel(xlab{j});
