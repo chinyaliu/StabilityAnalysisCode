@@ -16,14 +16,29 @@ for i = 1:length(k)
     o = o(real(o)>-50);
     
     % Choose discrete eigenvalues
-    [o_chosen, an_c] = choose_eiv(o, an, k(i));
+    [o_chosen, an_c] = choose_eiv(o, an, k(i)) ;
 
     % Calculate energy
     chm = 1;
-    if i == 1
-        [ENG(i),f1] = plotenergy(case1, o_chosen(chm), an_c(:,chm));
+    if (imag(o(chm))>0 && real(o(chm))>0)
+        if i == 1
+            [ENG(i),f1] = plotenergy(case1, "res", o_chosen(chm), an_c(:,chm));
+            [~,f2] = plotenergy(case1, "resz", o_chosen(chm), an_c(:,chm));
+            axf2 = get(f2,'CurrentAxes');
+            title(axf2,'$\frac{d\tau(z)}{dz}$');
+            [~,f3] = plotenergy(case1, "invu", o_chosen(chm), an_c(:,chm));
+            axf3 = get(f3,'CurrentAxes');
+            title(axf3,'$\frac{1}{|U-c|^2}$');
+        else
+            [ENG(i),f1] = plotenergy(case1, "res", o_chosen(chm), an_c(:,chm), f1);
+            [~,f2] = plotenergy(case1, "resz", o_chosen(chm), an_c(:,chm), f2);
+            [~,f3] = plotenergy(case1, "invu", o_chosen(chm), an_c(:,chm), f3);
+        end
     else
-        ENG(i) = plotenergy(case1, o_chosen(chm), an_c(:,chm), f1);
+        if i > 1 
+            close([f1 f2 f3]); 
+        end
+        error('No unstable mode found at k = %.2f.',k(i));
     end
 end
 toc(t1);
@@ -41,22 +56,18 @@ o_chosen = o(aa);
 an_c = an(:, aa);
 end
 
-function [ENG, f1] = plotenergy(case1, o, an, varargin)
+function [ENG, f1] = plotenergy(case1, engname, o, an, varargin)
 [ENG,z] = energy_boomkamp(case1, o, an);
 if isempty(varargin)
     f1 = figure('position', [0 0 480 960]);
-    plot(ENG.res, z, 'k', 'linewidth', 2, 'DisplayName', num2str(case1.k,'$%.1f$'));
+    plot(ENG.(engname), z, 'k', 'linewidth', 2, 'DisplayName', num2str(case1.k,'$%.2f$'));
     hold on;
     zc = case1.zc;
-%     yf(1) = yline(-zc, 'b');
-%     yf(2) = yline(zc-2*case1.H, 'b');
-%     yf(3) = yline(-case1.H, '--b');
-%     yf(4) = yline(-0.74708299-case1.H, 'color', '#46bf12');
     yf(1) = yline(-zc, 'color', '#46bf12');
     yf(2) = yline(zc-2*case1.H, 'color', '#46bf12');
     yf(3) = yline(-case1.H, '--', 'color', '#46bf12');
     yf(4) = yline(-0.74708299-case1.H, '-b');
-    yf(5) = xline(0, '--', 'color', '#606060');
+    yf(5) = xline(0, 'color', '#606060');
     hold off;
     set(yf(:),'linewidth',1.5,'HandleVisibility','off');
     if (case1.h > 6)
@@ -76,10 +87,8 @@ else
     axf1 = get(f1,'CurrentAxes');
     hnum = length(findobj(axf1, 'Type','Line'));
     hold(axf1,'on');
-    plot(axf1, ENG.res, z, 'k', 'linewidth', 2, 'linestyle', ls{hnum}, 'DisplayName', num2str(case1.k,'$%.1f$'));
-    yf(1) = yline(-case1.zc, 'color', '#46bf12');
-    yf(2) = yline(-0.74708299-case1.H, '-b');
+    plot(axf1, ENG.(engname), z, 'k', 'linewidth', 2, 'linestyle', ls{hnum}, 'DisplayName', num2str(case1.k,'$%.2f$'));
+    yline(axf1,-case1.zc, 'color', '#46bf12','linewidth',1.5,'HandleVisibility','off');
     hold(axf1,'off');
-    set(yf(:),'linewidth',1.5,'HandleVisibility','off');
 end
 end

@@ -63,7 +63,6 @@ function out = ddmtype(name)
             if strcmpi(init,'init')
                 cL = min(obj.zc/2,abs(obj.h-obj.zc)/2);
             else
-                c1 = 0.9988; c2 = 0.8814;
                 uzz = obj.subDclass().baseflow(-obj.zc);
                 cL = addvar.eps*sqrt(2*abs(imag(addvar.c(1))/uzz(3)));
                 cL = min([(obj.h-obj.zc)/2, obj.zc/2, cL]);

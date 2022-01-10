@@ -7,7 +7,6 @@ classdef wSubmerged < handle
         N = 400;                  % Number of collocation points
     end
     properties (SetAccess = private)
-        criticalH = @(x) (5000*acosh((-2497./(625*(x-1))).^(1/2)/2))./4407; % Critical height (large one)
         Re = inf;                 % Reynolds number
         zc;                       % Critical height
         subD; subDclass;          % Subdomains and its corresponding class function 
@@ -20,7 +19,6 @@ classdef wSubmerged < handle
             if (nargin >= 6)
                 obj.N = N; obj.k = k; obj.h = h; obj.Re = Re;
                 obj.Fr2 = Fr2; obj.H = H; 
-                obj.criticalH = @(x) H+abs((5000*acosh((-2497./(625*(x-1))).^(1/2)/2))./4407);
             end
             obj.method = strings(1,2);
         end
@@ -30,6 +28,14 @@ classdef wSubmerged < handle
         [c, an, cA, errGEP, dob] = solverGPU(obj, alg, des, bal, eigspec, funcN, addvar);
         % Select numerical methods and governing equations
         numMeth(obj,meth);
+        % Critical height of given phase velocity
+        function out = criticalH(obj,x)
+            if x <= 0.0012
+                out = 0;
+            else
+                out = obj.H+abs((5000*acosh((-2497./(625*(x-1))).^(1/2)/2))./4407);
+            end
+        end
         % Construct and modify subdomains with specified DD methods
         function setsubd(obj,init,funcN,addvar)
             [Na, arr] = funcN(obj, init, addvar);

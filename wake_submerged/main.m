@@ -10,7 +10,8 @@ t1 = tic;
 case1 = wSubmerged(N,H,k,h,Re,Fr2);
 case1.numMeth(method);
 zL = 0.74708299+H;
-[o, an] = case1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, struct('zL1',zL,'eps',eps));
+% [o, an] = case1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, struct('zL1',zL,'eps',eps));
+[o, an] = case1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, struct('zL1',0.76,'eps',eps));
 o = o(real(o)>-50);
 c = o/k;
 toc(t1);
@@ -64,7 +65,7 @@ if (h > 6)
 else
     blim = fix(-h);
 end
-for i = 1:1
+for i = 1:3
     fig(i) = figure('position',[0 0 1680 960]);
     plotvar = {abs(phi(:,i)),unwrap(angle(phi(:,i))),real(phi(:,i)),imag(phi(:,i))};
     for j = 1:4

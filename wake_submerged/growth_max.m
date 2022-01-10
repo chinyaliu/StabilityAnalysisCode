@@ -1,7 +1,7 @@
 clear all;
 if ~contains(path,'code_wake;')
     addpath('code_wake');
-end 
+end
 %% Set Solver & Algorithm
 [method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,H,k,Fr2,Re,eps,c0,h,f] = pars_wake(3);
 inflec_pt = -0.74708299-H;
@@ -39,12 +39,13 @@ ylabel('$\omega _i$','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
 
 %% Plot oi vs k
 fig2 = figure('position',[50,0,1000,720]);
-% plot(k,imag(o),'k.','Markersize',6);
 o(isnan(o))=0;
+% plot(k,imag(o)./k,'-b','linewidth',3);
 plot(k,imag(o),'-b','linewidth',3);
-hold on; yline(0,'linewidth',1.5,'color','#898989'); hold off;
+hold on; yline(0,'linewidth',1.5,'color','#898989','HandleVisibility','off'); hold off;
 xlim([0 max(k)]);
 xlabel('$k$','fontsize',30);
+% ylabel('$c_i$','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
 ylabel('$\omega _i$','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
 
 %% Plot critical height vs k

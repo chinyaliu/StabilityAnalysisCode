@@ -85,13 +85,13 @@ xp2 = exp(1i*linspace(0,4*pi,ptx));
 u2 = real((interp1(zu,up(ia),z2).')*xp2);
 w2 = real((interp1(zu,wp(ia),z2).')*xp2);
 [X, Z] = meshgrid(x2,z2);
-% [X, Z] = meshgrid(x(1:spspcx:end),z(1:spspcz:end));
 figure;
-% quiver(X, Z, upx(1:spspcz:end,1:spspcx:end), wpx(1:spspcz:end,1:spspcx:end));
 quiver(X, Z, u2, w2);
 hold on; 
 plot(x,qpx,'k');
-yline(-zc,'--k','linewidth',1.5);
+yline(-zc,'--','linewidth',1.5,'color','#606060');
+yline(case1.zc-2*H, '--', 'linewidth', 1.5,'color','#606060');
+yline(-H,'-','linewidth',1.5,'color','#606060');
 hold off;
 ylim([yL 1]);
 xlim([0 x(end)]);
@@ -115,8 +115,8 @@ for i = 1:3
         yline(arr(k), '--k','linewidth',1.5,'HandleVisibility','off');
     end
     yline(-zL, '--b','linewidth',1.5,'HandleVisibility','off');
-    plot(real(phi(:,i)),z,'-.b','DisplayName','real', 'linewidth', 2);
-    plot(imag(phi(:,i)),z,'--r','DisplayName','imag', 'linewidth', 2);
+    plot(real(phi(:,i)),z,'b','DisplayName','real', 'linewidth', 2);
+    plot(imag(phi(:,i)),z,'r','DisplayName','imag', 'linewidth', 2);
     hold off;
     ylabel('$z$','rotation',0, 'HorizontalAlignment','right');
     xticks(0);
