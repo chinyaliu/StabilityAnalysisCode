@@ -23,6 +23,8 @@ function out = ddmtype(name)
         if sum(N<30)>0
             N(N<30) = 30;
         end
+        mustBePositive(N);
+        mustBePositive(diff(arr));
     end
     % For four subdomains
     function [N,arr] = setN4sub(obj,init,addvar,o,varargin)

@@ -10,11 +10,12 @@ de_singularize = 'y';
 do_balancing = 'y';
 eig_spectrum = 'all';
 N = 600;
-k = 0.3;
+k = 2;
+% Re = 1000;
 Re = inf;
 Fr2 = 1.5^2;
 % zL = 0.74708299;
-h = 2*pi/real(k);
+h = 3*2*pi/real(k);
 ddm_number = 44;
 c0 = 1./sqrt(k*Fr2);
 f = wZhang_ddm.ddmtype(ddm_number);
@@ -22,6 +23,7 @@ eps = 0.1;
 if ~isempty(varargin)
     switch(varargin{1})
         case(2)
+            k = [0.3 1.1 1.5 3];
             eig_spectrum = 'max';
         case(3)
             eig_spectrum = 'max';

@@ -24,6 +24,7 @@ classdef wSubmerged < handle
         end
         % Solve the stability equations of the flow
         [c, an, cA, errGEP, dob] = solver(obj, alg, des, bal, eigspec, funcN, addvar);
+        [c, an, cA, errGEP, dob] = solver2(obj, alg, des, bal, eigspec, funcN, addvar);
         % Solve the stability equations of the flow
         [c, an, cA, errGEP, dob] = solverGPU(obj, alg, des, bal, eigspec, funcN, addvar);
         % Select numerical methods and governing equations
@@ -118,6 +119,16 @@ classdef wSubmerged < handle
             [Abc2, Bbc2] = obj.subD(end).BChe(size(Age,2)-1);
             A = [Age; Abc1; Abc2];
             B = [Bge; Bbc1; Bbc2];    
+        end
+        function [A, B] = makeAB2(obj)
+            % Governing equation
+            [Age, Bge] = obj.subD(1).match(obj.subD);
+            % BC (truncated, free surface)
+            [Abc1, Bbc1] = obj.subD(1).BC0(obj.Fr2,size(Age,2)-1);
+            % BC (free slip)
+            [Abc2, Bbc2] = obj.subD(end).BChf(size(Age,2)-1);
+            A = [Age; Abc1; Abc2];
+            B = [Bge; Bbc1; Bbc2];
         end
     end
 end

@@ -3,8 +3,8 @@ if ~contains(path,'code_wake;')
     addpath('code_wake');
 end 
 %% Set Solver & Algorithm
-[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,k,Fr2,Re,eps,c0,~,f] = pars_wake(3);
-h = 6*ones(1,length(k));
+[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,k,Fr2,Re,eps,c0,h,f] = pars_wake(3);
+% h = 6*ones(1,length(k));
 inflec_pt = -0.74708299;
 zL = 0.74708299;
 cutz = NaN(1,length(k));
@@ -15,7 +15,8 @@ tic;
 p1 = wZhang_ddm(in_init{:});
 p1.numMeth(method);
 oall = cell(1,3);
-R = [1e2,1e3,inf];
+R = [1e3,inf];
+% R = [1e2,1e3,inf];
 for j = 1:length(R)
     fprintf('Re = %4d\n', R(j));
     p1.chgRe(R(j),method);
@@ -75,10 +76,10 @@ for i = 1:3
 %     hh2(i) = plot(k,or,mk{i},'markersize',3, 'DisplayName', dn{i});
 end
 hold off; box on;
-xlabel('$k$','fontsize',30);
+xlabel('$k$');
 xticks(0:1:4);
 set(gca,'XMinorTick','on','YMinorTick','on')
-ylabel('$\omega_r$','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
+ylabel('$\omega_r$,'rotation',0, 'HorizontalAlignment','right');
 ax = gca;
 hCopy = copyobj(hh2, ax); 
 for i = 1:3

@@ -3,8 +3,8 @@ if ~contains(path,'code_wake;')
     addpath('code_wake');
 end 
 %% Solver & Algorithm list
-[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,~,H,k,Fr2,Re,eps,~,h,f] = pars_wake(2);
-N = 300:100:1500;
+[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,~,H,k,Fr2,Re,eps,c0,h,f] = pars_wake(2);
+N = 100:100:1500;
 
 %% Run solver
 tic;
@@ -12,48 +12,51 @@ oi = nan(length(k),length(N));
 cAall = nan(length(k),length(N));
 ln = length(N);
 parfor j = 1:length(k)
-    fprintf('k = %.2f\n',k(j));
-    addvar = struct('zL1',0.74708299+H,'eps',eps);
-    case1 = wSubmerged(100,H,k(j),h(j),Re,Fr2);
-    case1.numMeth(method);
-    nn = 300:100:1500;
+    nn = N;
     for i = 1:ln
-        case1.N = nn(i);
+        case1 = wSubmerged(nn(i),H,k(j),h(j),Re,Fr2);
+        case1.numMeth(method);
+        addvar = struct('zL1',case1.criticalH(c0(j)),'eps',eps);
         [o,~,cA] = case1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
         cAall(j,i) = cA;
         oi(j,i) = imag(o(1));
-%         fprintf('N = %3d, growth rate = %.8f\n', N(i), oi(i));
     end
-%     cAall(j,:) = cA;
-%     doi{j} = abs(diff(oi));
-%     doi{j} = abs(oi-oi(end));
 end
 doi = abs(oi-oi(:,end));
 toc;
 %% Plot figure
-col = {[0 0 0],[0 0 1],[1 0 0],"#77AC30"};
+col = {[0 0 0],[0 0 1],[1 0 0],'#4ab712'};
+lsy = {'-o','--o',':o','-.o'};
 figure;
-semilogy(N, cAall(1,:), '-ko', 'Displayname', sprintf('$k = %.2f$',k(1)));
+yf(1) = semilogy(N, cAall(1,:), lsy{1}, 'color',col{1}, 'Displayname', sprintf('$k = %.2f$',k(1)));
 hold on;
 for i = 2:length(k)
     nam = sprintf('$k = %.2f$',k(i));
-    semilogy(N, cAall(i,:), '-o', 'Displayname', nam, 'color',col{i});
+    yf(i) = semilogy(N, cAall(i,:), lsy{i}, 'color',col{i}, 'Displayname', nam);
 end
 hold off;
-xlabel('$N$');
-ylabel('$cond(A)$');
+set(yf(:),'linewidth',3,'markersize',8);
+set(gca,'fontsize',30);
+xticks(500:500:1500);
+xlabel('$N$','fontsize',36);
+ylabel('$cond(A)$','fontsize',36);
 legend('location','southeast');
 grid on;
 %% Plot figure
 figure;
-semilogy(N, doi(1,:), '-ko', 'Displayname', sprintf('$k = %.2f$',k(1)));
+yf(1) = semilogy(N, doi(1,:), lsy{1}, 'color',col{1}, 'Displayname', sprintf('$k = %.2f$',k(1)));
 hold on;
 for i = 2:length(k)
     nam = sprintf('$k = %.2f$',k(i));
-    semilogy(N, doi(i,:), '-o', 'Displayname', nam, 'color',col{i});
+    yf(i) = semilogy(N, doi(i,:), lsy{i}, 'color',col{i}, 'Displayname', nam);
 end
 hold off;
-xlabel('$N$');
-ylabel('$\ | \ \omega_i(N_m) - \omega_i(N_{end})\ |$');
+set(yf(:),'linewidth',3,'markersize',8);
+set(gca,'fontsize',30);
+ylim([1e-17 1e-2]);
+xlim([N(1) N(end)]);
+xticks(500:500:1500);
+xlabel('$N$','fontsize',36);
+ylabel('$\ | \ \omega_i - \omega_{0,i}\ |$','fontsize',36);
 legend('location','northeast');
 grid on;

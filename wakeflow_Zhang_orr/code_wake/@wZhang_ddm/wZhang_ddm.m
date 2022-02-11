@@ -6,7 +6,7 @@ classdef wZhang_ddm < handle
         N = 400;                  % Number of collocation points
     end
     properties (SetAccess = private)
-        criticalH = @(x) -(5000*acosh((-2497./(625*(x - 1))).^(1/2)/2))./4407;
+        criticalH = @(x) (5000*acosh((-2497./(625*(x - 1))).^(1/2)/2))./4407;
         Re = inf;                 % Reynolds number
         zc;                       % Critical height
         subD; subDclass;          % Subdomains and its corresponding class function 

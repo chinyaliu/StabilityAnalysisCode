@@ -16,16 +16,18 @@ tic;
 p1 = wSubmerged(in_init{:});
 p1.numMeth(method);
 o = NaN(1,length(k));
+j = 1;
 for i = 1:length(k)
     p1.k = k(i); p1.h = h(i);
 %     addvar.zL1 = zL(i);
     o(i) = p1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
     if isnan(p1.zc)
-        cutz(i)=cutz(1);
+        addvar.zL1 = cutz(j);
     else
         cutz(i)=p1.zc;
+        j = i;
+        addvar.zL1 = p1.zc;
     end
-    addvar.zL1 = cutz(i);
     fprintf('k = %.2f\n', k(i));
 end
 toc;
@@ -49,8 +51,11 @@ xlabel('$k$','fontsize',30);
 ylabel('$\omega _i$','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
 
 %% Plot critical height vs k
+[zc,ind] = rmmissing(cutz);
+ind2 = k>0.87;
 fig3 = figure('position',[50,0,1000,720]);
-plot(k,-cutz,'k.','Markersize',6);
+plot(k(~(ind&ind2)),-cutz(~(ind&ind2)),'k','linewidth',3);
+% plot(k,-cutz,'k.','Markersize',6);
 hold on; 
 yline(inflec_pt,'linewidth',1.5,'color','b');
 xlim([0 max(k)]);

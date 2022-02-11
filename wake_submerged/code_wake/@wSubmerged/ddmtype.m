@@ -10,6 +10,8 @@ function out = ddmtype(name)
             out = @setN4sub;
         case 44
             out = @setN4test4;
+        case 45
+            out = @setN4test5;
         otherwise
             error('Function for domain number not specified.');
     end
@@ -77,6 +79,27 @@ function out = ddmtype(name)
             end
             arr = [0 obj.zc-cL obj.zc obj.zc+cL obj.h];
             Nmin = 50;
+            N = [2*Nmin Nmin Nmin obj.N-4*Nmin];
+        else
+            [N, arr] = setN1sub(obj); % Or throw error
+        end
+        mustBePositive(N);
+        mustBePositive(diff(arr));
+    end
+    function [N,arr] = setN4test5(obj,init,addvar,varargin)
+        if obj.zc < obj.h
+            if strcmpi(init,'init')
+                cL = min(obj.zc/2,abs(obj.h-obj.zc)/2);
+            else
+                uzz = obj.subDclass().baseflow(obj.zc,obj.H);
+                cL = addvar.eps*sqrt(2*abs(imag(addvar.c(1))/uzz(3)));
+                cL = min([(obj.h-obj.zc)/2, obj.zc/2, cL]);
+            end
+            arr = [0 obj.zc-cL obj.zc obj.zc+cL obj.h];
+            Nmin = 50;
+            if obj.N < 300
+                Nmin = round(obj.N/5);
+            end
             N = [2*Nmin Nmin Nmin obj.N-4*Nmin];
         else
             [N, arr] = setN1sub(obj); % Or throw error

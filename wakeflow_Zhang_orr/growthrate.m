@@ -1,5 +1,5 @@
 clear all;
-if ~contains(path,'code_wake;')
+if ~contains(path,'wake_Zhang_orr\code_wake;')
     addpath('code_wake');
 end 
 %% Set Solver & Algorithm
