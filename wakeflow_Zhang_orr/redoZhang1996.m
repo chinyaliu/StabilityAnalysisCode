@@ -78,8 +78,8 @@ end
 hold off; box on;
 xlabel('$k$');
 xticks(0:1:4);
-set(gca,'XMinorTick','on','YMinorTick','on')
-ylabel('$\omega_r$,'rotation',0, 'HorizontalAlignment','right');
+set(gca,'XMinorTick','on','YMinorTick','on');
+ylabel('$\omega_r$','rotation',0, 'HorizontalAlignment','right');
 ax = gca;
 hCopy = copyobj(hh2, ax); 
 for i = 1:3

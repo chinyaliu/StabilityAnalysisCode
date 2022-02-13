@@ -4,6 +4,8 @@ function out = ddmtype(name)
             out = @setN1sub;
         case 2
             out = @setN2sub;
+        case 20
+            out = @setN2sub0;
         case 3
             out = @setN3sub;
         case 4
@@ -27,6 +29,16 @@ function out = ddmtype(name)
         if sum(N<30)>0
             N(N<30) = 30;
         end
+    end
+    % For two subdomains, H=0
+    function [N, arr] = setN2sub0(obj,varargin)
+        arr = [0 obj.zc obj.h];
+        N = round(diff(arr)*obj.N/obj.h);
+        if sum(N<30)>0
+            N(N<30) = 30;
+        end
+        mustBePositive(N);
+        mustBePositive(diff(arr));
     end
     % For three subdomains
     function [N,arr] = setN3sub(obj,varargin)

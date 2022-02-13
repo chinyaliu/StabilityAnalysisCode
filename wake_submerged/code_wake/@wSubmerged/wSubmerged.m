@@ -13,12 +13,19 @@ classdef wSubmerged < handle
         method;                   % Numerical methods, set by @numMeth
         ord;                      % Order of GE, 2 for Rayleigh, 4 for Orr-Sommerfeld
         dm;                       % Differential matrix constructing method (function handle)
+        bf;                       % Velocity profile
     end
     methods
-        function obj = wSubmerged(N,H,k,h,Re,Fr2)
+        function obj = wSubmerged(N,H,k,h,Re,Fr2,varargin)
             if (nargin >= 6)
                 obj.N = N; obj.k = k; obj.h = h; obj.Re = Re;
                 obj.Fr2 = Fr2; obj.H = H; 
+                if isempty(varargin)
+                    obj.bf = 'cosh';
+                else
+                    obj.bf = varargin(1);
+                end
+                obj.setbaseflow(obj.bf);
             end
             obj.method = strings(1,2);
         end
@@ -37,6 +44,41 @@ classdef wSubmerged < handle
                 out = obj.H+abs((5000*acosh((-2497./(625*(x-1))).^(1/2)/2))./4407);
             end
         end
+        % Set velocity profile
+        function setbaseflow(obj,bf)
+            switch(lower(bf))
+            case 'cosh'
+                obj.criticalH = @hydrofoil;
+            case 'pwlinear'
+                obj.criticalH = @pwlinear;
+            case 'tanh'
+                obj.criticalH = @cylintan;
+            otherwise
+                error('Invalid velocity profile name.');
+            end
+
+            function out = hydrofoil(obj,x)
+                if x <= 0.0012
+                    out = 0;
+                else
+                    out = obj.H+abs((5000*acosh((-2497./(625*(x-1))).^(1/2)/2))./4407);
+                end
+            end
+            function out = pwlinear(~,x)
+                u0 = 0.0012; h0 = 0.25; H0 = 1.75;
+                if x <= u0
+                    out = 0;
+                elseif x >= 1
+                    out = H0;
+                else
+                    out = h0+(x-u0)*(H0-h0)/(1-u0);
+                end
+            end
+            function out = cylintan(~,x)
+                c = 0.75; alpha = 4; beta = 0.32;
+                out = (beta+atanh((x-1)/c+1)).^0.5/alpha.^0.5;
+            end
+        end     
         % Construct and modify subdomains with specified DD methods
         function setsubd(obj,init,funcN,addvar)
             [Na, arr] = funcN(obj, init, addvar);
@@ -93,7 +135,7 @@ classdef wSubmerged < handle
         end
         % Return the baseflow
         function [z, U] = getU(obj)
-            num = 0; z = []; U = [];
+            z = []; U = [];
             for i = 1:length(obj.subD)
                 z = [z;obj.subD(i).z];
                 U = [U;obj.subD(i).U];
