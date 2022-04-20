@@ -13,137 +13,93 @@ classdef wSubmerged < handle
         method;                   % Numerical methods, set by @numMeth
         ord;                      % Order of GE, 2 for Rayleigh, 4 for Orr-Sommerfeld
         dm;                       % Differential matrix constructing method (function handle)
-        bf;                       % Velocity profile
+        baseflow;                 % Velocity profile (function handle)
+        invbf;                    % Inverse function of base flow (function handle)
     end
     methods
-        function obj = wSubmerged(N,H,k,h,Re,Fr2,varargin)
+        function obj = wSubmerged(N,H,k,h,Re,Fr2,bf)
             if (nargin >= 6)
                 obj.N = N; obj.k = k; obj.h = h; obj.Re = Re;
                 obj.Fr2 = Fr2; obj.H = H; 
-                if isempty(varargin)
-                    obj.bf = 'cosh';
-                else
-                    obj.bf = varargin(1);
-                end
-                obj.setbaseflow(obj.bf);
+                obj.setbaseflow(bf);
             end
             obj.method = strings(1,2);
         end
         % Solve the stability equations of the flow
         [c, an, cA, errGEP, dob] = solver(obj, alg, des, bal, eigspec, funcN, addvar);
         [c, an, cA, errGEP, dob] = solver2(obj, alg, des, bal, eigspec, funcN, addvar);
-        % Solve the stability equations of the flow
-        [c, an, cA, errGEP, dob] = solverGPU(obj, alg, des, bal, eigspec, funcN, addvar);
-        % Select numerical methods and governing equations
+        [c, an, cA, errGEP, dob] = solverfs(obj, alg, des, bal, eigspec, funcN, addvar);
+        [c, an, ca, ana] = solver_RE(obj, alg, des, bal, eigspec, funcN, addvar)
+        % Select the discretizing strategy (meth, ord, dm)
         numMeth(obj,meth);
-        % Critical height of given phase velocity
-        function out = criticalH(obj,x)
-            if x <= 0.0012
-                out = 0;
-            else
-                out = obj.H+abs((5000*acosh((-2497./(625*(x-1))).^(1/2)/2))./4407);
+        % Return chosen properties of the flow
+        function [out,varargout] = getprop(obj,prop,varargin)
+            switch lower(prop)
+            case 'u' % out:[z,U] 
+                % Return the baseflow collocation points
+                out = []; U = [];
+                for i = 1:length(obj.subD)
+                    out = [out;obj.subD(i).z];
+                    U = [U;obj.subD(i).U];
+                end
+                varargout{1} = U;
+            case 'cut' % out:cut positions
+                % Return the domain decomposed locations
+                out = nan(1,length(obj.subD)+1);
+                for i = 1:length(obj.subD)
+                    out(i) = obj.subD(i).ztop;
+                end
+                out(i+1) = obj.subD(end).zbot;
+            case 'modeshape' % in:eigenvector, out:[z,phi] 
+                an = varargin{1};
+                num = 0; out = []; phi = [];
+                for i = 1:length(obj.subD)
+                    out = [out;obj.subD(i).z];
+                    phi = [phi;obj.subD(i).modeshape(an(num+1:num+obj.subD(i).N+1))];
+                    num = num + obj.subD(i).N + 1;
+                end
+                varargout{1} = phi;
+            otherwise
+                error('Invalid input for function getprop()');
             end
         end
-        % Set velocity profile
-        function setbaseflow(obj,bf)
-            switch(lower(bf))
-            case 'cosh'
-                obj.criticalH = @hydrofoil;
-            case 'pwlinear'
-                obj.criticalH = @pwlinear;
-            case 'tanh'
-                obj.criticalH = @cylintan;
-            otherwise
-                error('Invalid velocity profile name.');
+        % Set properties of the flow
+        function setprop(obj,varargin)
+            if (mod(length(varargin),2) == 1 || isempty(varargin))
+                error('Invalid number of inputs.');
             end
-
-            function out = hydrofoil(obj,x)
-                if x <= 0.0012
-                    out = 0;
-                else
-                    out = obj.H+abs((5000*acosh((-2497./(625*(x-1))).^(1/2)/2))./4407);
-                end
-            end
-            function out = pwlinear(~,x)
-                u0 = 0.0012; h0 = 0.25; H0 = 1.75;
-                if x <= u0
-                    out = 0;
-                elseif x >= 1
-                    out = H0;
-                else
-                    out = h0+(x-u0)*(H0-h0)/(1-u0);
-                end
-            end
-            function out = cylintan(~,x)
-                c = 0.75; alpha = 4; beta = 0.32;
-                out = (beta+atanh((x-1)/c+1)).^0.5/alpha.^0.5;
-            end
-        end     
-        % Construct and modify subdomains with specified DD methods
-        function setsubd(obj,init,funcN,addvar)
-            [Na, arr] = funcN(obj, init, addvar);
-            % Create subdomains according to (N, arr)
-            if strcmpi(init,'init')
-                obj.subD = repmat(obj.subDclass(),length(Na),1); % initialize
-                for j = 1:length(Na)
-                    obj.subD(j) = obj.subDclass(Na(j),arr(j),arr(j+1),obj);
-                    obj.subD(j).makeAB();
-                end
-            else
-                for j = 1:length(Na)
-                    if j > length(obj.subD)
-                        obj.subD(j) = obj.subDclass(Na(j),arr(j),arr(j+1),obj);
-                        obj.subD(j).makeAB();
+            nam = varargin(1:2:end);
+            val = varargin(2:2:end);
+            for i = 1:length(nam)
+                switch nam{i}
+                case 'Re'
+                    obj.Re = val{i};
+                    if isinf(val{i})
+                        obj.method(1) = "Ray";
+                        obj.subDclass = @subRay;
+                        obj.ord = 2;
                     else
-                        obj.subD(j).chgL(Na(j),arr(j),arr(j+1),obj.H);
+                        obj.method(1) = "d4";
+                        obj.subDclass = @subOrr;
+                        obj.ord = 4;
+                    end
+                    obj.subD = obj.subDclass(); % initialize
+                case 'method'
+                    obj.numMeth(val{i});
+                case 'baseflow'
+                    obj.setbaseflow(val{i});
+                otherwise
+                    if isprop(obj,nam{i})
+                        obj.(nam{i}) = val{i};
+                    else
+                        error('Invalid property name.');
                     end
                 end
-                % Remove redundant subdomains
-                if length(Na) < length(obj.subD)
-                    obj.subD = obj.subD(1:length(Na));
-                end
-            end
-        end
-        % Set the Reynolds number of the flow
-        function chgRe(obj,Re)
-            obj.method(1) = "d4";
-            obj.Re = Re;
-            if isinf(obj.Re)
-                obj.method(1) = "Ray";
-                obj.subDclass = @subRay;
-                obj.ord = 2;
-            else
-                obj.subDclass = @subOrr;
-                obj.ord = 4;
-            end
-        end
-        % Combine the eigenvectors of the subdomains
-        function [z, phi] = findmodeshape(obj, an)
-            num = 0; z = []; phi = [];
-            for i = 1:length(obj.subD)
-                z = [z;obj.subD(i).z];
-                phi = [phi;obj.subD(i).modeshape(an(num+1:num+obj.subD(i).N+1))];
-                num = num + obj.subD(i).N + 1;
-            end
-        end
-        % Return the domain decompose positions
-        function out = getcut(obj)
-            for i = 1:length(obj.subD)
-                out(i) = obj.subD(i).ztop;
-            end
-            out(i+1) = obj.subD(end).zbot;
-        end
-        % Return the baseflow
-        function [z, U] = getU(obj)
-            z = []; U = [];
-            for i = 1:length(obj.subD)
-                z = [z;obj.subD(i).z];
-                U = [U;obj.subD(i).U];
             end
         end
     end
     methods (Static)
-        % Select the domain decompose strategy (meth, ord, dm)
+        % Select the domain decomposition strategy (f)
         out = ddmtype(name);
     end
     methods (Access = private)
@@ -152,11 +108,7 @@ classdef wSubmerged < handle
             % Governing equation
             [Age, Bge] = obj.subD(1).match(obj.subD);
             % BC (truncated, free surface)
-            [Abc1, Bbc1] = obj.subD(1).BC0(obj.Fr2,size(Age,2)-1);
-%             % BC (free slip)
-%             [Abc2, Bbc2] = obj.subD(end).BChf(size(Age,2)-1);
-%             A = [Age; Abc1; Abc2];
-%             B = [Bge; Bbc1; Bbc2];
+            [Abc1, Bbc1] = obj.subD(1).BC0(size(Age,2)-1);
             % BC (truncated, exponential decay)
             [Abc2, Bbc2] = obj.subD(end).BChe(size(Age,2)-1);
             A = [Age; Abc1; Abc2];
@@ -166,11 +118,40 @@ classdef wSubmerged < handle
             % Governing equation
             [Age, Bge] = obj.subD(1).match(obj.subD);
             % BC (truncated, free surface)
-            [Abc1, Bbc1] = obj.subD(1).BC0(obj.Fr2,size(Age,2)-1);
+            [Abc1, Bbc1] = obj.subD(1).BC0(size(Age,2)-1);
             % BC (free slip)
             [Abc2, Bbc2] = obj.subD(end).BChf(size(Age,2)-1);
             A = [Age; Abc1; Abc2];
             B = [Bge; Bbc1; Bbc2];
+        end
+        function [A, B] = makeABs(obj)
+            % Governing equation
+            [Age, Bge] = obj.subD(1).match(obj.subD);
+            % BC (truncated, free surface)
+            [Abc1, Bbc1] = obj.subD(1).BC0s(size(Age,2)-1);
+            % BC (free slip)
+            [Abc2, Bbc2] = obj.subD(end).BChf(size(Age,2)-1);
+            A = [Age(:,1:end-1); Abc1; Abc2(:,1:end-1)];
+            B = [Bge(:,1:end-1); Bbc1; Bbc2(:,1:end-1)];
+        end
+        % Set velocity profile (baseflow, invbf)
+        setbaseflow(obj,bf);
+        % Construct and modify subdomains with specified DD methods
+        function setsubd(obj,init,funcN,addvar)
+            [Na, arr] = funcN(obj, init, addvar);
+            % Create subdomains according to (N, arr)
+            flg = strcmpi(init,'init');
+            for j = 1:length(Na)
+                if flg || j > length(obj.subD)
+                    obj.subD(j) = obj.subDclass(Na(j),arr(j),arr(j+1),obj);
+                else
+                    obj.subD(j).chgL(Na(j),arr(j),arr(j+1));
+                end
+            end
+            % Remove redundant subdomains
+            if length(Na) < length(obj.subD)
+                obj.subD = obj.subD(1:length(Na));
+            end
         end
     end
 end

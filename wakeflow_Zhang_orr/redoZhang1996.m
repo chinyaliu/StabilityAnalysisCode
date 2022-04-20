@@ -4,7 +4,7 @@ if ~contains(path,'code_wake;')
 end 
 %% Set Solver & Algorithm
 [method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,k,Fr2,Re,eps,c0,h,f] = pars_wake(3);
-% h = 6*ones(1,length(k));
+% h = 6*ones(2*length(k),1);
 inflec_pt = -0.74708299;
 zL = 0.74708299;
 cutz = NaN(1,length(k));
@@ -15,42 +15,57 @@ tic;
 p1 = wZhang_ddm(in_init{:});
 p1.numMeth(method);
 oall = cell(1,3);
-R = [1e3,inf];
-% R = [1e2,1e3,inf];
-for j = 1:length(R)
+R = [1e2,1e3,inf];
+for j = 1:3
     fprintf('Re = %4d\n', R(j));
     p1.chgRe(R(j),method);
     o = NaN(1,length(k));
     addvar = struct('zL1',zL,'eps',eps);
-    for i = 1:length(k)
-        p1.k = k(i); p1.h = h(i);
-        o(i) = p1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
-        if isnan(p1.zc)
-            cutz(i)=cutz(1);
-        else
-            cutz(i)=-p1.zc;
+    if j == 3
+        m = 1;
+        k2 = [linspace(0.01,1,40) linspace(1.02,3,50) linspace(3.05,4,58)];
+        h = 3*2*pi./real(k2);
+        o = NaN(1,length(k2));
+        for i = 1:length(k2)
+            p1.k = k2(i); p1.h = h(i);
+            o(i) = p1.solver(alg, de_singularize, do_balancing, eig_spectrum, wZhang_ddm.ddmtype(44), addvar);
+            if isnan(p1.zc)
+                cutz(i)=cutz(m);
+            else
+                cutz(i)=-p1.zc;
+                m = i;
+            end
+            addvar.zL1 = cutz(i);
+            fprintf('k = %.2f\n', k2(i));
         end
-        addvar.zL1 = cutz(i);
-        fprintf('k = %.2f\n', k(i));
+        o = [o(1:90) o(91:3:end)];
+    else
+        for i = 1:length(k)
+            p1.k = k(i); p1.h = h(i);
+            o(i) = p1.solver(alg, de_singularize, do_balancing, eig_spectrum, wZhang_ddm.ddmtype(1), addvar);
+            fprintf('k = %.2f\n', k(i));
+        end
     end
     oall{j} = o;
 end
 toc;
 
 %% Read Zhang's results & Plot oi vs k
+col = [0.16,0.44,1.00;0.93,0.00,0.00;0.00,0.57,0.00];
 dn = {'100','1000','$\infty$'};
 imagedata = imread('Zhang.bmp');
 im2 = imbinarize(imagedata).*255;
 im2(im2==0) = 100;
 im2 = cast(im2,'uint8');
-fig = figure('position',[50,0,1000,720]);
+fig = figure('position',[50,0,720,540]);
 imagesc([0,4],[0.04,0],im2);
 set(gca,'YDir','normal');
 xticks(0:1:4);
 yticks(0:0.01:0.04);
 hold on;
 for i = 1:3
-    hh(i) = plot(k,imag(oall{i}),'.','markersize',6, 'DisplayName', dn{i});
+%     hh(i) = plot(k,imag(oall{i}),'.','markersize',10, 'DisplayName', dn{i},'color',col(i,:));
+    hh(i) = plot(k,imag(oall{i}),':','linewidth',3, 'DisplayName', dn{i},'color',col(i,:));
 end
 hold off;
 xlabel('$k$','fontsize',30);

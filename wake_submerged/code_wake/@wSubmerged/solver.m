@@ -1,5 +1,7 @@
 function [o, an, cA, errGEP, dob] = solver(obj, alg, des, bal, eigspec, funcN, addvar)
-% Set initial critical height guess
+if isempty(obj.method)
+    error('Numerical method not specified.');
+end% Set initial critical height guess
 if isfield(addvar,'zL1')
     obj.zc = max([addvar.zL1 2*obj.H-addvar.zL1]);
 else
@@ -15,7 +17,7 @@ else
     solfunc = @solveGEP;
     vout = cell(2,1);
 end
-it = 11; % maximum iteratiom
+it = 11; % maximum iteration
 c_temp = 0;
 for i = 1:it
     % Construct matrix A B
@@ -38,10 +40,10 @@ for i = 1:it
     if(abs(c_temp-c(1)) < 1e-8) % converged
         fprintf('converged to zL = %.8f\n', obj.zc);
         break;
-    elseif(c_good && i ~= it && obj.criticalH(real(c(1)))<obj.h) % keep iterating
+    elseif(c_good && i ~= it && obj.invbf(real(c(1)))<obj.h) % keep iterating
         fprintf('iter %2d, zL = %.8f\n', i, obj.zc);
         c_temp = c(1);
-        obj.zc = obj.criticalH(real(c(1)));
+        obj.zc = obj.invbf(real(c(1)));
     else
         obj.zc = nan;
         fprintf('Didn''t converge.\n');
@@ -52,10 +54,12 @@ for i = 1:it
     obj.setsubd('n', funcN, addvar);
 end
 % Return variables
-if strcmpi(bal,'y')
-    [dob,errGEP,cA] = deal(vout{:});
-else
-    [errGEP,cA] = deal(vout{:});
-    dob = 'n';
+if nargout > 2
+    if strcmpi(bal,'y')
+        [dob,errGEP,cA] = deal(vout{:});
+    else
+        [errGEP,cA] = deal(vout{:});
+        dob = 'n';
+    end
 end
 end

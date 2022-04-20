@@ -67,6 +67,8 @@ function eps2pdf(source, dest, crop, append, gray, quality, gs_options)
     % Set crop option
     if nargin < 3 || crop
         options = [options ' -dEPSCrop'];
+%         options = [options ' -dEDSFitPage'];
+%         options = [options ' -sPAPERSIZE=legal' ' -dFIXEDMEDIA'];
     end
 
     % Set the font path

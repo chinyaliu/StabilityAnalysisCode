@@ -1,0 +1,15 @@
+function f = pltneutral(ud,dltlist,varargin)
+lam = findneutral(ud,dltlist);
+if ~isempty(varargin)
+    f = varargin{1};
+    ax = get(f,'CurrentAxes');
+else
+    f = figure;
+    ax = gca;
+end
+hold(ax,'on');
+for i = 1:length(dltlist)
+    plot(ax, dltlist(i),lam{i},'r.','Markersize',4);
+end
+hold(ax,'off');
+end

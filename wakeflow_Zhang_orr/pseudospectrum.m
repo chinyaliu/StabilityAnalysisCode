@@ -25,13 +25,23 @@ c = c(imag(c)>-5);
 %%
 tic;
 [A,B] = case1.getAB(f,struct('zL1',zL,'eps',eps));
+if strcmpi(de_singularize,'y')
+    er = -200i;
+    sinB = all(B<eps,2);
+    B(sinB,:) = A(sinB,:)/er;
+end
+% BA = B\A;
+% KI = k*eye(size(BA,2));
 xx = linspace(-0.5,1,50);
 yy = linspace(-4,0.5,50);
+lny = length(yy);
 [X,Y] = meshgrid(xx,yy);
 Z = NaN(length(xx),length(yy));
 z = complex(X,Y);
-for i = 1:length(xx)
-    for j = 1:length(yy)
+parfor i = 1:length(xx)
+    for j = 1:lny
+%         Z(i,j) = norm(inv(BA-z(i,j)*KI))^(-1);
+%         Z(i,j) = norm(inv(z(i,j)*KI-BA))^(-1);
         Z(i,j) = norm(inv(A-z(i,j)*k*B))^(-1);
     end
 end
@@ -39,15 +49,23 @@ toc;
 
 %%
 figure;
-contour(X,Y,log(Z),-20:2:0,'ShowText','on','linewidth',2);
+scatter(real(c),imag(c),40,'r','filled','HandleVisibility','off');
 hold on;
-scatter(real(c),imag(c),30,'k','filled','HandleVisibility','off');
+[cc,hh] = contour(X,Y,log10(Z),-20:2:0,'ShowText','on','linewidth',2);
+clabel(cc,hh,'FontSize',18,'LabelSpacing',200);
 yline(0,'linewidth',1.5,'color','#898989','HandleVisibility','off');
-hold off;
+hold off; box on; grid on;
 xlim([-0.5 1]);
 ylim([-4 0.5]);
-colorbar; caxis([-20 0]);
+aa = colorbar; 
+aa.Label.String = '$log(\sigma_\epsilon)$';
+aa.Label.Interpreter = 'latex';
+caxis([-10 0]);
 title(sprintf('$k=%.2f$',real(k)));
+xlabel('$c _r$','fontsize',30);
+ylabel('$c _i$','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
+set(gca,'XMinorTick','on','YMinorTick','on','Fontsize',28);
+yticks([-4:1:1]);
 
 %% Pseudoeigenvalue
 t1 = tic;

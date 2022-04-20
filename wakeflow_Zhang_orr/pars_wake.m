@@ -6,17 +6,17 @@ solveGEPmeth = ["qr", "qz", "eig", "invB"];
 alg = solveGEPmeth(1);
 baseflowlist = ["cosh"];
 bflow = baseflowlist(1);
-de_singularize = 'y';
+de_singularize = 'n';
 do_balancing = 'y';
-eig_spectrum = 'all';
+eig_spectrum = 'max';
 N = 600;
-k = 2;
-% Re = 1000;
-Re = inf;
+k = 1.5;
+Re = 1000;
+% Re = inf;
 Fr2 = 1.5^2;
 % zL = 0.74708299;
-h = 3*2*pi/real(k);
-ddm_number = 44;
+h = 2*2*pi/real(k);
+ddm_number = 1;
 c0 = 1./sqrt(k*Fr2);
 f = wZhang_ddm.ddmtype(ddm_number);
 eps = 0.1;
@@ -26,8 +26,9 @@ if ~isempty(varargin)
             k = [0.3 1.1 1.5 3];
             eig_spectrum = 'max';
         case(3)
-            eig_spectrum = 'max';
-            k = linspace(0.01,4,400);
+%             eig_spectrum = 'max';
+%             k = linspace(0.01,4,150);
+            k = [linspace(0.01,1,40) linspace(1.02,3,50) linspace(3.05,4,20)];
             h = 3*2*pi./real(k);
     end
 end

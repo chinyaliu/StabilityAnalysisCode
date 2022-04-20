@@ -1,5 +1,5 @@
 function numMeth(obj,meth)
-    obj.chgRe(obj.Re);
+    obj.setprop('Re',obj.Re);
     obj.method(2) = lower(meth);
     if strcmpi(obj.method(2),'trefethen')
         error('Trefethen''s differential method can''t be used for M = N-2\n');
@@ -20,7 +20,6 @@ function numMeth(obj,meth)
         else
             [z, D] = Dchebnew(obj2.N,obj2.N,obj.ord);
         end
-        %[z, D] = Dcheb(obj2.N,obj.ord,obj.method(1));
     end
     function [z, D] = trD(obj2)
         [Du,z]=cheb(obj2.N);

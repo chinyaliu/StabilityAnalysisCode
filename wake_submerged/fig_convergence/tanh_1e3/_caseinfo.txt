@@ -1,0 +1,12 @@
+Initial:
+      Base flow       tanh
+             Fr 1.5
+             Re 1.0e+03
+              k 0.3, 1.1, 1.5, 4.5
+         B.B.C. Exponential decay
+              h 3.0 wavelength
+     DDM method ddmtype/setN1sub
+     GEP solver   qr
+      Balancing y
+De-singularizing y
+========================================

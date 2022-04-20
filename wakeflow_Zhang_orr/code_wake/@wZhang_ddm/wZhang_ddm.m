@@ -99,8 +99,6 @@ classdef wZhang_ddm < handle
             [Abc1, Bbc1] = obj.subD(1).BC0(obj.Fr2,size(Age,2)-1);
 %             % BC (free slip)
 %             [Abc2, Bbc2] = obj.subD(end).BChf(size(Age,2)-1);
-%             A = [Age; Abc1; Abc2];
-%             B = [Bge; Bbc1; Bbc2];
             % BC (truncated, exponential decay)
             [Abc2, Bbc2] = obj.subD(end).BChe(size(Age,2)-1);
             A = [Age; Abc1; Abc2];

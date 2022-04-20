@@ -11,7 +11,7 @@ cutz = cutz(k_ind);
 
 tic;
 parfor ii = 1:length(k_ind)
-    p1 = wSubmerged(N,H,k(ii),h(ii),Re,Fr2);
+    p1 = wSubmerged(N,H,k(ii),h(ii),Re,Fr2,bflow);
     p1.numMeth(method);
     cs = css(:,ii);
     zc = cutz(ii);
@@ -35,7 +35,7 @@ function csall = findmode(cs,zc,p1,k,alg, de_singularize, do_balancing, eig_spec
         oall = oall(real(oall)>-50); % Remove the eigenvalues assigned by de-singularizing
         o = maxeig(oall);
         if real(o) > 0
-            addvar.zL1 = p1.criticalH(real(o)/k);
+            addvar.zL1 = p1.invbf(real(o)/k);
         end
 
         call = oall/k;

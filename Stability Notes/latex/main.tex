@@ -1,0 +1,30 @@
+% !TEX TS-program = xelatex
+% !BIB program = bibtex
+% !TEX encoding = UTF-8 Unicode
+
+\documentclass[12pt,a4paper]{report}
+
+\input{setup}
+\setlength{\parskip}{10pt}
+\setlength{\parindent}{2em}
+\setstretch{1.6}
+
+\begin{document}
+
+\tableofcontents
+
+% Contents
+\input{contents/chFormulation.tex}
+\input{contents/chLinearStability.tex}
+\input{contents/chNumerical.tex}
+\input{contents/chResults.tex}
+
+% References
+\cleardoublepage
+\bibliographystyle{abbrv}
+\bibliography{back/mybib}
+
+% Appendices
+\input{back/appendix01}
+
+\end{document}

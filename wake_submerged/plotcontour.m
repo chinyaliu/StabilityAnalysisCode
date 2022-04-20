@@ -7,7 +7,7 @@ end
 
 %% Run solver
 t1 = tic;
-case1 = wSubmerged(N,H,k,h,Re,Fr2);
+case1 = wSubmerged(N,H,k,h,Re,Fr2,bflow);
 case1.numMeth(method);
 zL = 0.74708299+H;
 [o, an] = case1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, struct('zL1',zL,'eps',eps));
@@ -41,7 +41,7 @@ title(titext);
 
 %% Find velocity and wave amplitude
 modd = 1;
-[z, phi] = case1.findmodeshape(an_c(:,modd));
+[z, phi] = case1.getprop('modeshape',an_c(:,modd));
 if sum(phi(:,1)) < 0
     phi = -phi;
 end
@@ -110,7 +110,7 @@ for i = 1:3
         yline(-case1.zc, '-k','linewidth',1.5,'HandleVisibility','off');
         yline(case1.zc-2*H, '-k','linewidth',1.5,'HandleVisibility','off');
     end
-    arr = -case1.getcut;
+    arr = -case1.getprop('cut');
     for k = 2:length(arr)-1
         yline(arr(k), '--k','linewidth',1.5,'HandleVisibility','off');
     end

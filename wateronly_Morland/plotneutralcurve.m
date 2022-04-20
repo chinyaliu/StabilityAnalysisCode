@@ -1,12 +1,12 @@
-clear all;
+% clear all;
 ud = 2;
 dlt_list = linspace(0,0.8,1000);
 fx = @(x,y) [4*x^2+pi*y 0 -4*pi*y*x^4+4*x^2+2*pi*y 0 pi*y];
 lam_list = cell(1,length(dlt_list));
 for i = 1:length(dlt_list)
     polylam = fx(ud,dlt_list(i));
-    lam = roots(polylam);
-    lam_list{i} = real(lam(imag(lam)<eps));
+    lamm = roots(polylam);
+    lam_list{i} = real(lamm(imag(lamm)<eps));
 end
 
 %% Plot Morland's neutral curve
@@ -22,17 +22,18 @@ ylabel('$\tilde{c_0}/\tilde{u_d}\quad$','rotation',0);
 
 %% Plot fast
 ud = 2;
-dlt_list = linspace(0,0.8,3000);
+dlt_list = linspace(0,0.8,1000);
 fx = @(x,y) [4*x^2+pi*y 0 -4*pi*y*x^4+4*x^2+2*pi*y 0 pi*y];
-f = figure('position',[150 100 720 640]);
+% f = figure('position',[150 100 720 640]);
 hold on;
 for dlt = dlt_list
     polylam = fx(ud,dlt);
-    lam = roots(polylam);
-    lam = real(lam(imag(lam)<eps));
-    plot(dlt,lam,'k.','Markersize',4);
+    lamm = roots(polylam);
+    lamm = real(lamm(imag(lamm)<eps & real(lamm)>-eps));
+    plot(dlt,lamm,'r.','Markersize',4);
 end
-hold off; grid on;axis square;
+hold off; 
+% grid on;axis square;
 ylim([0 2.5]);
 xlabel('$\Delta$');
 ylabel('$\lambda\quad$','rotation',0);

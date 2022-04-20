@@ -4,9 +4,9 @@ if ~contains(path,'code_wake;')
 end
 %% Solver & Algorithm list
 [method,alg,bflow,~,do_balancing,~,~,H,k,Fr2,Re,eps,c0,h,f] = pars_wake;
-N = 300:100:2000;
+N = 100:100:1500;
 eig_spectrum = 'max';
-in_init = {N(1),H,k,h,Re,Fr2};
+in_init = {N(1),H,k,h,Re,Fr2,bflow};
 %% Run
 tic;
 case1 = wSubmerged(in_init{:});
@@ -29,8 +29,10 @@ semilogy(N, doi, '-ko','linewidth',3, 'Displayname', 'original');
 hold on;
 semilogy(N, doib, '--ro','linewidth',3, 'Displayname', 'de-singularized');
 hold off;
-xlabel('$N$');
-ylabel('$\ | \ \omega_i(N_m) - \omega_i(N_{end})\ |$');
+xlabel('$N$','fontsize',36);
+ylabel('$\ | \ \omega_i - \omega_{0,i}\ |$','fontsize',36);
 legend('location','northeast');
 grid on;
-xlim([300 2000]);
+xlim([100 1500]);
+xticks(500:500:1500);
+ylim([5e-16 2e-5]);

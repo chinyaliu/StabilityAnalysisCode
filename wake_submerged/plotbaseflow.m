@@ -1,19 +1,21 @@
-% Plot tha base flow of this profile
+% Plot the base flow of this profile
 clear;
-[~,~,~,~,~,~,N,H,~,~,Re,~,~,h,~] = pars_wake;
-case1 = subRay(N,0,h,struct('H',H,'k',[],'dm',[]));
-z = case1.z;
-U = case1.U;
+H = 0;
+h = 6;
+bf = "cosh";
+z = linspace(-h, 0, 100);
+case1 = wSubmerged(0,H,0,h,0,0,bf);
+U = case1.baseflow(z);
 inflec_pt = [-H-0.74708299 -H+0.74708299];
 
 %% plot U
 figure('position',[200 100 360 720]);
-plot(U(:,1),z,'k','linewidth',3);
+plot(U(:,1),z,'--k','linewidth',3);
 hold on;
-yline(inflec_pt(1), '-b','linewidth',2); 
-yline(inflec_pt(2), '-b','linewidth',2); 
-yline(-H, '--', 'color', '#46bf12','linewidth',2); 
-xline(0, '--', 'color', '#606060');
+yline(inflec_pt(1), '-b','linewidth',2,'HandleVisibility','off'); 
+yline(inflec_pt(2), '-b','linewidth',2,'HandleVisibility','off'); 
+yline(-H, '--', 'color', '#46bf12','linewidth',2,'HandleVisibility','off'); 
+xline(0, '--', 'color', '#606060','HandleVisibility','off');
 hold off;
 if (h > 6)
     blim = -6-2*H;

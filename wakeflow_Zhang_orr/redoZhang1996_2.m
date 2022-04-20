@@ -6,9 +6,9 @@ end
 [method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,k,Fr2,Re,eps,c0,h,f] = pars_wake(3);
 inflec_pt = -0.74708299;
 zL = -inflec_pt;
-cutz = NaN(1,length(k));
-cutz(1) = -inflec_pt;
 in_init = {N,k(1),h(1),Re,Fr2};
+addvar = struct('zL1',zL,'eps',eps);
+smeth = {alg, de_singularize, do_balancing, 'all', f, addvar};
 %% Select specific modes to observe
 % 100
 cs(1,1) = -5.69935554321657 + 0.155435654161913i;
@@ -31,62 +31,68 @@ R = [1e2,1e3,inf];
 css = cell(3,1);
 oss = cell(3,1);
 for j = 1:length(R)
-    fprintf('Re = %4d\n', R(j));
-    p1.chgRe(R(j),method);
-    addvar = struct('zL1',zL,'eps',eps);
-    css{j} = NaN(3,length(k));
-    oss{j} = NaN(3,length(k));
-    for i = 1:length(k)
-        fprintf('k = %.2f\n', k(i));
-        p1.k = k(i); p1.h = h(i);
-        oall = p1.solver(alg, de_singularize, do_balancing, 'all', f, addvar);
-        o = maxeig(oall);
-        if real(o) > 0
-            cutz(i)=-p1.criticalH(real(o)/k(i));
-        else
-            cutz(i)=cutz(1);
-        end
-        addvar.zL1 = cutz(i);
-        
-        call = oall/k(i);
-        if isinf(R(j))
-            a = 1:length(call); 
-            crange = ((real(call)-0.0012>-1e-5) & (real(call)-1<=1e-5));
-            dis = ((real(call)-1).^2 +imag(call).^2)>1e-5;
-            aa = a(crange&dis);
-            abch = isoutlier(imag(call(aa)),'movmedian',5);
-            aa = [a(dis&~crange) aa(abch)];
-            cnind = call(aa);
-        else
-            if (i~=1) && (abs(k(i)-0.8)>1e-5)
-                cmatn = repmat(calln,1,length(call));
-                cmat = repmat(call.',length(calln),1);
-                [~,ind] = min(abs(cmatn-cmat),[],2);
-                cnind = call(setdiff(1:end,ind));
-                calln = call(ind);
-            else
-                cnind = call(imag(call)>-2);
-                c1 = repmat(cs(j,:).',1,length(cnind));
-                c2 = repmat(cnind.',length(cs),1);
-                [~,ind] = min(abs(c1-c2),[],2);
-                calln = cnind(setdiff(1:end,ind));
-            end
-        end
-
-        % Choose selected eigenvalues
-        if ~isempty(cnind)
-            for m = 1:size(cs,1)
-                [mc,ind] = min(abs(cnind-cs(j,m)));
-                c = cnind(ind);
-                [~,ind2] = min(abs(c-cs(j,:)));
-                if ind2 == j
-                    cs(j,m) = c;
-                    css{j}(m,i) = c;
-                    oss{j}(m,i) = c*k(i);
-                end
-            end
-        end
+    in_init{4} = R(j);
+    if isinf(R(j))
+        smeth{5} = wZhang_ddm.ddmtype(44);
+    else
+        smeth{5} = wZhang_ddm.ddmtype(1);
     end
+    [css{j},oss{j}] = findmode(k,h,in_init,method,smeth,cs(j));
+% %     css{j} = ctemp;
+% %     oss{j} = otemp;
+%     css{j} = NaN(3,length(k));
+%     oss{j} = NaN(3,length(k));
+%     for i = 1:length(k)
+%         fprintf('k = %.2f\n', k(i));
+%         p1.k = k(i); p1.h = h(i);
+%         oall = p1.solver(alg, de_singularize, do_balancing, 'all', f, addvar);
+%         o = maxeig(oall);
+%         if real(o) > 0
+%             cutz(i)=-p1.criticalH(real(o)/k(i));
+%         else
+%             cutz(i)=cutz(1);
+%         end
+%         addvar.zL1 = cutz(i);
+%         
+%         call = oall/k(i);
+%         if isinf(R(j))
+%             a = 1:length(call); 
+%             crange = ((real(call)-0.0012>-1e-5) & (real(call)-1<=1e-5));
+%             dis = ((real(call)-1).^2 +imag(call).^2)>1e-5;
+%             aa = a(crange&dis);
+%             abch = isoutlier(imag(call(aa)),'movmedian',5);
+%             aa = [a(dis&~crange) aa(abch)];
+%             cnind = call(aa);
+%         else
+%             if (i~=1) && (abs(k(i)-0.8)>1e-5)
+%                 cmatn = repmat(calln,1,length(call));
+%                 cmat = repmat(call.',length(calln),1);
+%                 [~,ind] = min(abs(cmatn-cmat),[],2);
+%                 cnind = call(setdiff(1:end,ind));
+%                 calln = call(ind);
+%             else
+%                 cnind = call(imag(call)>-2);
+%                 c1 = repmat(cs(j,:).',1,length(cnind));
+%                 c2 = repmat(cnind.',length(cs),1);
+%                 [~,ind] = min(abs(c1-c2),[],2);
+%                 calln = cnind(setdiff(1:end,ind));
+%             end
+%         end
+% 
+%         % Choose selected eigenvalues
+%         if ~isempty(cnind)
+%             for m = 1:size(cs,1)
+%                 [mc,ind] = min(abs(cnind-cs(j,m)));
+%                 c = cnind(ind);
+%                 [~,ind2] = min(abs(c-cs(j,:)));
+%                 if ind2 == j
+%                     cs(j,m) = c;
+%                     css{j}(m,i) = c;
+%                     oss{j}(m,i) = c*k(i);
+%                 end
+%             end
+%         end
+%     end
 end
 toc;
 
@@ -185,5 +191,59 @@ function o = maxeig(ev)
         o = NaN;
     else
         o = w(1);
+    end
+end
+
+function [css,oss] = findmode(k,h,in_init,method,smeth,cs)
+    p1 = wZhang_ddm(in_init{:});
+    p1.numMeth(method);
+    cutz = nan;
+    for i = 1:length(k)
+        p1.k = k(i); p1.h = h(i);
+        oall = p1.solver(smeth{:});
+        o = maxeig(oall);
+        if (real(o) > 0) && (real(o/k(1)) < 1)
+            cutz=-p1.criticalH(real(o)/k(i));
+        end
+        smeth{end}.zL1 = cutz;
+        
+        call = oall/k(i);
+        if isinf(in_init{4})
+            a = 1:length(call); 
+            crange = ((real(call)-0.0012>-1e-5) & (real(call)-1<=1e-5));
+            dis = ((real(call)-1).^2 +imag(call).^2)>1e-5;
+            aa = a(crange&dis);
+            abch = isoutlier(imag(call(aa)),'movmedian',5);
+            aa = [a(dis&~crange) aa(abch)];
+            cnind = call(aa);
+        else
+            if (i~=1) && (abs(k(i)-0.8)>1e-5)
+                cmatn = repmat(calln,1,length(call));
+                cmat = repmat(call.',length(calln),1);
+                [~,ind] = min(abs(cmatn-cmat),[],2);
+                cnind = call(setdiff(1:end,ind));
+                calln = call(ind);
+            else
+                cnind = call(imag(call)>-2);
+                c1 = repmat(cs.',1,length(cnind));
+                c2 = repmat(cnind.',length(cs),1);
+                [~,ind] = min(abs(c1-c2),[],2);
+                calln = cnind(setdiff(1:end,ind));
+            end
+        end
+
+        % Choose selected eigenvalues
+        if ~isempty(cnind)
+            for m = 1:size(cs,1)
+                [~,ind] = min(abs(cnind-cs(m)));
+                c = cnind(ind);
+                [~,ind2] = min(abs(c-cs));
+                if ind2 == m
+                    cs(m) = c;
+                    css(m,i) = c;
+                    oss(m,i) = c*k(i);
+                end
+            end
+        end
     end
 end

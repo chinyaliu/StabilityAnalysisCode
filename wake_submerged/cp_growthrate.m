@@ -5,24 +5,25 @@ end
 %% Set Solver & Algorithm
 numofcase = 2;
 [method{1},alg{1},bflow,de_singularize{1},do_balancing{1},~,N{1},H,k,Fr2,Re{1},eps,c0,h,f{1}] = pars_wake(3,'inv');
-in_init{1} = {N{1},H,k(1),h(1),Re{1},Fr2};
-% [method{2},alg{2},~,de_singularize{2},do_balancing{2},~,N{2},~,~,~,Re{2},~,~,~,f{2}] = pars_wake(3,'vis');
-% in_init{2} = {N{2},H,k(1),h(1),Re{2},Fr2};
-[method{2},alg{2},~,de_singularize{2},do_balancing{2},~,N{2},~,~,~,Re{2},~,~,~,f{2}] = pars_wake(3,'inv');
-in_init{2} = in_init{1};
+in_init{1} = {N{1},H,k(1),h(1),Re{1},Fr2,bflow};
+[method{2},alg{2},~,de_singularize{2},do_balancing{2},~,N{2},~,~,~,Re{2},~,~,~,f{2}] = pars_wake(3,'vis');
+in_init{2} = {N{2},H,k(1),h(1),Re{2},Fr2,bflow};
+% [method{2},alg{2},~,de_singularize{2},do_balancing{2},~,N{2},~,~,~,Re{2},~,~,~,f{2}] = pars_wake(3,'inv');
+% in_init{2} = in_init{1};
 f{2} = wSubmerged.ddmtype(1);
 inflec_pt = -0.74708299-H;
 zL = (0.74708299+H)*ones(length(k),1);
-addvar = struct('zL1',c0(1),'eps',eps);
 eig_spectrum = 'max';
 
 %% Run solver
 tic;
 o = NaN(numofcase,length(k));
 cutz = NaN(numofcase,length(k));
+c01 = c0(1);
 parfor i = 1:numofcase
     p{i} = wSubmerged(in_init{i}{:});
     p{i}.numMeth(method{i});
+    addvar = struct('zL1',p{i}.invbf(c01),'eps',eps);
     [o(i,:), cutz(i,:)] = findmode(p{i},k,h,alg{i}, de_singularize{i}, do_balancing{i}, f{i}, addvar);
 end
 toc;
@@ -53,7 +54,7 @@ xlabel('$k$');
 ylabel('$\omega _i$','rotation',0, 'HorizontalAlignment','right');
 leg = legend('location','northeast');
 title(leg,'$Re$');
-ylim([0 0.03]);
+% ylim([0 0.03]);
 
 %% Plot oi vs k
 o(isnan(o))=0;
@@ -61,7 +62,7 @@ lsy = {'-k',':r','--b'};
 nam = {'Original','DDM'};
 fig2 = figure('position',[50,0,1000,720]);hold on;
 for i = 1:length(p)
-    plot(k,imag(oo(i,:)),lsy{i}, 'Displayname', nam{i});
+    plot(k,imag(o(i,:)),lsy{i}, 'Displayname', nam{i});
 end
 yline(0,'linewidth',1.5,'color','#898989','HandleVisibility','off');
 hold off; box on; grid on;

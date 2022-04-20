@@ -8,7 +8,7 @@ inflec_pt = -0.74708299-H;
 zL = (0.74708299+H)*ones(length(k),1);
 cutz = NaN(1,length(k));
 cutz(1) = -inflec_pt;
-in_init = {N,H,k(1),h(1),Re,Fr2};
+in_init = {N,H,k(1),h(1),Re,Fr2,bflow};
 addvar = struct('zL1',zL(1),'eps',eps);
 
 %% Run solver
@@ -40,15 +40,15 @@ xlabel('$\omega _r$','fontsize',30);
 ylabel('$\omega _i$','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
 
 %% Plot oi vs k
-fig2 = figure('position',[50,0,1000,720]);
+fig2 = figure('position',[50,0,720,540]);
 o(isnan(o))=0;
-% plot(k,imag(o)./k,'-b','linewidth',3);
-plot(k,imag(o),'-b','linewidth',3);
+plot(k,imag(o)./k,'-k','linewidth',3);
+% plot(k,imag(o),'-b','linewidth',3);
 hold on; yline(0,'linewidth',1.5,'color','#898989','HandleVisibility','off'); hold off;
 xlim([0 max(k)]);
 xlabel('$k$','fontsize',30);
-% ylabel('$c_i$','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
-ylabel('$\omega _i$','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
+ylabel('$c_i$','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
+% ylabel('$\omega _i$','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
 
 %% Plot critical height vs k
 [zc,ind] = rmmissing(cutz);

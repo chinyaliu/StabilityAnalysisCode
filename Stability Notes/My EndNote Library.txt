@@ -1,0 +1,110 @@
+﻿@phdthesis{RN4,
+   author = {沈, 巧婷},
+   title = {應用契比雪夫配置法探討氣-水耦合流場之穩定性分析},
+   university = {國立臺灣大學},
+   abstract = {本研究探討一空氣剪切流產生與初期發展的不穩定波水波. 利用數值解析耦合空氣與水體流場之穩定性動力方程式－Orr-Sommerfeld方程式, 並滿足空氣與水交界面之邊界條件. 本研究的數值方法為契比雪夫配置法, 即使用契比雪夫多項式展開特徵函數與以配置點離散, 兩者所搭配的數值方法, 並以QZ法求解其衍伸出的廣義特徵值問題. 其計算範圍可擴展至更長的波長(最長至20cm)與更強的風(摩擦速度最大至100cm/s), 並隨著風速的增加有雙重不穩定模態的產生. 研究結果顯示此數值方法為一容易應用, 且有高收斂性與準確性之方法},
+   keywords = {Chebyshev collocation method
+Domain decomposition method
+Linear stability analysis
+air-water interface
+wind wave
+區間分解法
+契比雪夫配置法
+氣-水界面
+線性穩定性分析
+電子書
+風浪},
+   year = {2019},
+   type = {Thesis}
+}
+
+@phdthesis{RN8,
+   author = {Dimas, Athanassios A.},
+   title = {Interaction between a two-dimensional wake and the free surface at low Froude numbers},
+   university = {Massachusetts Institute of Technology},
+   keywords = {Ocean Engineering, Mechanical Engineering.},
+   url = {http://hdl.handle.net/1721.1/14730},
+   year = {1988},
+   type = {Thesis}
+}
+
+@article{RN7,
+   author = {Mattingly, G. E. and Criminale, W. O.},
+   title = {The stability of an incompressible two-dimensional wake},
+   journal = {Journal of Fluid Mechanics},
+   volume = {51},
+   number = {2},
+   pages = {233-272},
+   ISSN = {0022-1120},
+   DOI = {10.1017/s0022112072001193},
+   year = {1972},
+   type = {Journal Article}
+}
+
+@article{RN10,
+   author = {Moler, C. B. and Stewart, G. W.},
+   title = {ALGORITHM FOR GENERALIZED MATRIX EIGENVALUE PROBLEMS},
+   journal = {Siam Journal on Numerical Analysis},
+   volume = {10},
+   number = {2},
+   pages = {241-256},
+   note = {ISI Document Delivery No.: P4758
+Times Cited: 686
+Cited Reference Count: 14
+Moler, cb stewart, gw
+701
+2
+28
+Siam publications
+Philadelphia},
+   keywords = {Mathematics},
+   ISSN = {0036-1429},
+   DOI = {10.1137/0710024},
+   url = {<Go to ISI>://WOS:A1973P475800001},
+   year = {1973},
+   type = {Journal Article}
+}
+
+@book{RN9,
+   author = {Schmid, Peter and Henningson, Dan},
+   title = {Stability and Transition in Shear Flows},
+   volume = {142},
+   abstract = {This book is a detailed look at some of the more modern issues of hydrodynamic stability, including transient growth, eigenvalue spectra, secondary instability. Analytical results and numerical simulations, linear and (selected) nonlinear stability methods will be presented. By including classical results as well as recent developments in the field of hydrodynamic stability and transition, the book can be used as a textbook for an introductory, graduate-level course in stability theory or for a special-topics fluids course. It will also be of value as a reference for researchers in the field of hydrodynamic stability theory or with an interest in recent developments in fluid dynamics. Since the appearance of "Drazin & Reid", no book on hydrodynamic stability theory has been published. However, stability theory has seen a rapid development over the past decade. Direct numerical simulations of transition to turbulence and linear analysis based on the initial-value problem are two of many such developments that will be included in the book.},
+   ISBN = {9780387989853},
+   DOI = {10.1007/978-1-4613-0185-1},
+   year = {2001},
+   type = {Book}
+}
+
+@article{RN5,
+   author = {Triantafyllou, George S. and Dimas, Athanassios A.},
+   title = {Interaction of two‐dimensional separated flows with a free surface at low Froude numbers},
+   journal = {Physics of fluids. A, Fluid dynamics},
+   volume = {1},
+   number = {11},
+   pages = {1813-1821},
+   abstract = {It is shown that the low Froude number wake of floating two‐dimensional objects is convectively unstable. This is shown to be true for bluff objects, like a circular cylinder, and for streamlined objects, like a thin airfoil. As a result, the wake behind a floating object remains steady, even at high Reynolds numbers, characterized by a long region of recirculating flow. It is concluded that the presence of the free surface has a stabilizing effect at low Froude numbers, suppressing the unsteadiness of the wake. The structure of the dispersion relation, shows that, at low Froude numbers, a short wavelength interaction between the wake instability and ambient waves is possible in the form of a spatially growing response.},
+   keywords = {Applied fluid mechanics
+Hydrodynamics, hydraulics, hydrostatics
+Fundamental areas of phenomenology (including applications)
+Fluid dynamics
+Physics
+Exact sciences and technology},
+   ISSN = {0899-8213},
+   DOI = {10.1063/1.857507},
+   year = {1989},
+   type = {Journal Article}
+}
+
+@phdthesis{RN2,
+   author = {Zhang, Chiong C.},
+   title = {Turbulent free-surface wakes behind towed models : experimental measurements, numerical simulations and stability analysis},
+   university = {MIT},
+   note = {(Chiong Chelsea)
+Massachusetts Institute of Technology. Dept. of Ocean Engineering},
+   keywords = {Ocean Engineering},
+   url = {http://oatd.org/oatd/record?record=handle\:1721.1\%2F10731&q=Zhang%2C%20Chiong%20C},
+   year = {1996},
+   type = {Thesis}
+}
+

@@ -14,13 +14,13 @@ lnh = length(nh);
 oih = nan(lnk,lnh);
 Nc = nan(lnk,lnh);
 tic;
-parfor i = 1:lnk
+for i = 1:lnk
     for j = 1:lnh
         h = nh(j)*2*pi./k(i)+H;
-        case1 = wSubmerged(100,H,k(i),h,Re,Fr2);
+        case1 = wSubmerged(100,H,k(i),h,Re,Fr2,bflow);
         case1.numMeth(method);
         c0 = min(0.99, 1./sqrt(k(i)*Fr2));
-        addvar = struct('zL1',case1.criticalH(c0),'eps',eps);
+        addvar = struct('zL1',case1.invbf(c0),'eps',eps);
         [oih(i,j), Nc(i,j)] = convgmode(N, case1, alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
     end
 end

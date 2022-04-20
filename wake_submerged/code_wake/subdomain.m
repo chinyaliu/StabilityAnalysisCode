@@ -1,47 +1,35 @@
 classdef (Abstract) subdomain < handle
     properties (SetAccess = protected)
         ztop; zbot; % Upper and lower bounds of subdomain (both > 0)
-        N;          % Number of collocation points in this subdomain
+        N = 0;      % Number of collocation points in this subdomain
         z;          % Collocation points defined using Gauss-Lobatto grids
         U;          % Base flow velocity up to nth derivative at z
         D;          % Chebyshev differential matrix up to nth deriavtive at z
-        k;          % Wavenumber of the perturbed streamfunction
         A; B;       % RHS/LHS of the GEP
-        baseflow;   % Velocity profile of the flow
+        pFlow;      % Properties of the flow (class handle)
     end
     methods
         % Class constructor, set flow properties
         function obj = subdomain(N,ztop,zbot,supObj,varargin)
             if (nargin == 4)
-                obj.N = N; obj.ztop = ztop; obj.zbot = zbot;
-                obj.k = supObj.k;
-                obj.setD(ztop,zbot,supObj.dm);
-                obj.setbaseflow(obj);
-                obj.U = obj.baseflow(obj.z,supObj.H);
+                obj.pFlow = supObj;
+                obj.chgL(N,ztop,zbot);
             end
         end
         % Set Chebyshev derivative matrix (z, D)
-        function setD(obj,ztop,zbot,varargin)
-            persistent dm
-            if isempty(dm) 
-                if length(varargin) == 1
-                    dm = varargin{1};
-                else
-                    error("Differential method not specified.");
-                end
-            end
-            [zeta,Din] = dm(obj);
+        function setD(obj,ztop,zbot)
+            [zeta,Din] = obj.pFlow.dm(obj);
             sz = size(Din,3);
             w = (2/(zbot-ztop)).^(0:1:sz-1);
             obj.D = reshape((reshape(Din,[],sz).*w),size(Din,1),[],sz);
             obj.z = 0.5*(zbot-ztop)*(zeta-1)-ztop;
         end
-        % Modify subdomain upper/lower limit and collocation point 
-        function chgL(obj,N,ztop,zbot,H)
+        % Change subdomain upper/lower limit and collocation point 
+        function chgL(obj,N,ztop,zbot)
             if ztop > zbot
                 error('Upper limit lower than lower limit.');
             end
-            if obj.N~=N % Call @setD only when N is changed
+            if obj.N~=N % Call @setD only when N is modified
                 obj.N = N;
                 obj.setD(ztop,zbot);
             else
@@ -51,56 +39,17 @@ classdef (Abstract) subdomain < handle
                 obj.z = (obj.z+obj.ztop)*(zbot-ztop)/(obj.zbot-obj.ztop)-ztop;
             end
             obj.ztop = ztop; obj.zbot = zbot;
-            obj.U = obj.baseflow(obj.z,H);
+            obj.U = obj.pFlow.baseflow(obj.z);
             obj.makeAB(); % Update matrix A, B with new flow properties
         end
         % Return 0-2nd order derivative of input eigenvector
         function phi = modeshape(obj,an)
             phi = reshape(reshape(permute(obj.D(:,:,1:3),[1 3 2]),[],size(obj.D,2))*an,[],3);
         end
-        % Set velocity profile
-        function setbaseflow(obj)
-            switch(lower(obj.bf))
-            case 'cosh'
-                obj.baseflow = @hydrofoil;
-            case 'pwlinear'
-                obj.baseflow = @pwlinear;
-            case 'tanh'
-                obj.baseflow = @cylintan;
-            otherwise
-                error('Invalid velocity profile name.');
-            end
-
-            function Ur = hydrofoil(z,H)
-                c1 = 0.9988; c2 = 0.8814;
-                Ur(:,1) = (1-c1*cosh(c2*(z+H)).^(-2));
-                Ur(:,2) = 2*c1*c2*tanh(c2*(z+H)).*(sech(c2*(z+H))).^2;
-                Ur(:,3) = 2*c1*c2^2*(sech(c2*(z+H))).^2.*((sech(c2*(z+H))).^2-2*(tanh(c2*(z+H))).^2);
-            end
-            function Ur = pwlinear(z,H)
-                if H > 0
-                    error('Profile for half-submerged only');
-                end
-                u0 = 0.0012; h0 = 0.25; H0 = 1.75;
-                Ur = [ones(length(z),1) zeros(length(z),2)];
-                Ur(z<H0,1) = u0 + (1-u0)*(z-h0)/(H0-h0);
-                Ur(z<h0,1) = u0;
-                Ur((z<H0)&(z<h0),2) = (1-u0)/(H0-h0);
-            end
-            function Ur = cylintan(z,H)
-                if H > 0
-                    error('Profile for half-submerged only');
-                end
-                c = 0.75; alpha = 4; beta = 0.32;
-                Ur(:,1) = 1-c*(1-tanh(alpha*z.^2-beta));
-                Ur(:,2) = 2*c*alpha*z.*(sech(beta-alpha*z.^2)).^2;
-                Ur(:,3) = 2*c*alpha*(4*alpha*z.^2.*tanh(beta-alpha*z.^2)+1).*(sech(beta-alpha*z.^2)).^2;
-            end
-        end     
     end
     methods(Abstract)
         % Boundary condition at surface
-        [A, B] = BC0(obj,Fr2,N)
+        [A, B] = BC0(obj,N)
         % Boundary condition at bottom
         [A, B] = BChf(obj,N)
         % Boundary condition at bottom
@@ -109,13 +58,6 @@ classdef (Abstract) subdomain < handle
         makeAB(obj)
     end
     methods (Static)
-%        % Velocity profile
-%       function Ur = baseflow(z,H)      
-%           c1 = 0.9988; c2 = 0.8814;
-%           Ur(:,1) = (1-c1*cosh(c2*(z+H)).^(-2));
-%           Ur(:,2) = 2*c1*c2*tanh(c2*(z+H)).*(sech(c2*(z+H))).^2;
-%           Ur(:,3) = 2*c1*c2^2*(sech(c2*(z+H))).^2.*((sech(c2*(z+H))).^2-2*(tanh(c2*(z+H))).^2);
-%        end
         % Combine matrix A, B of the input subdomains and set the matching conditions
         function [A, B] = match(subd)
             ord = size(subd(1).D,3) - 1; % match the eigenvector up to "ord"-order

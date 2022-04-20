@@ -1,0 +1,114 @@
+% !TeX root = ../main.tex
+
+\chapter{Mathematical Formulations}
+
+\section{Governing equations}
+Consider an undisturbed, steady, incompressible two-dimensional parallel flow with velocity $\vec{u}=U({z})$ and total pressure $p=P_0$. Cartesian coordinates are defined with $x$-axis in the streamwise direction and $z$-axis in the upward vertical direction. The fluid satisfies the continuity and momentum equations
+\begin{equation}
+    \nabla \cdot \vec{u}=0,
+    \label{eq:cont}
+\end{equation}
+\begin{equation}
+    \frac{\partial \vec{u}}{\partial t}+\left(\vec{u}\cdot\nabla\right)\vec{u}=-\frac{1}{\rho}\nabla p+\nu\nabla^2\vec{u},
+    \label{eq:ns}
+\end{equation}
+where $\rho$ and $\nu$ are the density and kinematic viscosity of the fluid.
+
+\section{Boundary conditions} \label{ch:bc}
+The flow domain is bounded on top by the free surface and extends to infinity in depth. At the upper boundary, the kinematic and dynamic boundary conditions are required to represent the presence of the free surface. The upper boundary conditions are defined at the free surface, but since the free surface isn't a fixed boundary, the boundary conditions are set at the position of the free surface $z=\eta(x,y,t)$, where $\eta(x,y,t)$ denotes the surface elevation. 
+
+Additionally, to derive the kinematic and dynamic boundary conditions at the free surface, local coordinates are required. Given the mathematical expression of the free surface $f(x,y,t)=z-\eta(x,y,t)=0$, its has an unit normal vector
+\begin{equation}
+    \hat{n} =\frac{\nabla f}{\| \nabla f\| } =\frac{-\eta _{x}\hat{i} -\eta _{y}\hat{j} +\hat{k}}{\left( \eta _{x}^{2} +\eta _{y}^{2} +1\right)^{1/2}} =( n_{x} ,n_{y} ,n_{z}),
+    \label{eq:nv}
+\end{equation}
+where a subscript $x$ or $y$ of the variable $\eta$ denotes a partical $x$- or $y$-derivative of $\eta$. Tangential vectors are defined to be perpendicular to the normal vector $\hat{n}$, but apart from this they are non-unique. For simplicity we define the two unit tangential vectors to be parallel to the $x$- and $y$-axes,
+\begin{equation}
+    \hat{t}_{x} =\frac{\hat{i} +\eta _{x}\hat{k}}{\left( 1+\eta _{x}^{2}\right)^{1/2}} ,\quad \hat{t}_{x} \cdot \hat{n} =0,
+\end{equation}
+\begin{equation}
+    \hat{t}_{y} =\frac{\hat{j} +\eta _{y}\hat{k}}{\left( 1+\eta _{y}^{2}\right)^{1/2}} ,\quad \hat{t}_{y} \cdot \hat{n} =0,
+\end{equation}
+note that the two tangential vectors are not necessarily orthogonal. The local coordinate system is then formed by the unit normal and tangential vectors $(\hat{n} ,\hat{t}_{x} ,\hat{t}_{y})$.
+
+\subsection{Kinematic boundary condition}
+The kinematic boundary condition states that each particle on the free surface stays on the surface, that is the material derivative of the surface remains zero,
+\begin{equation}
+    \frac{Df}{Dt} =\frac{\partial f}{\partial t} +\vec{u} \cdot \nabla f=0,\qquad \text{at}\ z=\eta(x,y,t),
+\end{equation}
+With $f(x,y,t)=z-\eta(x,y,t)=0$, the above equation can be written as
+\begin{equation}
+    \begin{split}
+    \frac{Df}{Dt} &=\frac{\partial }{\partial t}[ z-\eta ] +(\vec{u} \cdot \vec{n}) \| \nabla f\| \\ 
+    &=-\frac{\partial \eta }{\partial t} -u\frac{\partial \eta }{\partial x} -v\frac{\partial \eta }{\partial y}+w=0,\qquad \text{{at }} z=\eta,
+    \end{split}
+    \label{eq:kbc1}
+\end{equation}
+with the physical meaning that the deformation rate of the free surface equals to the flow velocity normal to the free surface. 
+
+\subsection{Dynamic boundary condition}
+The dynamic boundary condition states that the stress at the free surface is balanced. One of the forces acting on the free surface is the surface tension, which exists due to the discontinuity of density at the interface of two immiscible fluids. Here the free surface act as the interface between air and water. The intermolecular forces caused the interface to be under tension, leading to a pressure jump at positions where the interface is curved. This pressure jump is related to the curvature and normal vector of the interface, its relations described by the Young-Laplace equation
+\begin{equation}
+    \Delta p = -\sigma (\nabla\cdot\hat{n})=-\sigma\kappa,
+\end{equation}
+where $\sigma$ denotes the surface tension and $\kappa$ is the curvature of the free surface. In the above equation the relation $\kappa=\nabla\cdot\hat{n}$ is applied, by substituting equation (\ref{eq:nv}), the curvature can be written as
+\begin{equation}
+    \begin{split}
+        \kappa &=\nabla \cdot \hat{n} \\&=\frac{\partial n_{x}}{\partial x} +\frac{\partial n_{y}}{\partial y} +\frac{\partial n_{z}}{\partial z} \\&=\frac{-\eta _{xx}\left( \eta _{y}^{2} +1\right) -\eta _{yy}\left( \eta _{x}^{2} +1\right) +2\eta _{x} \eta _{y} \eta _{xy}}{\left( \eta _{x}^{2} +\eta _{y}^{2} +1\right)^{3/2}}
+    \end{split}
+    \label{eq:kappa}
+\end{equation}
+
+Surface tension balances with the total stress at the free surface. The total stress $\tau^s$ consists of stress in both air and water phases. For an incompressible, irrotational Newtonian fluid, the stress tensor is expressed as
+\begin{equation}
+    \begin{split}
+    \tau _{ij} &=-p\delta _{ij} +2\mu e_{ij} \\&=
+        \begin{bmatrix}
+         -p+2\mu \frac{\partial u}{\partial x} & \mu \left(\frac{\partial v}{\partial x} +\frac{\partial u}{\partial y}\right) & \mu \left(\frac{\partial w}{\partial x} +\frac{\partial u}{\partial z}\right)\\
+        \mu \left(\frac{\partial v}{\partial x} +\frac{\partial u}{\partial y}\right) & -p+2\mu \frac{\partial v}{\partial y} & \mu \left(\frac{\partial w}{\partial y} +\frac{\partial v}{\partial z}\right)\\
+        \mu \left(\frac{\partial w}{\partial x} +\frac{\partial u}{\partial z}\right) & \mu \left(\frac{\partial w}{\partial y} +\frac{\partial v}{\partial z}\right) & -p+2\mu \frac{\partial w}{\partial z}
+        \end{bmatrix},
+    \end{split}
+\end{equation}
+where $p$ is the total pressure. Therefore total stress acting on the free surface are derived by applying the stress tensor
+\begin{equation}
+\begin{split}
+    [ \tau ] \cdot \{\hat{n}\}^T &=\tau _{ij} n_{j} \\&= {\displaystyle \frac{\mu }{\left( \eta _{x}^{2} +\eta _{y}^{2} +1\right)^{1/2}}}\left\{{\displaystyle \left[ \eta _{x}\frac{p}{\mu } -2\eta _{x}\frac{\partial u}{\partial x} -\eta _{y}\left(\frac{\partial v}{\partial x} +\frac{\partial u}{\partial y}\right) +\left(\frac{\partial w}{\partial x} +\frac{\partial u}{\partial z}\right)\right]}\hat{i} \right.\\
+    & \qquad+{\displaystyle \left[ \eta _{y}\frac{p}{\mu } -2\eta _{y}\frac{\partial v}{\partial y} -\eta _{x}\left(\frac{\partial v}{\partial x} +\frac{\partial u}{\partial y}\right) +\left(\frac{\partial w}{\partial y} +\frac{\partial v}{\partial z}\right)\right]}\hat{j} \\
+    &\qquad+\left.{\displaystyle \left[ -\frac{p}{\mu } +2\frac{\partial w}{\partial z} -\eta _{x}\left(\frac{\partial w}{\partial x} +\frac{\partial u}{\partial z}\right) -\eta _{y}\left(\frac{\partial w}{\partial y} +\frac{\partial v}{\partial z}\right)\right]\hat{k}}\right\}.
+\end{split}
+\label{eq:tau}
+\end{equation}
+
+To satisfy the dynamic boundary condition, the total stress must be balanced with surface tension,
+\begin{equation}
+    [ \tau ] \cdot \{\hat{n}\}^T = -\sigma\kappa\hat{n}.
+\end{equation}
+To further simplify the boundary condition, we apply the above equation in three directions. Since the surface tension only has effect in the direction of the normal vector of the free surface, the stress balance is inspected in the normal and tangential directions of the free surface. Therefore, in the normal direction the $\hat{n}$ component of the total stress are balanced by the surface tension, while in the tangential directions the total stress sums up to zero
+\begin{align}
+    \{\hat{n}\} \cdotp [ \tau ] \cdotp \{\hat{n}\}^{T} &=-\sigma \kappa, \\
+    \{\hat{t_x}\} \cdotp [ \tau ] \cdotp \{\hat{n}\}^{T} &=0, \\
+    \{\hat{t_y}\} \cdotp [ \tau ] \cdotp \{\hat{n}\}^{T} &=0.
+\end{align}
+Substitute equations (\ref{eq:kappa}) and (\ref{eq:tau}) into the above equations,
+\begin{multline}
+    -p+\frac{2\mu }{\eta _{x}^{2} +\eta _{y}^{2} +1}\left[ \eta _{x}^{2}\frac{\partial u}{\partial x} +\eta _{y}^{2}\frac{\partial v}{\partial y} +\frac{\partial w}{\partial z}
+    +\eta _{x} \eta _{y}\left(\frac{\partial v}{\partial x} +\frac{\partial u}{\partial y}\right)-\eta _{x}\left(\frac{\partial w}{\partial x} +\frac{\partial u}{\partial z}\right) \right.\\
+    \left.-\eta _{y}\left(\frac{\partial w}{\partial y} +\frac{\partial v}{\partial z}\right)\right]    =\sigma \frac{\eta _{xx}\left( \eta _{y}^{2} +1\right) +\eta _{yy}\left( \eta _{x}^{2} +1\right) -2\eta _{x} \eta _{y} \eta _{xy}}{\left( \eta _{x}^{2} +\eta _{y}^{2} +1\right)^{3/2}},
+\end{multline}
+\begin{multline}
+2\eta _{x}\left(\frac{\partial w}{\partial z} -\frac{\partial u}{\partial x}\right) -\eta _{y}\left(\frac{\partial u}{\partial y} +\frac{\partial v}{\partial x}\right) +\left( 1-\eta _{x}^{2}\right)\left(\frac{\partial w}{\partial x} +\frac{\partial u}{\partial z}\right) \\
+-\eta _{x} \eta _{y}\left(\frac{\partial v}{\partial z} +\frac{\partial w}{\partial y}\right) =0,
+\end{multline}
+\begin{multline}
+2\eta _{y}\left(\frac{\partial w}{\partial z} -\frac{\partial v}{\partial y}\right) -\eta _{x}\left(\frac{\partial u}{\partial y} +\frac{\partial v}{\partial x}\right) +\left( 1-\eta _{y}^{2}\right)\left(\frac{\partial w}{\partial y} +\frac{\partial v}{\partial z}\right) \\ 
+-\eta _{x} \eta _{y}\left(\frac{\partial u}{\partial z} +\frac{\partial w}{\partial x}\right) =0.
+\end{multline}
+
+
+\subsection{Boundary condition at infinity}
+The flow domain extends to infinity in depth, and the boundary conditions is that the disturbance vanishes at infinite depth,
+\begin{equation}
+    u^\prime,w^\prime\rightarrow 0, \text{ as } z\rightarrow -\infty.
+    \label{eq:bbc1}
+\end{equation}

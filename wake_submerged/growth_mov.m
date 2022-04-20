@@ -9,7 +9,7 @@ inflec_pt = -0.74708299-H;
 zL = (0.74708299+H)*ones(length(k),1);
 cutz = -inflec_pt;
 addvar = struct('zL1',zL(1),'eps',eps);
-in_init = {N,H,k(1),h(1),Re,Fr2};
+in_init = {N,H,k(1),h(1),Re,Fr2,bflow};
 %% Select specific modes to observe
 switch(Fr2)
     % k = 0.05
@@ -100,7 +100,7 @@ for i = 1:length(k)
     oall = oall(real(oall)>-50); % Remove the eigenvalues assigned by de-singularizing
     o = maxeig(oall);
     if real(o) > 0
-        addvar.zL1=p1.criticalH(real(o)/k(i));
+        addvar.zL1=p1.invbf(real(o)/k(i));
     end
 
     % Plot the eigenspectrum

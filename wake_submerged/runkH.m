@@ -11,7 +11,7 @@ zc = 0.74708299+H_list;
 %%
 tic;
 parfor ii = 1:length(H_list)
-    p1 = wSubmerged(N,H_list(ii),1,1,Re,Fr2);
+    p1 = wSubmerged(N,H_list(ii),1,1,Re,Fr2,bflow);
     p1.numMeth(method);
     csall = findmode(k_list,zc(ii),p1,alg, de_singularize, do_balancing, eig_spectrum, f);
     cmodes(:,:,ii) = csall;
@@ -39,7 +39,7 @@ function csall = findmode(k_list,zc,p1,alg, de_singularize, do_balancing, eig_sp
         oall = oall(real(oall)>-50); % Remove the eigenvalues assigned by de-singularizing
         [o, osort] = maxeig(oall);
         if real(o) > 0 && imag(o)>1e-5
-            addvar.zL1 = p1.criticalH(real(o)/k_list(i));
+            addvar.zL1 = p1.invbf(real(o)/k_list(i));
         end
 
         c = osort/k_list(i);

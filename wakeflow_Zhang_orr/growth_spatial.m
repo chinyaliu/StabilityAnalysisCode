@@ -5,7 +5,7 @@ end
 %% Solver & Algorithm list
 [method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,~,Fr2,Re,eps,c0,~,f] = pars_wake(2);
 % Cusp method from k_i
-kr = linspace(0.01,4,400);
+kr = linspace(0.01,4,100);
 ki = [0 -0.5 -1 -1.5 -1.7];
 h = 2*pi./kr;
 inflec_pt = -0.74708299;

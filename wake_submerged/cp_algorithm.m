@@ -4,15 +4,15 @@ if ~contains(path,'code_wake;')
 end 
 %% Solver & Algorithm list
 [method,~,bflow,de_singularize,do_balancing,eig_spectrum,~,H,k,Fr2,Re,eps,c0,h,f] = pars_wake;
-N = 300:100:1500;
-in_init = {N(1),H,k,h,Re,Fr2};
-alg = ["eig", "qr"];
-% alg = ["eig", "qr", "invB"];
+N = 100:100:1500;
+in_init = {N(1),H,k,h,Re,Fr2,bflow};
+% alg = ["eig", "qr"];
+alg = ["eig", "qr", "invB"];
 %% Run
 tic;
 case1 = wSubmerged(in_init{:});
 case1.numMeth(method);
-zL = case1.criticalH(c0);
+zL = case1.invbf(c0);
 addvar = struct('zL1',zL,'eps',eps);
 for i = 1:length(N)
     case1.N = N(i);

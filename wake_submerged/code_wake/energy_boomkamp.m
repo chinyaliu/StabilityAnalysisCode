@@ -1,6 +1,7 @@
 function [ENG,z] = energy_boomkamp(flow1,eval,evec)
-[z0, phi] = findmodeshape(flow1, evec);
-[~, U] = getU(flow1);
+% [z0, phi] = findmodeshape(flow1, evec);
+[z0, phi] = flow1.getprop('modeshape',evec);
+[~, U] = flow1.getprop('u');
 k = flow1.k;
 q = evec(end);
 [z,ia] = unique(z0,'stable');

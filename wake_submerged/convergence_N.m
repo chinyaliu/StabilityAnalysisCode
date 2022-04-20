@@ -14,9 +14,9 @@ ln = length(N);
 parfor j = 1:length(k)
     nn = N;
     for i = 1:ln
-        case1 = wSubmerged(nn(i),H,k(j),h(j),Re,Fr2);
+        case1 = wSubmerged(nn(i),H,k(j),h(j),Re,Fr2,bflow);
         case1.numMeth(method);
-        addvar = struct('zL1',case1.criticalH(c0(j)),'eps',eps);
+        addvar = struct('zL1',case1.invbf(c0(j)),'eps',eps);
         [o,~,cA] = case1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
         cAall(j,i) = cA;
         oi(j,i) = imag(o(1));

@@ -15,18 +15,30 @@ function [w,xv,dobalance,bakerr,cA] = balanceAB(A,B,modenum,algorithm)
         end
     end
 
-    cA = cond(A);
-    cAb = cond(Ab);
-    if cA > cAb
-        [w,V] = solveGEP(Ab,Bb,modenum,algorithm);
-        % backward transformation to original eigenvector
-        xv =  diag(rscale)*V;
-        dobalance = 1;
-        cA = cAb;
-    elseif cA < cAb
-        [w,xv] = solveGEP(A,B,modenum,algorithm);
-        dobalance = 0;
-    end
+    % Force the solver to use balanced matrices
+    [w,V] = solveGEP(Ab,Bb,modenum,algorithm);
+    % backward transformation to original eigenvector
+    xv =  diag(rscale)*V;
+    dobalance = 1;
+    cA = cond(Bb);
+    
+%     if strcmpi(algorithm,'invb')
+%         cA = cond(B);
+%         cAb = cond(Bb);
+%     else
+%         cA = cond(A);
+%         cAb = cond(Ab);
+%     end
+%     if cA > cAb
+%         [w,V] = solveGEP(Ab,Bb,modenum,algorithm);
+%         % backward transformation to original eigenvector
+%         xv =  diag(rscale)*V;
+%         dobalance = 1;
+%         cA = cAb;
+%     elseif cA < cAb
+%         [w,xv] = solveGEP(A,B,modenum,algorithm);
+%         dobalance = 0;
+%     end
 
     if nargout > 3
         bakerr = max(abs(A*xv(:,1)-w(1)*B*xv(:,1)));

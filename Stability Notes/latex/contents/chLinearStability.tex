@@ -1,0 +1,166 @@
+% !TeX root = ../main.tex
+
+\chapter{Linear Stability Analysis of Flow}
+
+\section{Stability analysis}
+\subsection{Temporal and spatial stability}
+The temporal stability analysis is performed by constraining the wavenumber $k$ to be a real number, in other words, the amplitude of the perturbation waves neither grow nor decay with space. For a fixed real wavenumber ($k\in\mathbb{R}$), the associated complex frequencies ($\omega\in\mathbb{C}$) are found by solving the dispersion relation (\ref{eq:dp}). The imaginary part of $\omega$ is known as the growth rate of the perturbation ($\omega_i$) so that the flow grows with time for a positive value, while decays with time for a negative value. The stability of the flow is then dominated by the most unstable mode, which is the mode with the largest growth rate $\omega_{i, max}$.
+
+The concept of spatial stability analysis is similar to the temporal approach, where real frequencies ($\omega\in\mathbb{R}$) are considered, and the dispersion relation gives complex wavenumbers ($k\in\mathbb{C}$). The imaginary part of the wavenumber decides whether the perturbation grows or decays within space.
+
+\subsection{Spatial-temporal stability}
+
+\section{Orr-Sommerfeld equation}
+Linear stability analysis of the flow is investigated by introducing two-dimensional perturbations into the flow, which grow or decay with time. The perturbed flow has velocity $\vec{u}=U({z})+\vec{u'}({x},{z},{t})$, and pressure $p=P_0+p'({x},{z},{t})$, where the order of the perturbations $\mathcal{O}(\vec{u'}/{U}), \mathcal{O}(p'/P_0)\ll 1$. By substituting the perturbed velocity and pressure into equation (\ref{eq:cont}) and (\ref{eq:ns}), the continuity and momentum equations became
+\begin{equation}
+    \frac{\partial{u}'}{\partial{x}}+\frac{\partial{w}'}{\partial{z}}=0,
+    \label{eq:cont2}
+\end{equation}
+\begin{equation}
+    \frac{\partial{u}'}{\partial{t}}+{(U+u')}\frac{\partial (U+u')}{\partial{x}}+{w}'\frac{d(U+u')}{d{z}}=-\frac{1}{\rho}\frac{\partial(P_0+p')}{\partial{x}}+\nu\left(\frac{\partial^2(U+u')}{\partial{x}^2}+\frac{\partial^2(U+u')}{\partial{z}^2}\right),
+    \label{eq:u2}
+\end{equation}
+\begin{equation}
+    \frac{\partial{w}'}{\partial{t}}+(U+u')\frac{\partial{w}'}{\partial{x}}=-\frac{1}{\rho}\frac{\partial(P_0+p')}{\partial{z}}+\nu\left(\frac{\partial^2{w}'}{\partial{x}^2}+\frac{\partial^2{w}'}{\partial{z}^2}\right).
+    \label{eq:w2}
+\end{equation}
+Neglecting the high order terms in equations (\ref{eq:cont2}), (\ref{eq:u2}), and (\ref{eq:w2}),
+\begin{equation}
+    \frac{\partial{u}'}{\partial{x}}+\frac{\partial{w}'}{\partial{z}}=0,
+    \label{eq:cont3}
+\end{equation}
+\begin{equation}
+    \frac{\partial{u}'}{\partial{t}}+{U}\frac{\partial u'}{\partial{x}}+{w}'\frac{d{U}}{d{z}}=-\frac{1}{\rho}\frac{\partial{p}'}{\partial{x}}+\nu\left(\frac{\partial^2{u}'}{\partial{x}^2}+\frac{\partial^2{u}'}{\partial{z}^2}\right),
+    \label{eq:u3}
+\end{equation}
+\begin{equation}
+    \frac{\partial{w}'}{\partial{t}}+U\frac{\partial{w}'}{\partial{x}}=-\frac{1}{\rho}\frac{\partial{p}'}{\partial{z}}+\nu\left(\frac{\partial^2{w}'}{\partial{x}^2}+\frac{\partial^2{w}'}{\partial{z}^2}\right).
+    \label{eq:w3}
+\end{equation}
+By differentiating equation (\ref{eq:u3}) with $z$ and equation (\ref{eq:w3}) with $x$, the two equations can be combined, with the pressure terms eliminated
+ \begin{equation}
+     \frac{\partial}{\partial z}\left[\frac{\partial{u}'}{\partial{t}}+{U}\frac{\partial u'}{\partial{x}}+{w}'\frac{d{U}}{d{z}}-\nu\left(\frac{\partial^2{u}'}{\partial{x}^2}+\frac{\partial^2{u}'}{\partial{z}^2}\right)\right]
+     -\frac{\partial}{\partial x}\left[\frac{\partial{w}'}{\partial{t}}+U\frac{\partial{w}'}{\partial{x}}-\nu\left(\frac{\partial^2{w}'}{\partial{x}^2}+\frac{\partial^2{w}'}{\partial{z}^2}\right)\right]=0.
+     \label{eq:uw1}
+ \end{equation}
+ 
+The two governing equations (\ref{eq:cont3}) and (\ref{eq:uw1}) may be reduced into one by introducing a perturbation stream function $\psi ( x,z,t)$ defined as
+\begin{equation}
+u'( x,z,t) =\frac{\partial \psi ( x,z,t)}{\partial z},\quad w'( x,z,t) =-\frac{\partial \psi ( x,y,t)}{\partial x},
+\end{equation}
+which satisfies the continuity equation (\ref{eq:cont3}). In terms of the stream function, equation (\ref{eq:uw1}) became
+\begin{equation}
+    \left(\frac{\partial }{\partial t} +U\frac{\partial }{\partial x}\right)\left(\frac{\partial ^{2} \psi }{\partial z^{2}} +\frac{\partial ^{2} \psi }{\partial x^{2}}\right)-\frac{d^{2} U}{dz^{2}}\frac{\partial \psi }{\partial x} -\nu \left(\frac{\partial ^{4} \psi }{\partial x^{4}} +\frac{\partial ^{4} \psi }{\partial z^{4}} +2\frac{\partial ^{4} \psi }{\partial x^{2} \partial z^{2}}\right) =0.
+    \label{eq:gov1}
+\end{equation}
+
+The perturbation is arbitrary in form, so we may seek normal mode solutions to the problem. By a normal mode expansion in the streamwise direction, the stream function has the form
+\begin{equation}
+    \psi (x,z,t)=\int _{0}^{\infty } \phi (z)e^{ik(x-ct)} \ dk,
+\end{equation}
+where $k$ is the streamwise wavenumber, and $c$ represents the phase velocity. Upon substituting the above expression into equation (\ref{eq:gov1}), which is equivalent to doing a Fourier transform in the streamwise direction, we obtain a fourth-order ordinary differential equation
+\begin{equation}
+    kU\left( \phi_{zz}-k^{2} \phi \right) +kU_{zz}\phi  -i\nu \left( \phi_{zzzz}-k^{2} \phi_{zz}+k^{4} \phi \right) =\omega \left( \phi_{zz}-k^{2} \phi \right),
+    \label{eq:os}
+\end{equation}
+where $\omega=kc$ is the frequency, and a subscript $z$ denotes a $z$-derivative. This equation is known as the Orr-Sommerfeld equation, which governs the stability of locally parallel flows. A dimensionless form of the equation, with the free-flow velocity $U_\infty$ as characteristic velocity $[\mathcal{V}]$ and the half-width of the wake $b$ as characteristic length $[\mathcal{L}]$, gives
+\begin{equation}
+\tilde{k}\tilde{U}\left(\tilde{\phi}_{zz}-\tilde{k}^{2}\tilde{\phi}\right) +\tilde{k} \tilde{U}_{zz}\tilde{\phi}-\frac{i}{Re}\left( \tilde{\phi}_{zzzz}-\tilde{k}^{2} \tilde{\phi}_{zz}+\tilde{k}^{4} \tilde{\phi} \right) =\tilde{\omega} \left( \tilde{\phi}_{zz}-\tilde{k}^{2} \tilde{\phi} \right),
+    \label{eq:osn}
+\end{equation}
+where a tilde ($\ \tilde{}\ $) represents a dimensionless variable. The Reynolds number is defined as $Re=[\mathcal{V}][\mathcal{L}]/\nu$, representing the ratio of the inertia force to the viscous force in a fluid. In cases that viscous forces are negligible, the governing equation can be derived by letting $Re\rightarrow\infty$ in the dimensionless Orr-Sommerfeld equation (\ref{eq:osn}), giving
+\begin{equation}
+\tilde{k}\tilde{U}\tilde{\phi}_{zz}-\tilde{k}^{3} \tilde{U}\tilde{\phi} +\tilde{k} \tilde{U}_{zz}\tilde{\phi}=\tilde{\omega} \left( \tilde{\phi}_{zz}-\tilde{k}^{2} \tilde{\phi} \right),
+    \label{eq:rn}
+\end{equation}
+which is known as the Rayleigh equation. Dimensionless forms of the governing equations are used throughout the thesis, for simplicity the tilde ($\ \tilde{}\ $) expressions are dropped, and the variables are by default dimensionless if not specified otherwise.
+
+Associated with appropriate boundary conditions, the Orr-Sommerfeld equation and the Rayleigh equation may be solved. Non-trivial solutions can be found only if the variables $k$ and $\omega$ satisfy the dispersion relation
+\begin{equation}
+    D(k,\omega;Re)=0.
+    \label{eq:dp}
+\end{equation}
+The wavenumber $k$ and frequency $\omega$ are generally complex variables but may be altered when considering specific stability problems. In the following sections, this dispersion relation is used extensively in temporal, spatial, and spatial-temporal stability problems.
+
+\section{Boundary conditions}
+In this section the boundary conditions for linear stability analysis are derived by adapting the equations in Chapter \ref{ch:bc}. The flow is assumed to be two-dimensional, with disturbance added and expanded in normal modes.
+\subsection{Kinematic boundary condition}
+Two dimensional, dimensionless expression of the kinematic boundary condition (\ref{eq:kbc1}) at the free surface, with perturbations included,
+\begin{equation}
+    \frac{\partial \eta }{\partial t} +(U+u')\frac{\partial \eta }{\partial x}-w'=0,\qquad \text{{at }} z=\eta.
+\end{equation}
+For simplicity in numerical computations, the boundary conditions are expected to be defined at fixed locations, hence we expand the above equation with Taylor series at $z=0$,
+\begin{equation}
+    \frac{\partial \eta }{\partial t} +\left[ U +u' +\eta \frac{\partial U}{\partial z} +\eta \frac{\partial u'}{\partial z} +\mathcal{O}(\eta^2) \right]\frac{\partial \eta }{\partial x} -\left[ w' +\eta \frac{\partial w'}{\partial z}+\mathcal{O}(\eta^2)\right] =0.
+\end{equation}
+Assume perturbed velocity and surface elevation are small quantities $|u'|,|w'|,|\eta|\ll1$, and products of the small quantities are neglected, resulting in 
+\begin{equation}
+    \frac{\partial \eta }{\partial t} + U\frac{\partial \eta }{\partial x} -w =0,\qquad\text{at}\ z=0.
+\end{equation}
+By applying normal mode expansion to the perturbed velocity and surface elevation,
+\begin{equation}
+    kUq+k\phi=\omega q,\qquad\text{at}\ z=0,
+    \label{eq:kbc}
+\end{equation}
+where $\eta(x,t)=qe^{i(kx-\omega t)}$.
+
+\subsection{Dynamic boundary condition}
+\begin{equation}
+    \frac{2\eta _{x}}{Re}\left(\frac{\partial w}{\partial z} -\frac{\partial u}{\partial x}\right) +\frac{\left( 1-\eta _{x}^{2}\right)}{Re}\left(\frac{\partial u}{\partial z} +\frac{\partial w}{\partial x}\right) =0.
+\end{equation}
+\begin{equation}
+    \displaystyle -p+\frac{\eta }{Fr^{2}} +\frac{1}{Re}\frac{2}{\left( \eta _{x}^{2} +1\right)}\left[ \eta _{x}^{2}\frac{\partial u}{\partial x} +\frac{\partial w}{\partial z} -\eta _{x}\left(\frac{\partial u}{\partial z}\right)\right] =\frac{1}{We}\frac{\eta _{xx}}{\left( \eta _{x}^{2} +1\right)^{3/2}}.
+\end{equation}
+\begin{equation}
+    \frac{2\eta _{x}}{Re}\left(\frac{\partial w}{\partial z} -\frac{\partial u}{\partial x}\right) +\frac{\left( 1-\eta _{x}^{2}\right)}{Re}\left(\frac{\partial u}{\partial z} +\frac{\partial w}{\partial x}\right) =0.
+    \label{eq:tbc1}
+\end{equation}
+\begin{equation}
+    \displaystyle -p+\frac{\eta }{Fr^{2}} +\frac{1}{Re}\frac{2}{\left( \eta _{x}^{2} +1\right)}\left[ \eta _{x}^{2}\frac{\partial u}{\partial x} +\frac{\partial w}{\partial z} -\eta _{x}\left(\frac{\partial u}{\partial z}\right)\right] =0,
+    \label{eq:nbc1}
+\end{equation}
+The dynamic boundary condition states that the total stress at the free surface is balanced. Detailed stress balance relations are derived in Appendix \ref{ap:BC}. The effect of surface tension and disturbance in the air is neglected, and the normal and tangential stress balance equations (\ref{apeq:tx}) and (\ref{apeq:n}) are
+\begin{equation}
+    \frac{2\eta _{x}}{Re}\left(\frac{\partial w}{\partial z} -\frac{\partial u}{\partial x}\right) +\frac{\left( 1-\eta _{x}^{2}\right)}{Re}\left(\frac{\partial u}{\partial z} +\frac{\partial w}{\partial x}\right) =0.
+    \label{eq:tbc1}
+\end{equation}
+\begin{equation}
+    \displaystyle -p+\frac{\eta }{Fr^{2}} +\frac{1}{Re}\frac{2}{\left( \eta _{x}^{2} +1\right)}\left[ \eta _{x}^{2}\frac{\partial u}{\partial x} +\frac{\partial w}{\partial z} -\eta _{x}\left(\frac{\partial u}{\partial z}\right)\right] =0.
+    \label{eq:nbc1}
+\end{equation}
+First consider the tangential stress condition equation (\ref{eq:tbc1}). By replacing the velocities by the sum of background flow and perturbation flow velocities,
+\begin{equation}
+     \frac{2\eta _{x}}{Re}\left(\frac{\partial w'}{\partial z} -\frac{\partial u'}{\partial x}\right) +\frac{\left( 1-\eta _{x}^{2}\right)}{Re}\left(\frac{\partial U}{\partial z} +\frac{\partial u'}{\partial z} +\frac{\partial w'}{\partial x}\right) =0.
+    \label{eq:tbc2}
+\end{equation}
+The above equation is defined at $z=\eta$, so again we expand the equation at $z=0$ with Taylor series expansion and neglect high order terms, equation (\ref{eq:tbc2}) is reduced to
+\begin{equation}
+    \eta \frac{\partial ^{2} U}{\partial z^{2}} +\frac{\partial u'}{\partial z} +\frac{\partial w'}{\partial x} =0,
+\end{equation}
+with the fact that $\left.(\partial U/\partial z)\right|_{z=0}=0$. Normal mode expansion of the above equation yields the tangential stress condition,
+\begin{equation}
+    qU_{zz} +\phi _{zz} +k^{2} \phi =0.
+    \label{eq:tbc}
+\end{equation}
+
+Next the normal stress condition with disturbance is derived. By implementing perturbation forms into equation (\ref{eq:nbc1}), then apply Taylor series expansion at $z=0$ with high order terms neglected, the equation is reduced to
+\begin{equation}
+-p'+\frac{\eta }{Fr^{2}} +\frac{2}{Re}\frac{\partial w'}{\partial z} = 0.
+    \label{eq:nbc2}
+\end{equation}
+The pressure term can be replaced using the dimensionless form of the $x$-direction momentum equation (\ref{eq:u3}) and by differentiating equation (\ref{eq:nbc2}) with $x$,
+\begin{equation}
+    {\displaystyle \frac{\partial u'}{\partial t} +U\frac{\partial u'}{\partial x} +w'\frac{dU}{dz}} -{\displaystyle \frac{1}{Re}\left(\frac{\partial ^{2} u'}{\partial x^{2}} +\frac{\partial ^{2} u'}{\partial z^{2}}\right)} +\frac{\eta _{x}}{Fr^{2}} +\frac{2}{Re}\frac{\partial ^{2} w'}{\partial x\partial z} = 0.
+    \label{eq:nbc4}
+\end{equation}
+Normal mode expansion of the above equation yields the normal stress condition,
+\begin{equation}
+    {\displaystyle kU\phi _{z} -k\phi \frac{dU}{dz} +\frac{i}{Re}\left( \phi _{zzz} -3k^{2} \phi _{z}\right) +}\frac{k}{Fr^{2}}q ={\displaystyle \omega \phi _{z}}.
+    \label{eq:nbc}
+\end{equation}
+
+\subsection{Boundary condition at infinity}
+\begin{equation}
+    \phi,\phi_z\rightarrow 0, \text{ as } z\rightarrow -\infty.
+    \label{eq:bbcs}
+\end{equation}

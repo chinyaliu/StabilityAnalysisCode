@@ -1,0 +1,25 @@
+Initial:
+      Base flow       cosh
+             Fr 1.5
+             Re Inf
+              k 0.3, 1.1, 1.5, 3.0
+         B.B.C. Exponential decay
+              h 2.0 wavelength
+     DDM method ddmtype/setN4test5
+     GEP solver   qr
+      Balancing y
+ De-singularize y
+========================================
+
+New:
+      Base flow       cosh
+             Fr 1.5
+             Re Inf
+              k 0.3, 1.1, 1.5, 3.0
+         B.B.C. Exponential decay
+              h 1.0 wavelength
+     DDM method ddmtype/setN4test5
+     GEP solver invB
+      Balancing y
+ De-singularize y
+========================================
