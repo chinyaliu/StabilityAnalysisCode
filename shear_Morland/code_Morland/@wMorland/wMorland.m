@@ -6,6 +6,7 @@ classdef wMorland < handle
         N = 400;                  % Number of collocation points
     end
     properties (SetAccess = private)
+        Re = inf;                 % Reynolds number
         zc;                       % Critical height
         subD; subDclass;          % Subdomains and its corresponding class function 
         method;                   % Numerical methods, set by @numMeth
@@ -16,10 +17,11 @@ classdef wMorland < handle
     end
     methods
         % Class constructor, set flow properties
-        function obj = wMorland(N, h, ud, delta, lambda, meth, bf)
-            if (nargin >= 7)
+        function obj = wMorland(N, h, ud, delta, lambda, meth, bf, Re)
+            if (nargin >= 8)
                 obj.N = N; obj.k = 2*pi/lambda; obj.h = h;
-                obj.ud = ud; obj.delta = delta; 
+                obj.ud = ud; obj.delta = delta; obj.Re = Re;
+                obj.method = strings(1,2);
                 obj.numMeth(meth);
                 obj.setbaseflow(bf);
             end
@@ -70,18 +72,18 @@ classdef wMorland < handle
             val = varargin(2:2:end);
             for i = 1:length(nam)
                 switch nam{i}
-%                case 'Re'
-%                    obj.Re = val{i};
-%                    if isinf(val{i})
-%                        obj.method(1) = "Ray";
-%                        obj.subDclass = @subRay;
-%                        obj.ord = 2;
-%                    else
-%                        obj.method(1) = "d4";
-%                        obj.subDclass = @subOrr;
-%                        obj.ord = 4;
-%                    end
-%                    obj.subD = obj.subDclass(); % initialize
+                case 'Re'
+                    obj.Re = val{i};
+                    if isinf(val{i})
+                        obj.method(1) = "Ray";
+                        obj.subDclass = @subRay;
+                        obj.ord = 2;
+                    else
+                        obj.method(1) = "d4";
+                        obj.subDclass = @subOrr;
+                        obj.ord = 4;
+                    end
+                    obj.subD = obj.subDclass(); % initialize
                 case 'method'
                     obj.numMeth(val{i});
                 case 'baseflow'
@@ -140,13 +142,21 @@ classdef wMorland < handle
             [Abc1, Bbc1] = obj.subD(1).BC0(size(Age,2)-1);
 %             % BC (free slip)
 %             [Abc2, Bbc2] = obj.subD(end).BCh(size(Age,2)-1);
-%             A = [Age; Abc1; Abc2];
-%             B = [Bge; Bbc1; Bbc2];
             % BC (truncated, exponential decay)
             [Abc2, Bbc2] = obj.subD(end).BCh3(size(Age,2)-1);
             A = [Age; Abc1; Abc2];
             B = [Bge; Bbc1; Bbc2];
-            
+        end
+        % Construct matrix A, B for the GEP
+        function [A, B] = makeAB2(obj)
+            % Governing equation
+            [Age, Bge] = obj.subD(1).match(obj.subD);
+            % BC (truncated, free surface)
+            [Abc1, Bbc1] = obj.subD(1).BC0(size(Age,2)-1);
+             % BC (free slip)
+            [Abc2, Bbc2] = obj.subD(end).BCh(size(Age,2)-1);
+            A = [Age; Abc1; Abc2];
+            B = [Bge; Bbc1; Bbc2];
         end
     end
 end

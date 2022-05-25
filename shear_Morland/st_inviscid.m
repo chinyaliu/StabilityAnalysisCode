@@ -4,22 +4,22 @@ if ~contains(path,'code_Morland;')
 end
 
 %% Solver & Algorithm list
-[method,alg,bflow,de_singularize,do_balancing,~,N,ud_nd,delta_nd,lambda_nd,c0,h,f,eps] = pars_Morland(3);
+[method,alg,bflow,de_singularize,do_balancing,~,N,ud_nd,delta_nd,lambda_nd,c0,h,f,epss,Re] = pars_Morland(3);
 eig_spectrum = 'all';
 % Cusp method from k_i
 ki = [-0.1 -0.5 -1 -1.5];
 
 %% Real k
 tic;
-p1 = wMorland(N,h(1),ud_nd,delta_nd,lambda_nd(1),method,bflow);
-addvar = struct('zL1',p1.invbf(c0(1)),'eps',eps);
-cr = []; kr = [];
+p1 = wMorland(N,h(1),ud_nd,delta_nd,lambda_nd(1),method,bflow,Re);
+addvar = struct('zL1',p1.invbf(c0(1)),'eps',epss);
+or = []; kr = [];
 cutz = p1.invbf(c0);
 cut_temp = cutz(1);
 for i = 1:length(lambda_nd)
     p1.setprop('lambda',lambda_nd(i),'h',h(i));
-    call = p1.solver_RE(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
-    cr = [cr; call]; 
+    oall = p1.solver_RE(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
+    or = [or; oall]; 
     kr = [kr; (2*pi./lambda_nd(i))*ones(length(call),1)];
     if isnan(p1.zc)
         cutz(i) = cut_temp;
@@ -30,6 +30,7 @@ for i = 1:length(lambda_nd)
         addvar.zL1 = cut_temp;
     end
 end
+cr = or./kr;
 
 % %% Run solver
 % tic;
@@ -52,8 +53,8 @@ kk = cell(length(ki),1);
 parfor j = 1:length(ki)
     cutt = cutz; ht = h;
     for i = 1:length(lambda_nd)
-        addvar = struct('zL1',cutt(i),'eps',eps);
-        p1 = wMorland(N,ht(i),ud_nd,delta_nd,2,method,bflow);
+        addvar = struct('zL1',cutt(i),'eps',epss);
+        p1 = wMorland(N,ht(i),ud_nd,delta_nd,2,method,bflow,Re);
         p1.setprop('k',2*pi./lambda_nd(i)+ki(j)*1i);
         c = p1.solver_RE(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
         cc{j} = [cc{j}; c];
@@ -86,7 +87,6 @@ leg = legend(hCopy,'location','southeastoutside');
 title(leg,'$k_i$');
 
 %% o
-or = cr.*kr;
 figure; 
 ax = axes();
 plot(real(or),imag(or),'k.','Markersize',8,'HandleVisibility','off');

@@ -16,6 +16,7 @@ addvar = struct('zL1',case1.invbf(c0),'eps',eps);
 o = case1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
 % Run second time with different N
 case1.setprop('N',N+Nad);
+case1.setprop('h',2.*h);
 o2 = case1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
 o = o(real(o)>-50); o2 = o2(real(o2)>-50);
 toc(t1);

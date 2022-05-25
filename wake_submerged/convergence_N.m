@@ -25,7 +25,8 @@ end
 doi = abs(oi-oi(:,end));
 toc;
 %% Plot figure
-col = {[0 0 0],[0 0 1],[1 0 0],'#4ab712'};
+% col = {[0 0 0],[0 0 1],[1 0 0],'#4ab712'};
+col = {[0 0 0],[0.16,0.44,1.00],[0.93,0.00,0.00],[0.00,0.57,0.00]};
 lsy = {'-o','--o',':o','-.o'};
 figure;
 yf(1) = semilogy(N, cAall(1,:), lsy{1}, 'color',col{1}, 'Displayname', sprintf('$k = %.2f$',k(1)));

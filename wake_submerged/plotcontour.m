@@ -26,18 +26,18 @@ o_chosen = o(aa); c_chosen = c(aa);
 an_c = an(:,aa);
 
 %% Plot eigenvalue spectrum ci_cr
-figure;
-plot(real(c),imag(c),'ok');
-hold on; 
-yline(0,'linewidth',1.5,'color','#898989'); 
-scatter(real(c_chosen),imag(c_chosen),'b','filled');
-hold off;
-xlabel('$c_r$','fontsize',30);
-ylabel('$c_i$','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
-ymax = max(abs(imag(c)));
-ylim([-1.5*ymax 1.5*ymax]);
-titext = sprintf('$k=%.2f%+.2fi$',real(k),imag(k));
-title(titext);
+% figure;
+% plot(real(c),imag(c),'ok');
+% hold on; 
+% yline(0,'linewidth',1.5,'color','#898989'); 
+% scatter(real(c_chosen),imag(c_chosen),'b','filled');
+% hold off;
+% xlabel('$c_r$','fontsize',30);
+% ylabel('$c_i$','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
+% ymax = max(abs(imag(c)));
+% ylim([-1.5*ymax 1.5*ymax]);
+% titext = sprintf('$k=%.2f%+.2fi$',real(k),imag(k));
+% title(titext);
 
 %% Find velocity and wave amplitude
 modd = 1;
@@ -57,17 +57,18 @@ upx = real(up*x_phase);
 wpx = real(wp*x_phase);
 qpx = real(qp*x_phase);
 
-vel_unit = max(max(upx,[],'all'),max(wpx,[],'all'));
+vel_unit = max(sqrt(upx.^2+wpx.^2),[],'all');
+% vel_unit = max(max(upx,[],'all'),max(wpx,[],'all'));
 % vel_unit = 2*max(qpx);
 upx = upx/vel_unit;
 wpx = wpx/vel_unit;
 qpx = qpx/vel_unit;
 
 %% Plot contour
-plotcont(x,z,upx,qpx,zc,H);
-title('$u''$');
-plotcont(x,z,wpx,qpx,zc,H);
-title('$w''$');
+% plotcont(x,z,upx,qpx,zc,H);
+% title('$u''$');
+% plotcont(x,z,wpx,qpx,zc,H);
+% title('$w''$');
 
 %% Plot velocity field
 if H > 0
@@ -86,37 +87,39 @@ u2 = real((interp1(zu,up(ia),z2).')*xp2);
 w2 = real((interp1(zu,wp(ia),z2).')*xp2);
 [X, Z] = meshgrid(x2,z2);
 figure;
-quiver(X, Z, u2, w2);
+quiver(X, Z, u2, w2, 'k', 'linewidth', 1);
 hold on; 
-plot(x,qpx,'k');
-yline(-zc,'--','linewidth',1.5,'color','#606060');
+plot(x,qpx,'b');
+yline(-zc,':','linewidth',1.5,'color','#606060');
 yline(case1.zc-2*H, '--', 'linewidth', 1.5,'color','#606060');
 yline(-H,'-','linewidth',1.5,'color','#606060');
 hold off;
-ylim([yL 1]);
+ylim([-5*max(qpx) max(qpx)]);
 xlim([0 x(end)]);
 set(gca,'XTick',0:pi:4*pi,...
     'XTickLabel',{'0','$\pi$','$2\pi$','$3\pi$','$4\pi$'},...
     'XMinorTick', 'on', 'YMinorTick', 'on');
+xlabel('$T$');
+ylabel('$z$','rotation',0, 'HorizontalAlignment','right');
 
 %%
 figtitle = ["$\phi$", "$\phi_ z$", "$\phi_ {zz}$"];
 for i = 1:3
-    f = figure('position',[0 0 480 960]);
+    f = figure('position',[0 0 360 720]);
     plotvar = {abs(phi(:,i)),unwrap(angle(phi(:,i))),real(phi(:,i)),imag(phi(:,i))};
     xline(0,'--','linewidth',1.5,'color','#606060','HandleVisibility','off');
     hold on;
     if ~isnan(case1.zc)
-        yline(-case1.zc, '-k','linewidth',1.5,'HandleVisibility','off');
-        yline(case1.zc-2*H, '-k','linewidth',1.5,'HandleVisibility','off');
+        yline(-case1.zc, ':k','linewidth',1.5,'HandleVisibility','off');
+        yline(case1.zc-2*H, ':k','linewidth',1.5,'HandleVisibility','off');
     end
-    arr = -case1.getprop('cut');
-    for k = 2:length(arr)-1
-        yline(arr(k), '--k','linewidth',1.5,'HandleVisibility','off');
-    end
-    yline(-zL, '--b','linewidth',1.5,'HandleVisibility','off');
+%     arr = -case1.getprop('cut');
+%     for k = 2:length(arr)-1
+%         yline(arr(k), '--k','linewidth',1.5,'HandleVisibility','off');
+%     end
+%     yline(-zL, '--b','linewidth',1.5,'HandleVisibility','off');
     plot(real(phi(:,i)),z,'b','DisplayName','real', 'linewidth', 2);
-    plot(imag(phi(:,i)),z,'r','DisplayName','imag', 'linewidth', 2);
+    plot(imag(phi(:,i)),z,'--r','DisplayName','imag', 'linewidth', 2);
     hold off;
     ylabel('$z$','rotation',0, 'HorizontalAlignment','right');
     xticks(0);

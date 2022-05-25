@@ -1,10 +1,10 @@
 function numMeth(obj,meth)
-%     obj.setprop('Re',obj.Re);
-    % inviscid
-    obj.method = ["Ray"];
-    obj.ord = 2;
-    obj.subDclass = @subRay;
-    obj.subD = obj.subDclass(); % initialize
+     obj.setprop('Re',obj.Re);
+%     % inviscid
+%     obj.method = ["Ray"];
+%     obj.ord = 2;
+%     obj.subDclass = @subRay;
+%     obj.subD = obj.subDclass(); % initialize
     
     obj.method(2) = lower(meth);
     if strcmpi(obj.method(2),'trefethen')

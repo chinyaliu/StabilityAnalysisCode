@@ -3,19 +3,19 @@ if ~contains(path,'code_Morland;')
     addpath('code_Morland');
 end
 %% Set Solver & Algorithm
-[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,ud_nd,delta_nd,lambda_nd,c0,h,f,eps] = pars_Morland(1);
+[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,ud_nd,delta_nd,lambda_nd,c0,h,f,epss,Re] = pars_Morland(1);
 fprintf('u_d = %1.2f, delta = %1.3f, lambda = %1.3f\n',ud_nd,delta_nd,lambda_nd);
 
 %% Run solver
 t1 = tic;
-case1 = wMorland(N,h,ud_nd,delta_nd,lambda_nd,method,bflow);
+case1 = wMorland(N,h,ud_nd,delta_nd,lambda_nd,method,bflow,Re);
 case1.setprop('k',case1.k-0.1i);
-addvar = struct('zL1',case1.invbf(c0),'eps',eps);
-[c,an,call,anall] = case1.solver_RE(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
+addvar = struct('zL1',case1.invbf(c0),'eps',epss);
+[o,an,oall,anall] = case1.solver_RE(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
 toc(t1);
 k = 2*pi./lambda_nd;
-o = c.*k;
-oall = call.*k;
+c = o./k;
+call = oall./k;
 
 %% Plot eigenvalue spectrum ci_cr
 figure;

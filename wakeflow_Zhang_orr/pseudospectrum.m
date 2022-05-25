@@ -32,8 +32,10 @@ if strcmpi(de_singularize,'y')
 end
 % BA = B\A;
 % KI = k*eye(size(BA,2));
-xx = linspace(-0.5,1,50);
-yy = linspace(-4,0.5,50);
+xx = linspace(-1,1.5,50);
+yy = linspace(-3,0.2,50);
+% xx = linspace(-0.5,1,50);
+% yy = linspace(-4,0.5,50);
 lny = length(yy);
 [X,Y] = meshgrid(xx,yy);
 Z = NaN(length(xx),length(yy));
@@ -42,7 +44,8 @@ parfor i = 1:length(xx)
     for j = 1:lny
 %         Z(i,j) = norm(inv(BA-z(i,j)*KI))^(-1);
 %         Z(i,j) = norm(inv(z(i,j)*KI-BA))^(-1);
-        Z(i,j) = norm(inv(A-z(i,j)*k*B))^(-1);
+        Z(i,j) = norm(inv(A-z(i,j)*B))^(-1);
+%         Z(i,j) = norm(inv(A-z(i,j)*k*B))^(-1);
     end
 end
 toc;

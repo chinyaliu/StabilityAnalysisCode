@@ -1,4 +1,4 @@
-function [c, an, ca, ana] = solver_RE(obj, alg, des, bal, eigspec, funcN, addvar)
+function [o, an, oa, ana] = solver_RE(obj, alg, des, bal, eigspec, funcN, addvar)
 % A solver with eigenvalue choosing criteria (Rayleigh equation only)
 eigspec = 'all'; % Whole eigenvalue spectrum is required
 % Set initial critical height guess
@@ -34,28 +34,29 @@ for i = 1:it
         sinB = all(B<eps,2);
         B(sinB,:) = A(sinB,:)/er; % Give artificial eigenvalues
     end
-    [ca,ana] = solfunc(A,B,eigspec,alg);
+    [oa,ana] = solfunc(A,B,eigspec,alg);
     if strcmpi(des,'y')
         % Discard artificial eigenvalues
-        ca = ca(real(ca)>0.8*er); 
-        ana = ana(:,real(ca)>0.8*er);
+        oa = ca(real(oa)>0.8*er); 
+        ana = ana(:,real(oa)>0.8*er);
     end
     % Choose eigenvalue
-    a = 1:length(ca); 
+    a = 1:length(oa); 
+    ca = oa./obj.k;
     crange = ((real(ca)>-1e-5) & (real(ca)-obj.ud<=1e-5));
     aa = a(crange);
     abch = isoutlier(imag(ca(aa)),'movmedian',5);
-    c = ca(aa(abch)); an = ana(:,aa(abch));
+    o = oa(aa(abch)); an = ana(:,aa(abch));
     % Determine if the eigenvalue of largest growth rate converge
-    if isempty(c)
+    if isempty(o)
         obj.zc = nan;
         fprintf('Didn''t converge.\n');
         break;
     else      
-        [~,ind] = sort(imag(c*obj.k),'descend');   
-        c = c(ind); an = an(:,ind);
-        z_diff = abs(obj.invbf(real(c(1)))-ztemp);
-        ztemp = obj.invbf(real(c(1)));
+        [~,ind] = sort(imag(o),'descend');   
+        o = o(ind); an = an(:,ind);
+        z_diff = abs(obj.invbf(real(o(1)/obj.k))-ztemp);
+        ztemp = obj.invbf(real(o(1)/obj.k));
         if(z_diff < 1e-10) % converged
             fprintf('converged to zL = %.8f\n', obj.zc);
             break;
@@ -72,6 +73,6 @@ for i = 1:it
     addvar.c = c;
     obj.setsubd('n', funcN, addvar);
 end
-c = [c; ca(a(~crange))];
+o = [o; oa(a(~crange))];
 an = [an ana(:,a(~crange))];
 end

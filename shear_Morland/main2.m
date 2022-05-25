@@ -3,24 +3,24 @@ if ~contains(path,'code_Morland;')
     addpath('code_Morland');
 end
 %% Set Solver & Algorithm
-[method,alg,bflow,de_singularize,do_balancing,~,N,ud_nd,delta_nd,lambda_nd,c0,h,f,eps] = pars_Morland;
+[method,alg,bflow,de_singularize,do_balancing,~,N,ud_nd,delta_nd,lambda_nd,c0,h,f,epss,Re] = pars_Morland;
 eig_spectrum = 'all';
 N2 = N+100;
 
 %% Run solver
 t1 = tic;
-case1 = wMorland(N,h,ud_nd,delta_nd,lambda_nd,method,bflow);
+case1 = wMorland(N,h,ud_nd,delta_nd,lambda_nd,method,bflow,Re);
 case1.setprop('k',case1.k-0.1i);
-addvar = struct('zL1',-0.26067,'eps',eps);
+addvar = struct('zL1',-0.26067,'eps',epss);
 % addvar = struct('zL1',case1.invbf(c0),'eps',eps);
-c = case1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
+o = case1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
 % Run second time with different N
 case1.setprop('N',N2);
-c2 = case1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
-c = c(real(c)>-50); c2 = c2(real(c2)>-50);
+o2 = case1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
+o = o(real(o)>-50); o2 = o2(real(o2)>-50);
 k = case1.k;
-o = c*k;
-o2 = c2*k;
+c = oi./k;
+c2 = o2./k;
 toc(t1);
 
 %% Compare between eigenvalues of N and N2

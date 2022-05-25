@@ -1,4 +1,4 @@
-function [method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,ud_nd,delta_nd,lam_nd,c0,h,f,eps] = pars_Morland(varargin)
+function [method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,ud_nd,delta_nd,lam_nd,c0,h,f,eps,Re] = pars_Morland(varargin)
 %% Set Solver & Algorithm
 diff_meth = ["Schimd", "Trefethen"];
 method = diff_meth(1);
@@ -8,14 +8,17 @@ baseflowlist = ["exponential", "error function"];
 bflow = baseflowlist(1);
 de_singularize = 'y';
 do_balancing = 'y';
-eig_spectrum = 'all';
+eig_spectrum = 'max';
 N = 600;
+Re = 5000;
 ud_nd = 2;
 delta_nd = 0.291;
-lam_nd = 0.817;
+% lam_nd = 0.817;
+lam_nd = 1.35;
 % delta_nd = 0.234;
 % lam_nd = 0.764;
-ddm_number = 44;
+ddm_number = 1;
+% ddm_number = 44;
 eps = 0.1;
 f = wMorland.ddmtype(ddm_number);
 if ~isempty(varargin)
@@ -30,6 +33,9 @@ if ~isempty(varargin)
             delta_nd = [0.299 0.234 0.187 0.150];
             lam_nd = [0.823 0.764 0.707 0.649]; 
         case(3)
+            lam_nd = [0.7 0.88 1.18];
+%             lam_nd = [0.45 0.82 1.35];
+        case(4)
             lam_nd = linspace(0.01,2,300);
     end
 end

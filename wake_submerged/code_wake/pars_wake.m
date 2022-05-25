@@ -8,12 +8,14 @@ baseflowlist = ["cosh", "pwlinear", "tanh"];
 bflow = baseflowlist(1);
 de_singularize = 'y';
 do_balancing = 'y';
+% eig_spectrum = 'max';
 eig_spectrum = 'all';
 N = 600;
 k = 1.5;
 % Re = 1000;
 Re = inf;
-Fr2 = 1.5^2;
+Fr2 = inf;
+% Fr2 = 1.5^2;
 H = 0;
 % ddm_number = 1; % Re = 1000
 ddm_number = 45; % Re = inf
@@ -22,8 +24,8 @@ eps = 0.1;
 if ~isempty(varargin)
     switch(varargin{1})
         case(2)
-%             k = [0.3 1.1 1.5 2]; % Re = 1000
-            k = [0.3 1.1 1.5 3]; % Re = inf
+            k = [0.3 1.1 1.5 2]; % Re = 1000
+%             k = [0.3 1.1 1.5 3]; % Re = inf
 %             k = [0.1 0.5 1.1 1.8];
         case(3)
 %             k = [linspace(0.01,0.2,20) linspace(0.21,1,250) linspace(1.01,4,100)];

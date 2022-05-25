@@ -3,13 +3,17 @@ if ~contains(path,'code_Morland;')
     addpath('code_Morland');
 end 
 %% Solver & Algorithm list
-[method,alg,bflow,de_singularize,do_balancing,~,~,ud_nd,delta_nd,lambda_nd,c0,h,f,epss] = pars_Morland(2);
+[method,alg,bflow,de_singularize,do_balancing,~,~,ud_nd,delta_nd,lambda_nd,c0,h,f,epss,Re] = pars_Morland(3);
 N = 100:100:1500;
 eig_spectrum = 'max';
 lnk = length(lambda_nd);
 lnn = length(N);
 hh = h(1)/lambda_nd(1);
-Re = inf;
+if length(ud_nd)==1
+    ud_nd = ud_nd*ones(1,lnk);
+    delta_nd = delta_nd*ones(1,lnk);
+end
+pltylab = '$\ | \ \omega_i - \omega_{0,i}\ |$';
 
 %% Convergence test folder
 subFolder = ['fig_convergence/' datestr(datetime('now','TimeZone','local'),'mm-dd-HHMM')];
@@ -41,27 +45,27 @@ fclose(fid);
 %% Infinite boundary & truncation height
 nh = linspace(0.5,5,10);
 lnh = length(nh);
-cih1 = nan(lnk,lnh);
+oih1 = nan(lnk,lnh);
 Nh1 = nan(lnk,lnh);
-cih2 = cih1; Nh2 = Nh1;
+oih2 = oih1; Nh2 = Nh1;
 tic;
 parfor i = 1:lnk
     nhloop = nh;
     for j = 1:lnh
         htemp = nhloop(j)*lambda_nd(i);
-        case1 = wMorland(100,htemp,ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow);
+        case1 = wMorland(100,htemp,ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow,Re);
         addvar = struct('zL1',case1.invbf(c0(i)),'eps',epss);
-        [cih1(i,j), Nh1(i,j)] = convgmode(N, case1, alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
-        [cih2(i,j), Nh2(i,j)] = convgmode2(N, case1, alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
+        [oih1(i,j), Nh1(i,j)] = convgmode(N, case1, alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
+        [oih2(i,j), Nh2(i,j)] = convgmode2(N, case1, alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
     end
 end
 toc;
 % Analyze convergence
 dd1 = []; dd2 = [];
 for i = 1:lnk
-    dtemp = diff(abs(cih1(i,:)-cih1(i,end)));
+    dtemp = diff(abs(oih1(i,:)-oih1(i,end)));
     dd1(i) = find(dtemp<5*dtemp(end-1),1,'first');
-    dtemp = diff(abs(cih2(i,:)-cih2(i,end)));
+    dtemp = diff(abs(oih2(i,:)-oih2(i,end)));
     dd2(i) = find(dtemp<5*dtemp(end-1),1,'first');
 end
 ind1 = max(dd1); ind2 = max(dd2);
@@ -76,44 +80,44 @@ h = h/hh*nh0;
 for i = 1:lnk
     nam(i) = "$\"+sprintf("lambda = %.3f$",lambda_nd(i));
 end
-f1(1) = plotcon(nh,abs(cih1-cih1(:,end)),'$h/\lambda$','$\ | \ c_i - c_{0,i}\ |$',nam);
+f1(1) = plotcon(nh,abs(oih1-oih1(:,end)),'$h/\lambda$',pltylab,nam);
 xlim([0.5 5]);
 xticks(1:1:5);
 ylim([1e-16 1e-2]);
 expfig([subFolder '/exp']);
-f1(2) = plotcon(nh,abs(cih2-cih2(:,end)),'$h/\lambda$','$\ | \ c_i - c_{0,i}\ |$',nam);
+f1(2) = plotcon(nh,abs(oih2-oih2(:,end)),'$h/\lambda$',pltylab,nam);
 xlim([0.5 5]);
 xticks(1:1:5);
 ylim([1e-16 1e-2]);
 expfig([subFolder '/fs']);
 
 %% Domain decomposition
-ci1 = nan(lnk,lnn);
-ci2 = ci1; ci4 = ci1;
+oi1 = nan(lnk,lnn);
+oi2 = oi1; oi4 = oi1;
 tic;
 parfor i = 1:lnk
     nloop = N;
     for j = 1:lnn
-        case1 = wMorland(100,h(i),ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow);
+        case1 = wMorland(100,h(i),ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow,Re);
         addvar = struct('zL1',case1.invbf(c0(i)),'eps',epss);
         case1.N = nloop(j);
-        c = solver(bbc,case1,alg,de_singularize, do_balancing, eig_spectrum, wMorland.ddmtype(1), addvar);
-        ci1(i,j) = imag(c(1));
-        c2 = solver(bbc,case1,alg,de_singularize, do_balancing, eig_spectrum, wMorland.ddmtype(2), addvar);
-        ci2(i,j) = imag(c2(1));
-        c4 = solver(bbc,case1,alg,de_singularize, do_balancing, eig_spectrum, wMorland.ddmtype(44), addvar);
-        ci4(i,j) = imag(c4(1));
+        o = solver(bbc,case1,alg,de_singularize, do_balancing, eig_spectrum, wMorland.ddmtype(1), addvar);
+        oi1(i,j) = imag(o(1));
+        o2 = solver(bbc,case1,alg,de_singularize, do_balancing, eig_spectrum, wMorland.ddmtype(2), addvar);
+        oi2(i,j) = imag(o2(1));
+        o4 = solver(bbc,case1,alg,de_singularize, do_balancing, eig_spectrum, wMorland.ddmtype(44), addvar);
+        oi4(i,j) = imag(o4(1));
     end
 end
 toc;
 % Analyze convergence
 dd1 = []; dd2 = []; dd4 = [];
 for i = 1:lnk
-    dtemp = abs(ci1(i,:)-ci1(i,end));
+    dtemp = abs(oi1(i,:)-oi1(i,end));
     dd1(i) = sum(dtemp(end-4:end));
-    dtemp = abs(ci2(i,:)-ci2(i,end));
+    dtemp = abs(oi2(i,:)-oi2(i,end));
     dd2(i) = sum(dtemp(end-4:end));
-    dtemp = abs(ci4(i,:)-ci4(i,end));
+    dtemp = abs(oi4(i,:)-oi4(i,end));
     dd4(i) = sum(dtemp(end-4:end));
 end
 ind = [max(dd1) max(dd2) max(dd4)];
@@ -127,15 +131,15 @@ case 3
     f = wMorland.ddmtype(44);
 end
 %% Plot
-f1(3) = plotcon(N,abs(ci1-ci1(:,end)),'$N$','$\ | \ c_i - c_{0,i}\ |$',nam);
+f1(3) = plotcon(N,abs(oi1-oi1(:,end)),'$N$',pltylab,nam);
 xlim([N(1) N(end)]);
 ylim([1e-17 1e-1]);
 expfig([subFolder '/d1']);
-f1(4) = plotcon(N,abs(ci2-ci2(:,end)),'$N$','$\ | \ c_i - c_{0,i}\ |$',nam);
+f1(4) = plotcon(N,abs(oi2-oi2(:,end)),'$N$',pltylab,nam);
 xlim([N(1) N(end)]);
 ylim([1e-17 1e-1]);
 expfig([subFolder '/d2']);
-f1(5) = plotcon(N,abs(ci4-ci4(:,end)),'$N$','$\ | \ c_i - c_{0,i}\ |$',nam);
+f1(5) = plotcon(N,abs(oi4-oi4(:,end)),'$N$',pltylab,nam);
 xlim([N(1) N(end)]);
 ylim([1e-17 1e-1]);
 expfig([subFolder '/d4']);
@@ -144,38 +148,38 @@ expfig([subFolder '/d4']);
 alglist = ["eig", "qr", "invB"];
 tt1 = nan(lnk,length(nh));
 tt2 = tt1; tt3 = tt1;
-ci1 = tt1; ci2 = tt1; ci3 = tt1;
+oi1 = tt1; oi2 = tt1; oi3 = tt1;
 tic;
 parfor i = 1:lnk
     algloop = ["eig", "qr", "invB"];
     nloop = N;
     for j = 1:lnn
-        case1 = wMorland(100,h(i),ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow);
+        case1 = wMorland(100,h(i),ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow,Re);
         addvar = struct('zL1',case1.invbf(c0(i)),'eps',epss);
         case1.N = nloop(j);
         t1 = tic;
-        c = solver(bbc,case1,algloop(1), de_singularize, do_balancing, eig_spectrum, f, addvar);
+        o = solver(bbc,case1,algloop(1), de_singularize, do_balancing, eig_spectrum, f, addvar);
         tt1(i,j) = toc(t1);
-        ci1(i,j) = imag(c(1));
+        oi1(i,j) = imag(o(1));
         t1 = tic;
-        c = solver(bbc,case1,algloop(2), de_singularize, do_balancing, eig_spectrum, f, addvar);
+        o = solver(bbc,case1,algloop(2), de_singularize, do_balancing, eig_spectrum, f, addvar);
         tt2(i,j) = toc(t1);
-        ci2(i,j) = imag(c(1));
+        oi2(i,j) = imag(o(1));
         t1 = tic;
-        c = solver(bbc,case1,algloop(3), de_singularize, do_balancing, eig_spectrum, f, addvar);
+        o = solver(bbc,case1,algloop(3), de_singularize, do_balancing, eig_spectrum, f, addvar);
         tt3(i,j) = toc(t1);
-        ci3(i,j) = imag(c(1));
+        oi3(i,j) = imag(o(1));
     end
 end
 toc;
 % Analyze convergence
 dd1 = []; dd2 = []; dd3 = [];
 for i = 1:lnk
-    dtemp = abs(ci1(i,:)-ci1(i,end));
+    dtemp = abs(oi1(i,:)-oi1(i,end));
     dd1(i) = sum(dtemp(end-4:end));
-    dtemp = abs(ci2(i,:)-ci2(i,end));
+    dtemp = abs(oi2(i,:)-oi2(i,end));
     dd2(i) = sum(dtemp(end-4:end));
-    dtemp = abs(ci3(i,:)-ci3(i,end));
+    dtemp = abs(oi3(i,:)-oi3(i,end));
     dd3(i) = sum(dtemp(end-4:end));
 end
 ind = [max(dd1) max(dd2) max(dd3)];
@@ -185,9 +189,9 @@ alg = alglist(ind);
 nam = ["$\mathrm{qz}$" "$\mathrm{inv}(A)$" "$\mathrm{inv}(B)$"];
 ct = length(f1);
 for i = 1:lnk
-    y1 = [ci1(i,:); ci2(i,:); ci3(i,:)];
+    y1 = [oi1(i,:); oi2(i,:); oi3(i,:)];
     y2 = [tt1(i,:); tt2(i,:); tt3(i,:)];
-    f1(ct+1) = plotcon(N,abs(y1-y1(:,end)),'$N$','$\ | \ c_i - c_{0,i}\ |$',nam);
+    f1(ct+1) = plotcon(N,abs(y1-y1(:,end)),'$N$',pltylab,nam);
     xlim([N(1) N(end)]);
     ylim([1e-17 1e-3]);
     expfig([subFolder '/' sprintf('lam%03.0f',100*lambda_nd(i))]);
@@ -203,28 +207,28 @@ end
 if strcmp(alg,'invB')
     de_singularize = 'y';
 else
-    ci1 = nan(lnk,length(nh));
-    ci2 = ci1;
+    oi1 = nan(lnk,length(nh));
+    oi2 = oi1;
     tic;
     parfor i = 1:lnk
         nloop = N;
         for j = 1:lnn
-            case1 = wMorland(100,h(i),ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow);
+            case1 = wMorland(100,h(i),ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow,Re);
             addvar = struct('zL1',case1.invbf(c0(i)),'eps',epss);
             case1.N = nloop(j);
-            c = solver(bbc,case1,alg, 'n', do_balancing, eig_spectrum, f, addvar);
-            ci1(i,j) = imag(c(1));
-            c = solver(bbc,case1,alg, 'y', do_balancing, eig_spectrum, f, addvar);
-            ci2(i,j) = imag(c(1));
+            o = solver(bbc,case1,alg, 'n', do_balancing, eig_spectrum, f, addvar);
+            oi1(i,j) = imag(o(1));
+            o = solver(bbc,case1,alg, 'y', do_balancing, eig_spectrum, f, addvar);
+            oi2(i,j) = imag(o(1));
         end
     end
     toc;
     % Analyze convergence
     dd1 = []; dd2 = [];
     for i = 1:lnk
-        dtemp = abs(ci1(i,:)-ci1(i,end));
+        dtemp = abs(oi1(i,:)-oi1(i,end));
         dd1(i) = sum(dtemp(end-4:end));
-        dtemp = abs(ci2(i,:)-ci2(i,end));
+        dtemp = abs(oi2(i,:)-oi2(i,end));
         dd2(i) = sum(dtemp(end-4:end));
     end
     ind = [max(dd1) max(dd2)];
@@ -240,9 +244,9 @@ else
     ct = length(f1);
     for i = 1:lnk
         ct = ct+1;
-        y1 = [ci1(i,:); ci2(i,:);];
+        y1 = [oi1(i,:); oi2(i,:);];
         y2 = [tt1(i,:); tt2(i,:);];
-        f1(ct) = plotcon(N,abs(y1-y1(:,end)),'$N$','$\ | \ c_i - c_{0,i}\ |$',nam);
+        f1(ct) = plotcon(N,abs(y1-y1(:,end)),'$N$',pltylab,nam);
         xlim([N(1) N(end)]);
         ylim([1e-17 1e-3]);
         expfig([subFolder '/' sprintf('lam%03.0f_sing',100*lambda_nd(i))]);
@@ -250,28 +254,28 @@ else
 end
 
 %% Balancing
-ci1 = nan(lnk,length(nh));
-ci2 = ci1;
+oi1 = nan(lnk,length(nh));
+oi2 = oi1;
 tic;
 parfor i = 1:lnk
     nloop = N;
     for j = 1:lnn
-        case1 = wMorland(100,h(i),ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow);
+        case1 = wMorland(100,h(i),ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow,Re);
         addvar = struct('zL1',case1.invbf(c0(i)),'eps',epss);
         case1.N = nloop(j);
-        c = solver(bbc,case1,alg, de_singularize, 'n', eig_spectrum, f, addvar);
-        ci1(i,j) = imag(c(1));
-        c = solver(bbc,case1,alg, de_singularize, 'y', eig_spectrum, f, addvar);
-        ci2(i,j) = imag(c(1));
+        o = solver(bbc,case1,alg, de_singularize, 'n', eig_spectrum, f, addvar);
+        oi1(i,j) = imag(o(1));
+        o = solver(bbc,case1,alg, de_singularize, 'y', eig_spectrum, f, addvar);
+        oi2(i,j) = imag(o(1));
     end
 end
 toc;
 % Analyze convergence
 dd1 = []; dd2 = [];
 for i = 1:lnk
-    dtemp = abs(ci1(i,:)-ci1(i,end));
+    dtemp = abs(oi1(i,:)-oi1(i,end));
     dd1(i) = sum(dtemp(end-4:end));
-    dtemp = abs(ci2(i,:)-ci2(i,end));
+    dtemp = abs(oi2(i,:)-oi2(i,end));
     dd2(i) = sum(dtemp(end-4:end));
 end
 ind = [max(dd1) max(dd2)];
@@ -287,9 +291,9 @@ nam = ["original" "balanced"];
 ct = length(f1);
 for i = 1:lnk
     ct = ct+1;
-    y1 = [ci1(i,:); ci2(i,:);];
+    y1 = [oi1(i,:); oi2(i,:);];
     y2 = [tt1(i,:); tt2(i,:);];
-    f1(ct) = plotcon(N,abs(y1-y1(:,end)),'$N$','$\ | \ c_i - c_{0,i}\ |$',nam);
+    f1(ct) = plotcon(N,abs(y1-y1(:,end)),'$N$',pltylab,nam);
     xlim([N(1) N(end)]);
     ylim([1e-17 1e-3]);
     expfig([subFolder '/' sprintf('lam%03.0f_bal',100*lambda_nd(i))]);
@@ -305,7 +309,7 @@ fid = fopen([subFolder '/_caseinfo.txt'],'a');
 fprintf(fid, '\n%s\n','New:');
 fprintf(fid,'%15s %10s\n','Base flow',bflow);
 fprintf(fid,'%15s %.1e\n','Re',Re);
-fprintf(fid,'%15s %15s\n','B.B.C.','Exponential decay');
+fprintf(fid,'%15s %15s\n','B.B.C.',Bbc);
 fprintf(fid,'%15s %1.1f wavelength\n','h',nh0);
 fprintf(fid,'%15s %10s\n','DDM method',func2str(f));
 fprintf(fid,'%15s %4s\n','GEP solver',alg);
@@ -329,47 +333,47 @@ ylabel(yl,'fontsize',36);
 legend('location','northeast');
 end
 
-function [ci, Nc] = convgmode(N, case1, alg, de_singularize, do_balancing, eig_spectrum, f, addvar)
+function [oi, Nc] = convgmode(N, case1, alg, de_singularize, do_balancing, eig_spectrum, f, addvar)
     Nc = N(end);
-    ctemp = 0;
+    otemp = 0;
     for i = 1:length(N)
         case1.N = N(i);
-        c = case1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
-        ci = imag(c);
+        o = case1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
+        oi = imag(o);
         if ~isnan(case1.zc)
             addvar.zL1 = case1.zc;
             if i~=1
-                if (abs((ci-ctemp)/ci)<1e-8 || i == length(N))
+                if (abs(oi-otemp)<1e-8 || i == length(N))
                     Nc = N(i);
                     break;
                 else
-                    ctemp = ci;
+                    otemp = oi;
                 end
             else
-                ctemp = imag(c);
+                otemp = oi;
             end
         end
     end
 end
 
-function [ci, Nc] = convgmode2(N, case1, alg, de_singularize, do_balancing, eig_spectrum, f, addvar)
+function [oi, Nc] = convgmode2(N, case1, alg, de_singularize, do_balancing, eig_spectrum, f, addvar)
     Nc = N(end);
-    ctemp = 0;
+    otemp = 0;
     for i = 1:length(N)
         case1.N = N(i);
-        c = case1.solver2(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
-        ci = imag(c);
+        o = case1.solver2(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
+        oi = imag(o);
         if ~isnan(case1.zc)
             addvar.zL1 = case1.zc;
             if i~=1
-                if (abs((ci-ctemp)/ci)<1e-8 || i == length(N))
+                if (abs(oi-otemp)<1e-8 || i == length(N))
                     Nc = N(i);
                     break;
                 else
-                    ctemp = ci;
+                    otemp = oi;
                 end
             else
-                ctemp = imag(c);
+                otemp = oi;
             end
         end
     end

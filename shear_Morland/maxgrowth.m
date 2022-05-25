@@ -3,14 +3,14 @@ if ~contains(path,'code_Morland;')
     addpath('code_Morland');
 end
 %% Set Solver & Algorithm
-[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,ud_nd,~,~,~,~,f,epss] = pars_Morland;
+[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,ud_nd,~,~,~,~,f,epss,Re] = pars_Morland;
 dt = linspace(0.01,0.8,40);
 lnx = length(dt);
 lam = linspace(0.01,2.5,40);
 lny = length(lam);
 
 %% Run solver
-c = nan(lnx,lny);
+o = nan(lnx,lny);
 k = repmat(2*pi./lam,lnx,1);
 tic;
 parfor j = 1:lny
@@ -18,13 +18,13 @@ parfor j = 1:lny
     c0 = min(pi+pi./lam(j)^2, 0.99*ud_nd);
     dtj = dt;
     for i = 1:lnx
-        case1 = wMorland(N,h,ud_nd,dtj(i),lam(j),method,bflow);
+        case1 = wMorland(N,h,ud_nd,dtj(i),lam(j),method,bflow,Re);
         addvar = struct('zL1',case1.invbf(c0),'eps',epss);
-        c1 = case1.solver_RE(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
-        c(i,j) = c1(1);
+        o1 = case1.solver_RE(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
+        o(i,j) = o1(1);
     end
 end
-o = c.*k;
+c = o./k;
 toc;
 
 % %% Plot growth rate
@@ -75,7 +75,7 @@ for i = 1:lnx2
     for j = 1:lny2
         if ~isnan(F2(i,j))
             h =2*lam2(j);
-            case1 = wMorland(N,h,ud_nd,dt2(i),lam2(j),method,bflow);
+            case1 = wMorland(N,h,ud_nd,dt2(i),lam2(j),method,bflow,Re);
             zL1(i,j) = case1.invbf(F2(i,j));
         end
     end
@@ -90,7 +90,7 @@ parfor j = 1:lny2
     dtj = dt2;
     for i = 1:lnx2
         if ~isnan(zL1(i,j))
-            case1 = wMorland(N,h,ud_nd,dtj(i),lam2(j),method,bflow);
+            case1 = wMorland(N,h,ud_nd,dtj(i),lam2(j),method,bflow,Re);
             addvar = struct('zL1',zL1(i,j),'eps',epss);
             c1 = case1.solver_RE(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
             c2(i,j) = c1(1);

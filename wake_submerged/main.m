@@ -58,7 +58,7 @@ titext = sprintf('$k=%.2f%+.2fi$',real(k),imag(k));
 title(titext);
 
 %% Plot modeshape
-% [z, phi] = case1.getprop('modeshape',an_c(:,1));
+[z, phi] = case1.getprop('modeshape',an_c(:,1));
 % phi = -phi;
 figtitle = ["$\phi$", "$\phi_ z$", "$\phi_ {zz}$"];
 xlab = {'$magnitude$','$angle$','$real$','$imag$'};
