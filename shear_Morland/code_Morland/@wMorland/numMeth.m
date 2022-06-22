@@ -1,5 +1,4 @@
 function numMeth(obj,meth)
-     obj.setprop('Re',obj.Re);
 %     % inviscid
 %     obj.method = ["Ray"];
 %     obj.ord = 2;

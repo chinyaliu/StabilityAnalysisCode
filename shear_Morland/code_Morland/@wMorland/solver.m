@@ -29,10 +29,10 @@ for i = 1:it
         sinB = all(abs(B)<eps,2);
         B(sinB,:) = A(sinB,:)/er;
     end
-    sinA = all(abs(A)<eps,2);
-    if sum(sinA) > 0
-        A(sinA,:) = B(sinA,:)*er;
-    end
+%     sinA = all(abs(A)<eps,2);
+%     if sum(sinA) > 0
+%         A(sinA,:) = B(sinA,:)*er;
+%     end
     % Solve for the eigenvalue(s)
     if nargout > 2
         [o,an,vout{:}] = solfunc(A,B,eigspec,alg);
@@ -49,7 +49,7 @@ for i = 1:it
     end
     c = o/obj.k;
     % Determine if the eigenvalue of largest imaginary part converge
-    c_good = imag(o(1))>1e-8 && real(c(1)) > 0 && real(c(1)) < 1;
+    c_good = imag(o(1))>1e-8 && real(c(1)) > 0 && real(c(1)) < obj.ud;
     if(abs(c_temp*obj.k-o(1)) < 1e-8) % converged
         fprintf('converged to zL = %.8f\n', obj.zc);
         break;

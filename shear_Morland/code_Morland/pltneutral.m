@@ -1,5 +1,4 @@
 function f = pltneutral(ud,dltlist,varargin)
-lam = findneutral(ud,dltlist);
 if ~isempty(varargin)
     f = varargin{1};
     ax = get(f,'CurrentAxes');
@@ -9,7 +8,9 @@ else
 end
 hold(ax,'on');
 for i = 1:length(dltlist)
-    plot(ax, dltlist(i),lam{i},'r.','Markersize',4);
+    [lam1,lam2] = findneutral(ud,dltlist(i));
+    plot(ax, dltlist(i),lam1,'k.','Markersize',4);
+    plot(ax, dltlist(i),lam2,'k.','Markersize',4);
 end
 hold(ax,'off');
 end

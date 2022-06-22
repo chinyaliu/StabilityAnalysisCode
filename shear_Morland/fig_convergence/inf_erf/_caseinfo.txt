@@ -1,0 +1,27 @@
+Initial:
+      Base flow error function
+             Re Inf
+         B.B.C. Exponential decay
+              h 2.0 wavelength
+     DDM method ddmtype/setN4test4
+     GEP solver invB
+      Balancing n
+ De-singularize y
+Test Case:
+     ud   delta  lambda
+  1.750   0.299   0.823
+  2.000   0.234   0.764
+  2.250   0.187   0.707
+  2.500   0.150   0.649
+========================================
+
+New:
+      Base flow error function
+             Re Inf
+         B.B.C. Exponential decay
+              h 2.0 wavelength
+     DDM method ddmtype/setN4test4
+     GEP solver invB
+      Balancing n
+ De-singularize y
+========================================

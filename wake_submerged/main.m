@@ -3,7 +3,7 @@ if ~contains(path,'code_wake;')
     addpath('code_wake');
 end 
 %% Set Solver & Algorithm
-[method,alg,bflow,de_singularize,do_balancing,~,N,H,k,Fr2,Re,eps,c0,h,f] = pars_wake;
+[method,alg,bflow,de_singularize,do_balancing,~,N,H,k,Fr2,Re,eps,c0,h,f] = pars_wake(1,'inv');
 eig_spectrum = 'all';
 
 %% Run solver
@@ -20,10 +20,11 @@ toc(t1);
 
 %% Choose eigenvalue
 a = 1:length(c); 
-crange = ((real(c)-0.0012>-1e-5) & (real(c)-1<=1e-7));
-aa = a(crange);
-abch = isoutlier(imag(c(aa)),'movmedian',5);
-aa = [a(~crange) aa(abch)];
+cneg = (real(c)-0.0012>-1e-5);
+ccont = (real(c)<=1-1e-4);
+aa = a(cneg & ccont);
+abch = isoutlier(imag(c(aa)),'movmedian',10);
+aa = [a(~cneg) aa(abch)];
 % aa = aa(abch);
 o_chosen = o(aa); c_chosen = c(aa);
 an_c = an(:,aa);

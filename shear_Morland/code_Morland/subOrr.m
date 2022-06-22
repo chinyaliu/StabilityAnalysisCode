@@ -12,7 +12,8 @@ classdef subOrr < subdomain
         function [A, B] = BC0(obj,N)
             k = obj.pFlow.k;
             Re = obj.pFlow.Re;
-            c0 = obj.pFlow.k^2/4/pi+pi; % Non-dimensional constant in DFSBC
+            c0 = pi; % Neglect surface tension
+%             c0 = obj.pFlow.k^2/4/pi+pi; % Non-dimensional constant in DFSBC
             Abc = [[k*obj.D(1,:,1) k*obj.U(1,1)];...
                 [obj.D(1,:,3)+k^2*obj.D(1,:,1) obj.U(1,3)];...
                 [1i*obj.D(1,:,4)/Re+(k*obj.U(1,1)-3*1i*k^2/Re)*obj.D(1,:,2)-k*obj.U(1,2)*obj.D(1,:,1) k*c0]];

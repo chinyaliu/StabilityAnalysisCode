@@ -23,8 +23,8 @@ for i = 1:it
     % Construct matrix A B
     [A,B] = obj.makeAB();
     % De-singularize
+    er = -200;
     if strcmpi(des,'y')
-        er = -200;
         sinB = all(B<eps,2);
         B(sinB,:) = A(sinB,:)/er;
     end
@@ -34,19 +34,22 @@ for i = 1:it
     else
         [o,an] = solfunc(A,B,eigspec,alg);
     end
+    % Discard artificial eigenvalues(if exists)
+    o = o(real(o)>0.8*er); 
+    an = an(:,real(o)>0.8*er);
     % Determine if the eigenvalue of largest imaginary part converge
     c = o(1)/obj.k;
     c_good = imag(c(1)*obj.k)>1e-8 && real(c(1)) > 0 && real(c(1)) < 1;
     if(abs(c_temp-c(1)) < 1e-8) % converged
-        fprintf('converged to zL = %.8f\n', obj.zc);
+%         fprintf('converged to zL = %.8f\n', obj.zc);
         break;
     elseif(c_good && i ~= it && obj.invbf(real(c(1)))<obj.h) % keep iterating
-        fprintf('iter %2d, zL = %.8f\n', i, obj.zc);
+%         fprintf('iter %2d, zL = %.8f\n', i, obj.zc);
         c_temp = c(1);
         obj.zc = obj.invbf(real(c(1)));
     else
         obj.zc = nan;
-        fprintf('Didn''t converge.\n');
+%         fprintf('Didn''t converge.\n');
         break;
     end
     % Update the subdomains with eigenvalues of this iteration

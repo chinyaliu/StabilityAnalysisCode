@@ -22,19 +22,21 @@ ylabel('$\tilde{c_0}/\tilde{u_d}\quad$','rotation',0);
 
 %% Plot fast
 ud = 2;
-dlt_list = linspace(0,0.8,1000);
+dlt_list = [linspace(0,0.18,500) linspace(0.18,0.8,700)];
 fx = @(x,y) [4*x^2+pi*y 0 -4*pi*y*x^4+4*x^2+2*pi*y 0 pi*y];
-% f = figure('position',[150 100 720 640]);
+f = figure('position',[150 100 720 640]);
 hold on;
 for dlt = dlt_list
     polylam = fx(ud,dlt);
     lamm = roots(polylam);
     lamm = real(lamm(imag(lamm)<eps & real(lamm)>-eps));
-    plot(dlt,lamm,'r.','Markersize',4);
+    plot(dlt,lamm,'k.','Markersize',4);
 end
-hold off; 
-% grid on;axis square;
+hold off; box on; 
+set(gca,'XMinorTick','on','YMinorTick','on');
 ylim([0 2.5]);
 xlabel('$\Delta$');
 ylabel('$\lambda\quad$','rotation',0);
-title(sprintf('$u_d=%1.1f$',ud));
+text(0.4,1,'Unstable','fontsize',24,'Color','red');
+text(0.15,0.075,'Stable','fontsize',24,'Color','blue');
+text(0.1,1.8,'Stable','fontsize',24,'Color','blue');

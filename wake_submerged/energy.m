@@ -22,7 +22,7 @@ for i = 1:length(k)
 
     % Calculate energy
     chm = 1;
-    if imag(o(chm))>0 && real(o(chm))>0
+    if imag(o_chosen(chm))>0% && real(o(chm))>0
         if i == 1
             [ENG(i),f1] = plotenergy(case1, "res", o_chosen(chm), an_c(:,chm));
             [~,f2] = plotenergy(case1, "resz", o_chosen(chm), an_c(:,chm));
@@ -62,13 +62,15 @@ function [ENG, f1] = plotenergy(case1, engname, o, an, varargin)
 [ENG,z] = energy_boomkamp(case1, o, an);
 if isempty(varargin)
     f1 = figure('position', [0 0 360 720]);
-    plot(ENG.(engname), z, 'k', 'linewidth', 2, 'DisplayName', num2str(case1.k,'$%.2f$'));
+    plot(ENG.(engname), z, 'color', [0.93,0.00,0.00], 'linewidth', 3, 'DisplayName', num2str(case1.k,'$%.2f$'));
+%     plot(ENG.(engname), z, 'k', 'linewidth', 2, 'DisplayName', num2str(case1.k,'$%.2f$'));
     hold on;
-%     zc = case1.zc;
-    yf(1) = xline(0, 'color', '#bdbdbd');
-    yf(2) = yline(-0.74708299-case1.H, '--', 'color', '#636363');
+    zc = case1.zc;
+    yf(1) = xline(0, '--', 'color', '#bdbdbd');
+    yf(2) = yline(-0.74708299-case1.H, ':', 'color', '#636363');
 %     yf(2) = yline(-0.74708299-case1.H, '--k');
 %     yf(3) = yline(-zc, 'color', [0.00,0.57,0.00]);
+    yf(3) = yline(-zc, '--', 'color', [0.93,0.00,0.00]);
 %     yf(4) = yline(-case1.H, '--', 'color', [0.00,0.57,0.00]);
 %     yf(5) = yline(zc-2*case1.H, 'color', [0.00,0.57,0.00]);
     hold off; box on;
@@ -90,7 +92,9 @@ else
     axf1 = get(f1,'CurrentAxes');
     hnum = length(findobj(axf1, 'Type','Line'));
     hold(axf1,'on');
-    plot(axf1, ENG.(engname), z, 'k', 'linewidth', 2, 'linestyle', ls{hnum}, 'DisplayName', num2str(case1.k,'$%.2f$'));
+    plot(axf1, ENG.(engname), z, 'color', [0.00,0.57,0.00], 'linewidth', 3, 'DisplayName', num2str(case1.k,'$%.2f$'));
+    yline(axf1,-case1.zc, '--', 'color', [0.00,0.57,0.00],'linewidth',2,'HandleVisibility','off');
+%     plot(axf1, ENG.(engname), z, 'k', 'linewidth', 2, 'linestyle', ls{hnum}, 'DisplayName', num2str(case1.k,'$%.2f$'));
 %     yline(axf1,-case1.zc, 'color', [0.00,0.57,0.00],'linewidth',2.5,'HandleVisibility','off');
     hold(axf1,'off');
 end

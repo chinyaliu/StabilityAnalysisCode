@@ -8,14 +8,14 @@ function [lambda,maximum_c] = findmaxgrowth(init_var, sol_vars, cut, varargin)
         maximum_c = NaN;
     else
         inrange = @(lam) lam<=inimax & lam>=inimin;
-        if length(varargin) == 1
-            lamR = 0.5*min(inimax-varargin{1},varargin{1}-inimin);
+        if ~isempty(varargin)
             lamguess = varargin{1};
+            lamR =  varargin{2};
         else
-            lamR = 0.5*(inimin+inimax);
-            lamguess = 0.5*(inimax-inimin);
+            lamguess = 0.5*(inimax+inimin);
+            lamR = 0.5*(inimax-inimin);
         end
-        sol_vars{end}.zL1 = -case1.criticalH(sqrt(0.5*(lamguess+1./lamguess)));
+        sol_vars{end}.zL1 = flow1.invbf(sqrt(0.5*lamguess));
         [lambda, maximum_c] = maxgrowth(lamguess, lamR);
     end
 
@@ -27,23 +27,24 @@ function [lambda,maximum_c] = findmaxgrowth(init_var, sol_vars, cut, varargin)
             lam = lambda_list(i);
             fprintf('wavelength = %.5f\n', lam);
             flow1.k = 2*pi/lam;
-            flow1.h = 3*lam;
-            c = flow1.solvers(sol_vars{:});
+            flow1.h = 2*lam;
+            o = flow1.solver(sol_vars{:});
+            c = o./flow1.k;
             if crange(c) < clim % Howard's semicircle theorm
                 c_list(i) = c;
             end
             if ~isnan(flow1.zc)
-                sol_vars{end}.zL1 = -flow1.zc;
+                sol_vars{end}.zL1 = flow1.zc;
             end
         end
         % Select the indice of lambda_list with the largest imaginary part of eigenvalue
         [~,ind] = max(imag(c_list)./lambda_list);
         % Decide if lambda converges, if not recursively call this function
-        if abs(lambda_list(ind)-templam)<1e-6 && ~isnan(c_list(ind))
+        if abs(lambda_list(ind)-templam)<1e-8 && ~isnan(c_list(ind))
             maxlam = lambda_list(ind);
             maxc = c_list(ind);
         else
-            if dlam < 1e-10 || ~inrange(lambda_list(ind)) || isnan(c_list(ind))
+            if dlam < 1e-8 || ~inrange(lambda_list(ind)) || isnan(c_list(ind))
                 maxlam = NaN;
                 maxc = NaN;
             else

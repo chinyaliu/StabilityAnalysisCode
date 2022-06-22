@@ -3,13 +3,12 @@ if ~contains(path,'code_Morland;')
     addpath('code_Morland');
 end
 %% Set Solver & Algorithm
-[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,ud_nd,delta_nd,lambda_nd,c0,h,f,epss,Re] = pars_Morland;
+[method,alg,bflow,de_singularize,do_balancing,eig_spectrum,N,ud_nd,delta_nd,lambda_nd,c0,h,f,epss,Re] = pars_Morland(5,'vis');
 fprintf('u_d = %1.2f, delta = %1.3f, lambda = %1.3f\n',ud_nd,delta_nd,lambda_nd);
 
 %% Run solver
 t1 = tic;
 case1 = wMorland(N,h,ud_nd,delta_nd,lambda_nd,method,bflow,Re);
-% case1.setprop('k',case1.k-0.5i);
 addvar = struct('zL1',case1.invbf(c0),'eps',epss);
 [o,an] = case1.solver(alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
 toc(t1);
@@ -19,10 +18,13 @@ c = o./k;
 %% Choose eigenvalue
 a = 1:length(c); 
 crange = ((real(c)>-1e-5) & (real(c)-ud_nd<=1e-5));
-aa = a(crange);
-abch = isoutlier(imag(c(aa)),'movmedian',5);
-aa = [aa(abch) a(~crange)];
-% aa = aa(abch);
+cimag = imag(c)>-1;
+aa = a(crange&cimag);
+abci = isoutlier(imag(c(aa)),'movmedian',5);
+abcr = isoutlier(real(c(aa)),'movmedian',20);
+aa = [aa(abci|abcr) a(~crange)];
+[~, ind] = sort(imag(c(aa)),'descend');
+aa = aa(ind);
 o_chosen = o(aa); c_chosen = c(aa);
 an_c = an(:,aa);
 
@@ -35,9 +37,12 @@ scatter(real(c_chosen),imag(c_chosen),'b','filled');
 hold off;
 xlabel('$c_r$','fontsize',30);
 ylabel('$c_i$','fontsize',30,'rotation',0, 'HorizontalAlignment','right');
-ymax = max(abs(imag(c)));
+ymax = imag(c_chosen(1));
+ymin = imag(c_chosen(end));
 if ymax>0
-    ylim([-1.5*ymax 1.5*ymax]);
+    ylim([1.5*ymin 2*ymax]);
+else
+    ylim([-1 0.05]);
 end
 titext = sprintf('$k=%.2f%+.2fi$',real(k),imag(k));
 title(titext);

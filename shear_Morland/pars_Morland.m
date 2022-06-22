@@ -6,15 +6,15 @@ solveGEPmeth = ["qr", "qz", "eig", "invB"];
 alg = solveGEPmeth(4);
 baseflowlist = ["exponential", "error function"];
 bflow = baseflowlist(1);
-de_singularize = 'y';
 do_balancing = 'y';
-eig_spectrum = 'max';
+de_singularize = 'y';
+eig_spectrum = 'all';
 N = 600;
-Re = 5000;
+Re = inf;
 ud_nd = 2;
 delta_nd = 0.291;
 % lam_nd = 0.817;
-lam_nd = 1.35;
+lam_nd = 30;
 % delta_nd = 0.234;
 % lam_nd = 0.764;
 ddm_number = 1;
@@ -33,13 +33,40 @@ if ~isempty(varargin)
             delta_nd = [0.299 0.234 0.187 0.150];
             lam_nd = [0.823 0.764 0.707 0.649]; 
         case(3)
-            lam_nd = [0.7 0.88 1.18];
-%             lam_nd = [0.45 0.82 1.35];
-        case(4)
-            lam_nd = linspace(0.01,2,300);
+            lam_nd = [0.4 0.817 1.4];
+%             lam_nd = linspace(0.01,2,300);
+        case(5)
+            u = 30;
+            lam = 4;
+            [ud_nd,delta_nd,lam_nd,Re] = wtoMor(u,lam);
+        case(6)
+            u = [30 30 80 80];
+            lam = [4 20 4 20];
+            for i = 1:length(u)
+                [ud_nd(i),delta_nd(i),lam_nd(i),Re(i)] = wtoMor(u(i),lam(i));
+            end
     end
 end
 h = 2*lam_nd;
-c0 = min(sqrt(0.5*lam_nd), 0.99*ud_nd);
+c0 = min(sqrt(0.5*(lam_nd+1./lam_nd)), 0.99*ud_nd);
+if length(varargin)>1
+    switch(lower(varargin{2}))
+        case 'inv'
+            Re = inf;
+            f = wMorland.ddmtype(44);
+            alg = solveGEPmeth(4);
+            do_balancing = 'n';
+            de_singularize = 'y';
+            N = 600;
+            h = 2*lam_nd;
+        case 'vis'
+            f = wMorland.ddmtype(1);
+            alg = solveGEPmeth(1);
+            do_balancing = 'y';
+            de_singularize = 'n';
+            N = 400;
+            h = 1*lam_nd;
+    end
+end
 
 end

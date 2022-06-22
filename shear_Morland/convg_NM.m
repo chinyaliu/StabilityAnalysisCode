@@ -3,7 +3,7 @@ if ~contains(path,'code_Morland;')
     addpath('code_Morland');
 end 
 %% Solver & Algorithm list
-[method,alg,bflow,de_singularize,do_balancing,~,~,ud_nd,delta_nd,lambda_nd,c0,h,f,epss,Re] = pars_Morland(3);
+[method,alg,bflow,de_singularize,do_balancing,~,~,ud_nd,delta_nd,lambda_nd,c0,h,f,epss,Re] = pars_Morland(6);
 N = 100:100:1500;
 eig_spectrum = 'max';
 lnk = length(lambda_nd);
@@ -12,6 +12,9 @@ hh = h(1)/lambda_nd(1);
 if length(ud_nd)==1
     ud_nd = ud_nd*ones(1,lnk);
     delta_nd = delta_nd*ones(1,lnk);
+end
+if length(Re) == 1
+    Re = Re*ones(1,lnk);
 end
 pltylab = '$\ | \ \omega_i - \omega_{0,i}\ |$';
 
@@ -27,7 +30,6 @@ end
 fid = fopen([subFolder '/_caseinfo.txt'],'w');
 fprintf(fid, '%s\n','Initial:');
 fprintf(fid,'%15s %10s\n','Base flow',bflow);
-fprintf(fid,'%15s %.1e\n','Re',Re);
 fprintf(fid,'%15s %15s\n','B.B.C.','Exponential decay');
 fprintf(fid,'%15s %1.1f wavelength\n','h',hh);
 fprintf(fid,'%15s %10s\n','DDM method',func2str(f));
@@ -35,9 +37,9 @@ fprintf(fid,'%15s %4s\n','GEP solver',alg);
 fprintf(fid,'%15s %1s\n','Balancing',do_balancing);
 fprintf(fid,'%15s %1s\n','De-singularize',de_singularize);
 fprintf(fid, '%s\n','Test Case:');
-fprintf(fid,'%7s %7s %7s\n','ud','delta','lambda');
+fprintf(fid,'%7s %7s %7s %7s\n','ud','delta','lambda','Re');
 for i = 1:lnk
-    fprintf(fid,'%7.3f %7.3f %7.3f\n',ud_nd(i),delta_nd(i),lambda_nd(i));
+    fprintf(fid,'%7.3f %7.3f %7.3f %.1e\n',ud_nd(i),delta_nd(i),lambda_nd(i),Re(i));
 end
 fprintf(fid,'%s\n',repelem('=',40));
 fclose(fid);
@@ -53,7 +55,7 @@ parfor i = 1:lnk
     nhloop = nh;
     for j = 1:lnh
         htemp = nhloop(j)*lambda_nd(i);
-        case1 = wMorland(100,htemp,ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow,Re);
+        case1 = wMorland(100,htemp,ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow,Re(i));
         addvar = struct('zL1',case1.invbf(c0(i)),'eps',epss);
         [oih1(i,j), Nh1(i,j)] = convgmode(N, case1, alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
         [oih2(i,j), Nh2(i,j)] = convgmode2(N, case1, alg, de_singularize, do_balancing, eig_spectrum, f, addvar);
@@ -63,7 +65,7 @@ toc;
 % Analyze convergence
 dd1 = []; dd2 = [];
 for i = 1:lnk
-    dtemp = diff(abs(oih1(i,:)-oih1(i,end)));
+    dtemp = abs(diff(abs(oih1(i,:)-oih1(i,end))));
     dd1(i) = find(dtemp<5*dtemp(end-1),1,'first');
     dtemp = diff(abs(oih2(i,:)-oih2(i,end)));
     dd2(i) = find(dtemp<5*dtemp(end-1),1,'first');
@@ -98,7 +100,7 @@ tic;
 parfor i = 1:lnk
     nloop = N;
     for j = 1:lnn
-        case1 = wMorland(100,h(i),ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow,Re);
+        case1 = wMorland(100,h(i),ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow,Re(i));
         addvar = struct('zL1',case1.invbf(c0(i)),'eps',epss);
         case1.N = nloop(j);
         o = solver(bbc,case1,alg,de_singularize, do_balancing, eig_spectrum, wMorland.ddmtype(1), addvar);
@@ -154,7 +156,7 @@ parfor i = 1:lnk
     algloop = ["eig", "qr", "invB"];
     nloop = N;
     for j = 1:lnn
-        case1 = wMorland(100,h(i),ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow,Re);
+        case1 = wMorland(100,h(i),ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow,Re(i));
         addvar = struct('zL1',case1.invbf(c0(i)),'eps',epss);
         case1.N = nloop(j);
         t1 = tic;
@@ -213,7 +215,7 @@ else
     parfor i = 1:lnk
         nloop = N;
         for j = 1:lnn
-            case1 = wMorland(100,h(i),ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow,Re);
+            case1 = wMorland(100,h(i),ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow,Re(i));
             addvar = struct('zL1',case1.invbf(c0(i)),'eps',epss);
             case1.N = nloop(j);
             o = solver(bbc,case1,alg, 'n', do_balancing, eig_spectrum, f, addvar);
@@ -260,7 +262,7 @@ tic;
 parfor i = 1:lnk
     nloop = N;
     for j = 1:lnn
-        case1 = wMorland(100,h(i),ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow,Re);
+        case1 = wMorland(100,h(i),ud_nd(i),delta_nd(i),lambda_nd(i),method,bflow,Re(i));
         addvar = struct('zL1',case1.invbf(c0(i)),'eps',epss);
         case1.N = nloop(j);
         o = solver(bbc,case1,alg, de_singularize, 'n', eig_spectrum, f, addvar);
@@ -308,7 +310,6 @@ end
 fid = fopen([subFolder '/_caseinfo.txt'],'a');
 fprintf(fid, '\n%s\n','New:');
 fprintf(fid,'%15s %10s\n','Base flow',bflow);
-fprintf(fid,'%15s %.1e\n','Re',Re);
 fprintf(fid,'%15s %15s\n','B.B.C.',Bbc);
 fprintf(fid,'%15s %1.1f wavelength\n','h',nh0);
 fprintf(fid,'%15s %10s\n','DDM method',func2str(f));
@@ -342,16 +343,16 @@ function [oi, Nc] = convgmode(N, case1, alg, de_singularize, do_balancing, eig_s
         oi = imag(o);
         if ~isnan(case1.zc)
             addvar.zL1 = case1.zc;
-            if i~=1
-                if (abs(oi-otemp)<1e-8 || i == length(N))
-                    Nc = N(i);
-                    break;
-                else
-                    otemp = oi;
-                end
+        end
+        if i~=1
+            if (abs(oi-otemp)<1e-8 || i == length(N))
+                Nc = N(i);
+                break;
             else
                 otemp = oi;
             end
+        else
+            otemp = oi;
         end
     end
 end
@@ -365,16 +366,16 @@ function [oi, Nc] = convgmode2(N, case1, alg, de_singularize, do_balancing, eig_
         oi = imag(o);
         if ~isnan(case1.zc)
             addvar.zL1 = case1.zc;
-            if i~=1
-                if (abs(oi-otemp)<1e-8 || i == length(N))
-                    Nc = N(i);
-                    break;
-                else
-                    otemp = oi;
-                end
+        end
+        if i~=1
+            if (abs(oi-otemp)<1e-8 || i == length(N))
+                Nc = N(i);
+                break;
             else
                 otemp = oi;
             end
+        else
+            otemp = oi;
         end
     end
 end

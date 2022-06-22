@@ -6,7 +6,7 @@ classdef wMorland < handle
         N = 400;                  % Number of collocation points
     end
     properties (SetAccess = private)
-        Re = inf;                 % Reynolds number
+        Re = 0;                 % Reynolds number
         zc;                       % Critical height
         subD; subDclass;          % Subdomains and its corresponding class function 
         method;                   % Numerical methods, set by @numMeth
@@ -20,8 +20,9 @@ classdef wMorland < handle
         function obj = wMorland(N, h, ud, delta, lambda, meth, bf, Re)
             if (nargin >= 8)
                 obj.N = N; obj.k = 2*pi/lambda; obj.h = h;
-                obj.ud = ud; obj.delta = delta; obj.Re = Re;
+                obj.ud = ud; obj.delta = delta;
                 obj.method = strings(1,2);
+                obj.setprop('Re',Re);
                 obj.numMeth(meth);
                 obj.setbaseflow(bf);
             end
@@ -59,6 +60,8 @@ classdef wMorland < handle
                     num = num + obj.subD(i).N + 1;
                 end
                 varargout{1} = phi;
+            case 'lambda'
+                out = 2*pi/obj.k;
             otherwise
                 error('Invalid input for function getprop()');
             end
@@ -73,17 +76,19 @@ classdef wMorland < handle
             for i = 1:length(nam)
                 switch nam{i}
                 case 'Re'
-                    obj.Re = val{i};
-                    if isinf(val{i})
-                        obj.method(1) = "Ray";
-                        obj.subDclass = @subRay;
-                        obj.ord = 2;
-                    else
-                        obj.method(1) = "d4";
-                        obj.subDclass = @subOrr;
-                        obj.ord = 4;
+                    if val{i}~=obj.Re
+                        obj.Re = val{i};
+                        if isinf(val{i})
+                            obj.method(1) = "Ray";
+                            obj.subDclass = @subRay;
+                            obj.ord = 2;
+                        else
+                            obj.method(1) = "d4";
+                            obj.subDclass = @subOrr;
+                            obj.ord = 4;
+                        end
+                        obj.subD = obj.subDclass(); % initialize
                     end
-                    obj.subD = obj.subDclass(); % initialize
                 case 'method'
                     obj.numMeth(val{i});
                 case 'baseflow'
